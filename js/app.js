@@ -677,6 +677,9 @@ function tdRow(cells){
     return '<td class="'+(i===0?'rank':'')+'">'+c+'</td>';
   }).join('')+'</tr>';
 }
+function noDataRow(cols,msg){
+  return '<tr class="norow-row"><td class="norow" colspan="'+cols+'">'+msg+'</td></tr>';
+}
 async function hydrateTable(){
   var tbl=document.getElementById('stbl');
   if(!tbl) return;
@@ -684,29 +687,34 @@ async function hydrateTable(){
   if(!key || !NeroAPI.enabled()) return;          /* keep placeholder rows */
 
   var d=await NeroAPI.get(key);
-  if(!d) return;
-  var rows=[], i=1;
+  if(!d) return;                                  /* API unreachable: keep placeholder rows */
+  var rows=[], i=1, cols=tbl.rows[0].cells.length;
 
   if(key==='zeny' && Array.isArray(d)){
     d.forEach(function(r){
       rows.push(tdRow([i++, r.name, fmtNum(r.zeny), r.base_level, r.guild||'—']));
     });
+    tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
+      : noDataRow(cols,'No characters tracked yet — check back once players have started playing.');
   } else if(key==='woe' && d.guilds){
     d.guilds.forEach(function(g){
       rows.push(tdRow([i++, g.name, g.castles, g.average_lv, g.connect_member+' / '+g.max_member]));
     });
+    tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
+      : noDataRow(cols,'No guilds have been created yet — check back once guilds start forming.');
   } else if(key==='mvp'){
-    if(!d.available) return;
+    if(!d.available) return;                      /* keep the honest "no tracking" row already in the HTML */
     d.rows.forEach(function(r){
       rows.push(tdRow([i++, r.name, fmtNum(r.kills), '—', fmtNum(r.kills*2)]));
     });
+    if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
   } else if(key==='pvp'){
-    if(!d.available) return;
+    if(!d.available) return;                      /* keep the honest "no tracking" row already in the HTML */
     d.rows.forEach(function(r){
       rows.push(tdRow([i++, r.name, fmtNum(r.kills), fmtNum(r.deaths), r.kd, fmtNum(r.points)]));
     });
+    if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
   }
-  if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
 }
 
 /* ================= SPA ROUTER ================= */
