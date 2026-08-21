@@ -27,9 +27,9 @@ body.page .sitehead{position:sticky;top:0;z-index:9;background:rgba(7,11,18,.86)
 .hd-logo{height:56px;width:auto;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(0,0,0,.55));transition:transform .25s;flex-shrink:0}
 .hd-logo:hover{transform:scale(1.07)}
 .hd-status{display:flex;align-items:center;gap:12px;flex-shrink:0}
-.hd-time{color:#000;-webkit-text-stroke:0.3px var(--gold);text-shadow:0 0 8px rgba(228,184,75,.7);font-size:13px;white-space:nowrap}
-.hd-peaklbl{color:#000;-webkit-text-stroke:0.3px var(--gold);text-shadow:0 0 8px rgba(228,184,75,.7);font-size:13px;white-space:nowrap}
-.hd-peaklbl b{color:#000;-webkit-text-stroke:0.3px var(--gold);font-weight:600}
+.hd-time{color:#000;-webkit-text-stroke:0.1px var(--gold);text-shadow:0 0 8px rgba(228,184,75,.7);font-size:13px;white-space:nowrap}
+.hd-peaklbl{color:#000;-webkit-text-stroke:0.1px var(--gold);text-shadow:0 0 8px rgba(228,184,75,.7);font-size:13px;white-space:nowrap}
+.hd-peaklbl b{color:#000;-webkit-text-stroke:0.1px var(--gold);font-weight:600}
 .hd-pill{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.8);color:#fff;
  font-size:13px;padding:8px 20px;white-space:nowrap;
  border-radius:20px;border:1px solid var(--gold);box-shadow:0 2px 10px rgba(0,0,0,.35)}
