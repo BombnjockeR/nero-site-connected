@@ -84,6 +84,7 @@ function openPanel(type){
   document.getElementById('pnl-title').textContent=TITLES[type];
   document.getElementById('pnl-body').innerHTML=render(type);
   if(type==='donation') selAmt=null;
+  if(type==='account') loadAccountPanel();
   panel.classList.add('show'); backdrop.classList.add('show');
 }
 function closePanel(){
@@ -192,16 +193,35 @@ function accountHTML(){
   var n=Auth.user()||'Adventurer';
   return `
   <div class="prof-hero"><div class="prof-av">${initials(n)}</div>
-    <div><div class="prof-nm">${n}</div><div class="prof-sub">Member since 2026</div></div></div>
-  <div class="kv"><span>Cash Point</span><span>1,250,000 CP</span></div>
-  <div class="kv"><span>Characters</span><span>3</span></div>
-  <div class="kv"><span>Guild</span><span>Valhalla</span></div>
-  <div class="kv"><span>Status</span><span style="color:#46d17f">Online</span></div>
+    <div><div class="prof-nm">${n}</div><div class="prof-sub" id="pnl-since">—</div></div></div>
+  <div class="kv"><span>Cash Point</span><span id="pnl-cp">—</span></div>
+  <div class="kv"><span>Characters</span><span id="pnl-nchar">—</span></div>
+  <div class="kv"><span>Guild</span><span id="pnl-guild">—</span></div>
+  <div class="kv"><span>Status</span><span id="pnl-status">—</span></div>
   <button class="btn-gold" onclick="openPanel('donation')">Donate / Top Up</button>
   <a class="btn-ghost" href="${ROOT}pages/account.html">Manage Account</a>
   <a class="btn-ghost" href="${ROOT}pages/marketplace.html">My Marketplace Listings</a>
-  <button class="btn-ghost" onclick="doLogout()">Log Out</button>
-  <p class="lead" style="margin-top:16px;font-size:12px">Profile data is placeholder until the backend is connected.</p>`;
+  <button class="btn-ghost" onclick="doLogout()">Log Out</button>`;
+}
+async function loadAccountPanel(){
+  var set=function(id,v,color){
+    var e=document.getElementById(id); if(!e) return;
+    e.textContent=v; if(color!==undefined) e.style.color=color;
+  };
+  var d = await NeroAPI.get('me');
+  if(!d){
+    set('pnl-cp','Not connected'); set('pnl-nchar','—'); set('pnl-guild','—');
+    set('pnl-status','—'); set('pnl-since','—');
+    return;
+  }
+  var chars=d.characters||[];
+  var anyOnline=chars.some(function(c){ return Number(c.online)===1; });
+  var withGuild=chars.filter(function(c){ return c.guild; });
+  set('pnl-cp', fmtNum(d.account.cash_point||0)+' CP');
+  set('pnl-nchar', chars.length);
+  set('pnl-guild', withGuild.length ? withGuild[0].guild : '—');
+  set('pnl-status', anyOnline?'Online':'Offline', anyOnline?'#46d17f':'');
+  set('pnl-since', d.account.registered ? ('Member since '+d.account.registered) : 'Member');
 }
 async function doLogout(){
   if(NeroAPI.enabled()){ await NeroAPI.post('/account.php',{action:'logout'}); }
