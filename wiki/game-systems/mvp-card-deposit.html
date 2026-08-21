@@ -1,0 +1,336 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MVP Card Deposit & Resonance — NeRO</title>
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</head><body class="page">
+<div class="pagebg"><video autoplay muted loop playsinline><source src="../../assets/nero_landingpage.mp4" type="video/mp4"></video><div class="pagebg-veil"></div></div>
+<div id="app">
+<header class="sitehead">
+  <img class="hd-logo" src="../../assets/logo.png" alt="Home" title="Home" onclick="location.href='../../'">
+  <nav class="hd-tabs"><a class="tab on" href="../../wiki/index.html">Wiki</a><a class="tab" href="../../pages/stat-woe.html">WoE</a><a class="tab" href="../../pages/stat-pvp.html">PvP</a><a class="tab" href="../../pages/stat-mvp.html">MVP</a><a class="tab" href="../../pages/stat-zeny.html">Zeny</a><a class="tab" href="../../pages/marketplace.html">Market</a></nav>
+  <div class="hd-right">
+    <div class="hd-online soon"><span class="dot"></span><span class="lbl">Coming Soon</span></div>
+    <div class="hd-acct" id="hd-acct"></div>
+  </div>
+</header>
+<div class="wiki-layout">
+  <nav class="wiki-side" id="wiki-side">
+    <div class="wk-drawer-head"><span>Contents</span>
+      <button class="wk-close" onclick="wikiNav(false)" aria-label="Close menu"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="wk-search"><i class="ti ti-search"></i><input id="wikisearch" placeholder="Search the wiki..." oninput="wikiSearch()" autocomplete="off"></div><div class="wk-results" id="wk-results"></div><div class="wk-nav" id="wk-nav"><a class="wk-home" href="../../wiki/index.html"><i class="ti ti-home"></i> Welcome to NeRO</a><div class="grp">Getting Started</div><a class="" href="../../wiki/getting-started/server-information.html">Server Information</a><a class="" href="../../wiki/getting-started/starter-rewards.html">New Player Start</a><a class="" href="../../wiki/getting-started/player-commands.html">Player Commands</a><a class="" href="../../wiki/getting-started/vip.html">VIP Benefits</a><div class="grp">Game Systems</div><a class="" href="../../wiki/game-systems/refine-system.html">Refine System</a><a class="" href="../../wiki/game-systems/equipment-options/index.html">Equipment Options</a><a class=" sub" href="../../wiki/game-systems/equipment-options/weapon.html">Weapon</a><a class=" sub" href="../../wiki/game-systems/equipment-options/armor.html">Armor</a><a class=" sub" href="../../wiki/game-systems/equipment-options/shield.html">Shield</a><a class=" sub" href="../../wiki/game-systems/equipment-options/garment.html">Garment</a><a class=" sub" href="../../wiki/game-systems/equipment-options/shoes.html">Shoes</a><a class="" href="../../wiki/game-systems/shadow-equipment/index.html">Shadow Equipment</a><a class=" sub" href="../../wiki/game-systems/shadow-equipment/status-sets.html">Status Sets</a><a class=" sub" href="../../wiki/game-systems/shadow-equipment/offense-sets.html">Offense Sets</a><a class=" sub" href="../../wiki/game-systems/shadow-equipment/lifesteal-sets.html">Lifesteal Sets</a><a class=" sub" href="../../wiki/game-systems/shadow-equipment/earring-shadow.html">Earring Shadow</a><a class="" href="../../wiki/game-systems/era-headgear-enchant.html">Era Headgear and Garment Enchant</a><a class="" href="../../wiki/game-systems/gacha-boxes.html">Gacha Boxes</a><a class="active" href="../../wiki/game-systems/mvp-card-deposit.html">MVP Card Deposit & Resonance</a><a class="" href="../../wiki/game-systems/currencies.html">Currencies & Tokens</a><div class="grp">Reward Exchange</div><a class="" href="../../wiki/reward-exchange/pvp-and-ranks.html">Rankings</a><a class="" href="../../wiki/reward-exchange/pvp-and-mvp-points.html">PVP & MVP Points</a><a class="" href="../../wiki/reward-exchange/nero-dungeon-scrap.html">Nero Dungeon Scrap</a><div class="grp">Content & Progression</div><a class="" href="../../wiki/content-and-progression/battle-pass.html">Battle Pass</a><a class="" href="../../wiki/content-and-progression/endless-tower.html">Endless Tower</a><a class="" href="../../wiki/content-and-progression/instances.html">Instances & Dungeons</a></div>
+  </nav>
+  <div class="wk-scrim" id="wk-scrim" onclick="wikiNav(false)"></div>
+  <main class="wiki-main" id="wiki-main" data-title="MVP Card Deposit & Resonance">
+    <button class="wk-openbtn" onclick="wikiNav(true)"><i class="ti ti-menu-2"></i> Wiki Contents</button>
+    <h1 id="mvp-card-deposit-resonance">MVP Card Deposit &amp; Resonance</h1>
+<p>Deposit MVP and mini-boss cards into your <strong>archive</strong> to permanently gain their <strong>Card Resonance</strong> buff — you keep the buff without wearing the card.</p>
+<blockquote>
+<p>"The Soul of [Golden Thief Bug] has been successfully imprinted into your archive."</p>
+</blockquote>
+<h2 id="individual-card-buffs">Individual Card Buffs</h2>
+<div class="tbl-wrap"><table>
+<thead>
+<tr>
+<th>Card</th>
+<th>Buff</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Amon Ra</td>
+<td>INT +3</td>
+</tr>
+<tr>
+<td>Assassin Cross Eremes</td>
+<td>Critical Damage +3%</td>
+</tr>
+<tr>
+<td>Atroce</td>
+<td>ATK +15</td>
+</tr>
+<tr>
+<td>Bacsojin</td>
+<td>Max SP +2%, SP Recovery +2%</td>
+</tr>
+<tr>
+<td>Baphomet</td>
+<td>ATK +10, Physical Splash Damage +2%</td>
+</tr>
+<tr>
+<td>Beelzebub</td>
+<td>Variable Cast -3%</td>
+</tr>
+<tr>
+<td>Boitata</td>
+<td>Fire Damage +3%</td>
+</tr>
+<tr>
+<td>Dark Lord</td>
+<td>Fire Damage +3%</td>
+</tr>
+<tr>
+<td>Detale</td>
+<td>Max HP +3%, Boss Damage Reduction +2%</td>
+</tr>
+<tr>
+<td>Doppelganger</td>
+<td>ASPD +2%</td>
+</tr>
+<tr>
+<td>Dracula</td>
+<td>Max SP +3%, SP Recovery +3%</td>
+</tr>
+<tr>
+<td>Drake</td>
+<td>Medium Size Damage +2%</td>
+</tr>
+<tr>
+<td>Eddga</td>
+<td>AGI +3</td>
+</tr>
+<tr>
+<td>Evil Snake Lord</td>
+<td>INT +2, MDEF +3</td>
+</tr>
+<tr>
+<td>Fallen Bishop Hibram</td>
+<td>MATK +3%</td>
+</tr>
+<tr>
+<td>Garm / Hatii</td>
+<td>Water Resistance +2%, Max HP +2%</td>
+</tr>
+<tr>
+<td>Gloom Under Night</td>
+<td>Holy &amp; Shadow Damage +3%</td>
+</tr>
+<tr>
+<td>Golden Thief Bug</td>
+<td>MDEF +5, Neutral Resistance +2%</td>
+</tr>
+<tr>
+<td>High Priest Margaretha</td>
+<td>Recovery from Healing Items +5%</td>
+</tr>
+<tr>
+<td>High Wizard Katrinn</td>
+<td>Magic Damage +2%</td>
+</tr>
+<tr>
+<td>Ifrit</td>
+<td>All Stats +1</td>
+</tr>
+<tr>
+<td>Incantation Samurai</td>
+<td>Ignore DEF +2%</td>
+</tr>
+<tr>
+<td>Kiel-D-01</td>
+<td>Variable Cast -2%, ASPD +1%</td>
+</tr>
+<tr>
+<td>Stormy Knight</td>
+<td>Water Damage +3%</td>
+</tr>
+<tr>
+<td>Ktullanux</td>
+<td>Water Resistance +3%</td>
+</tr>
+<tr>
+<td>Lady Tanee</td>
+<td>Max SP +5%</td>
+</tr>
+<tr>
+<td>Lord Knight Seyren</td>
+<td>STR +2, ATK +10</td>
+</tr>
+<tr>
+<td>Lord of Death</td>
+<td>Status Resistance +5%</td>
+</tr>
+<tr>
+<td>Maya</td>
+<td>Reflect Magic Damage +2%</td>
+</tr>
+<tr>
+<td>Mistress</td>
+<td>SP Cost -2%</td>
+</tr>
+<tr>
+<td>Moonlight Flower</td>
+<td>Movement Speed +3%</td>
+</tr>
+<tr>
+<td>Orc Hero</td>
+<td>STR +3</td>
+</tr>
+<tr>
+<td>Orc Lord</td>
+<td>Reflect Physical Damage +2%</td>
+</tr>
+<tr>
+<td>Osiris</td>
+<td>VIT +3</td>
+</tr>
+<tr>
+<td>Pharaoh</td>
+<td>Max SP +3%</td>
+</tr>
+<tr>
+<td>Phreeoni</td>
+<td>HIT +15</td>
+</tr>
+<tr>
+<td>RSX-0806</td>
+<td>Max HP +3%</td>
+</tr>
+<tr>
+<td>Sniper Cecil</td>
+<td>HIT +10, Critical +3</td>
+</tr>
+<tr>
+<td>Tao Gunka</td>
+<td>Max HP +5%, DEF -5</td>
+</tr>
+<tr>
+<td>Thanatos</td>
+<td>Ignore DEF +3%</td>
+</tr>
+<tr>
+<td>Turtle General</td>
+<td>Physical Damage +3%</td>
+</tr>
+<tr>
+<td>Valkyrie Randgris</td>
+<td>Demi-Human Damage +2%</td>
+</tr>
+<tr>
+<td>Vesper</td>
+<td>Ignore MDEF +3%</td>
+</tr>
+<tr>
+<td>Whitesmith Howard</td>
+<td>Weight Limit +1000</td>
+</tr>
+<tr>
+<td>Ygnizem</td>
+<td>Max HP +2%, Max SP +2%</td>
+</tr>
+<tr>
+<td>Angeling</td>
+<td>Recovery from Healing Items +5%</td>
+</tr>
+<tr>
+<td>Arc Angeling</td>
+<td>SP Recovery +5%, Max SP +2%</td>
+</tr>
+<tr>
+<td>Dark Illusion</td>
+<td>MATK +10</td>
+</tr>
+<tr>
+<td>Deviling</td>
+<td>Neutral Resistance +2%</td>
+</tr>
+<tr>
+<td>Ghostring</td>
+<td>Demi-Human Resistance +2%</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="collection-bonuses">Collection Bonuses</h2>
+<p>Depositing a full themed set grants an <strong>extra</strong> bonus on top of the individual buffs.</p>
+<div class="tbl-wrap"><table>
+<thead>
+<tr>
+<th>Collection</th>
+<th>Members</th>
+<th>Bonus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Elemental Lords</strong></td>
+<td>Dark Lord + Stormy Knight + Boitata</td>
+<td>Fire, Water &amp; Wind Resistance +3%</td>
+</tr>
+<tr>
+<td><strong>Bio Laboratory Elite</strong></td>
+<td>Lord Knight Seyren + High Wizard Katrinn + High Priest Margaretha + Assassin Cross Eremes + Whitesmith Howard + Sniper Cecil</td>
+<td>ATK +10, MATK +10</td>
+</tr>
+<tr>
+<td><strong>Ancient Kings</strong></td>
+<td>Amon Ra + Pharaoh + Osiris</td>
+<td>Max HP +2%, Max SP +2%</td>
+</tr>
+<tr>
+<td><strong>Divine Guardians</strong></td>
+<td>Golden Thief Bug + Valkyrie Randgris + Tao Gunka</td>
+<td>Max HP +3%, Boss Damage Reduction +2%</td>
+</tr>
+<tr>
+<td><strong>Lords of Chaos</strong></td>
+<td>Ifrit + Fallen Bishop Hibram + Beelzebub</td>
+<td>Physical Damage +2%, Magic Damage +2%</td>
+</tr>
+<tr>
+<td><strong>Mechanical Genius</strong></td>
+<td>Kiel-D-01 + RSX-0806 + Vesper</td>
+<td>Variable Cast Time -1%, Ignore MDEF +2%</td>
+</tr>
+<tr>
+<td><strong>Lords of War</strong></td>
+<td>Atroce + Turtle General + Orc Hero</td>
+<td>ATK +15, HIT +10</td>
+</tr>
+<tr>
+<td><strong>Blade of Destiny</strong></td>
+<td>Thanatos + Incantation Samurai + Doppelganger</td>
+<td>Ignore DEF +2%, ASPD +1%</td>
+</tr>
+<tr>
+<td><strong>Night Stalkers</strong></td>
+<td>Moonlight Flower + Dracula + Lord of Death</td>
+<td>Movement Speed +2%, Status Resistance +3%</td>
+</tr>
+<tr>
+<td><strong>Dragon Lords</strong></td>
+<td>Detale + Garm (Hatii) + Drake</td>
+<td>Boss Damage +2%, Boss Damage Reduction +2%</td>
+</tr>
+<tr>
+<td><strong>Shadow Illusion</strong></td>
+<td>Dark Illusion + Dark Lord</td>
+<td>Variable Cast Time -3%</td>
+</tr>
+<tr>
+<td><strong>Full MVP Collection</strong></td>
+<td>Deposit all MVP Cards</td>
+<td>All Stats +2, ATK +15, MATK +15, Max HP +3%, Max SP +3%</td>
+</tr>
+</tbody>
+</table></div>
+  </main>
+</div>
+<div class="backdrop" id="backdrop" onclick="closePanel()"></div>
+<aside class="panel" id="panel">
+  <div class="panel-head"><i id="pnl-icon" class="ti"></i><h2 id="pnl-title"></h2>
+    <button class="panel-close" onclick="closePanel()">&times;</button></div>
+  <div class="panel-body" id="pnl-body"></div>
+</aside>
+</div>
+<div class="music" id="music">
+  <button class="mus-toggle" id="mus-toggle" title="Play / pause"><i class="ti ti-player-play"></i></button>
+  <div class="mus-mid">
+    <div class="mus-track" id="mus-track">—</div>
+  </div>
+  <button class="mus-next" id="mus-next" title="Next track"><i class="ti ti-player-track-next"></i></button>
+  <button class="mus-list" id="mus-list-btn" title="Playlist"><i class="ti ti-playlist"></i></button>
+  <div class="mus-panel" id="mus-panel"></div>
+</div>
+<audio id="bgm" preload="auto"></audio>
+<script src="../../js/data.js"></script><script src="../../js/wiki-index.js"></script><script src="../../js/app.js"></script>
+</body></html>
