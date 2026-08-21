@@ -101,15 +101,15 @@ function render(t){
   return '';
 }
 
-function soonPanelHTML(msg){
-  return `<div class="soon-panel"><i class="ti ti-clock-hour-4"></i>
-    <h3>Coming Soon</h3>
-    <p>${msg}</p></div>`;
-}
-
 /* ---- Login / Register / Account ---- */
-function loginHTML(){
-  return soonPanelHTML("Account login and registration are being finished up. Check back soon!");
+function loginHTML(){ return `
+  <p class="lead">Sign in to your NeRO account to donate, trade, and track your progress.</p>
+  <div id="login-msg"></div>
+  <label class="fld">Account ID</label><input class="inp" id="login-id" placeholder="yourname">
+  <label class="fld">Password</label><input class="inp" id="login-pw" type="password" placeholder="••••••••">
+  <button class="btn-gold" id="login-btn" onclick="doLogin()">Login</button>
+  <div class="rowlinks"><a href="#" onclick="return false">Forgot password?</a>
+  <a href="#" onclick="openPanel('register');return false">Register</a></div>`;
 }
 async function doLogin(){
   var id=(document.getElementById('login-id').value||'').trim();
@@ -121,11 +121,37 @@ async function doLogin(){
   var b=document.getElementById('login-btn'); b.disabled=true; b.textContent='Signing in...';
   var res=await NeroAPI.post('/account.php',{action:'login',userid:id,password:pw});
   b.disabled=false; b.textContent='Login';
-  if(res&&res.ok){ Auth.loggedIn=true; Auth.setUser(res.data.userid); renderAcct(); openPanel('account'); }
+  if(res&&res.ok){
+    Auth.loggedIn=true; Auth.setUser(res.data.userid); Auth.setToken(res.data.token||'');
+    renderAcct(); openPanel('account');
+  }
   else panelMsg('login-msg',(res&&res.error)||'Could not sign in.',false);
 }
 function registerHTML(){
-  return soonPanelHTML("Account registration is being finished up. Check back soon!");
+  return `
+    <p class="lead">Create your NeRO game account. This is the same account you use in-game.</p>
+    <div id="reg-msg"></div>
+    <label class="fld">Username</label>
+    <input class="inp" id="reg-id" placeholder="4-23 letters or numbers" maxlength="23"
+           autocomplete="username" oninput="regPwHint()">
+    <label class="fld">Email</label>
+    <input class="inp" id="reg-mail" type="email" placeholder="name@email.com" maxlength="39">
+    <label class="fld">Password</label>
+    <input class="inp" id="reg-pw" type="password" placeholder="8-31 characters" maxlength="31"
+           autocomplete="new-password" oninput="regPwHint()">
+    <ul class="pw-rules" id="reg-rules">
+      <li data-r="len"><i class="ti ti-circle"></i> 8 to 31 characters</li>
+      <li data-r="upper"><i class="ti ti-circle"></i> At least 1 uppercase letter</li>
+      <li data-r="lower"><i class="ti ti-circle"></i> At least 1 lowercase letter</li>
+      <li data-r="digit"><i class="ti ti-circle"></i> At least 1 number</li>
+      <li data-r="name"><i class="ti ti-circle"></i> Cannot contain your username</li>
+    </ul>
+    <label class="fld">Confirm password</label>
+    <input class="inp" id="reg-pw2" type="password" placeholder="repeat password" maxlength="31" autocomplete="new-password">
+    <label class="fld">Gender</label>
+    <select class="inp" id="reg-sex"><option value="M">Male</option><option value="F">Female</option></select>
+    <button class="btn-gold" id="reg-btn" onclick="doRegister()">Create Account</button>
+    <div class="rowlinks"><span></span><a href="#" onclick="openPanel('login');return false">Already have an account?</a></div>`;
 }
 
 function panelMsg(id,text,ok){
@@ -179,7 +205,8 @@ function accountHTML(){
 }
 async function doLogout(){
   if(NeroAPI.enabled()){ await NeroAPI.post('/account.php',{action:'logout'}); }
-  Auth.logout(); renderAcct(); closePanel();
+  Auth.logout(); Auth.setToken('');
+  renderAcct(); closePanel();
   if(location.pathname.indexOf('account.html')>-1) location.href=ROOT;
 }
 
@@ -213,7 +240,9 @@ function serverHTML(){ var s=SERVER_INFO; return `
 /* ---- Donation (1 CP : 1 Rp) ---- */
 var selAmt=null;
 function donationHTML(){
-  return soonPanelHTML("Donations and Cash Point top-ups are being finished up. Check back soon!");
+  return `<div class="soon-panel"><i class="ti ti-clock-hour-4"></i>
+    <h3>Coming Soon</h3>
+    <p>Donations and Cash Point top-ups are being finished up. Check back soon!</p></div>`;
 }
 
 function pickAmt(i){ selAmt=i;
@@ -303,7 +332,8 @@ async function refreshOnline(){
   sessionStorage.setItem('nero_online',ONLINE);
   paintOnline();
 }
-/* Online counter UI removed for now — no need to poll. */
+setInterval(refreshOnline, NeroAPI.enabled()? 30000 : 5000);
+refreshOnline();
 
 /* ================= MUSIC PLAYER ================= */
 var bgm=document.getElementById('bgm');
@@ -519,6 +549,7 @@ async function loadAccountPage(){
     if(chars.length){
       cb.innerHTML=chars.map(function(c){
         var online = Number(c.online)===1;
+        var dis = online ? 'disabled title="Character must be offline"' : '';
         return '<tr>'+
           '<td><b>'+c.name+'</b></td>'+
           '<td>'+jobName(Number(c.class))+'</td>'+
@@ -527,10 +558,15 @@ async function loadAccountPage(){
           '<td>'+fmtNum(c.zeny)+'</td>'+
           '<td>'+(c.guild||'—')+'</td>'+
           '<td><span class="pill '+(online?'on':'off')+'">'+(online?'Online':'Offline')+'</span></td>'+
+          '<td><div class="row-actions">'+
+            '<button class="act-btn" '+dis+' onclick="doResetLook('+c.char_id+',this)">Reset Look</button>'+
+            '<button class="act-btn" '+dis+' onclick="doResetPos('+c.char_id+',this)">Unstuck</button>'+
+            '<button class="act-btn" '+dis+' onclick="doChangeSlot('+c.char_id+','+c.char_num+',this)">Change Slot</button>'+
+          '</div></td>'+
         '</tr>';
       }).join('');
     }else{
-      cb.innerHTML='<tr><td colspan="7" class="norow">'+
+      cb.innerHTML='<tr><td colspan="8" class="norow">'+
         (demo ? 'Connect the backend to see your characters.' : 'No characters on this account yet.')+
         '</td></tr>';
     }
@@ -564,6 +600,33 @@ async function loadAccountPage(){
         '</td></tr>';
     }
   }
+}
+
+/* ---- Character management (mirrors FluxCP: reset look / unstuck / change slot) ---- */
+async function doResetLook(charId, btn){
+  if(btn){ btn.disabled=true; }
+  var res=await NeroAPI.post('/character.php',{action:'resetlook',char_id:charId});
+  if(btn){ btn.disabled=false; }
+  alert((res&&res.ok) ? (res.data&&res.data.message||'Look reset.') : ((res&&res.error)||'Could not reset look.'));
+  if(res&&res.ok) loadAccountPage();
+}
+async function doResetPos(charId, btn){
+  if(btn){ btn.disabled=true; }
+  var res=await NeroAPI.post('/character.php',{action:'resetpos',char_id:charId});
+  if(btn){ btn.disabled=false; }
+  alert((res&&res.ok) ? (res.data&&res.data.message||'Location reset.') : ((res&&res.error)||'Could not reset location.'));
+  if(res&&res.ok) loadAccountPage();
+}
+async function doChangeSlot(charId, currentNum, btn){
+  var slot=prompt('Move to which slot number? (1-9, currently #'+(currentNum+1)+')');
+  if(slot===null) return;
+  slot=parseInt(slot,10);
+  if(!slot||slot<1) return alert('Enter a valid slot number.');
+  if(btn){ btn.disabled=true; }
+  var res=await NeroAPI.post('/character.php',{action:'changeslot',char_id:charId,slot:slot});
+  if(btn){ btn.disabled=false; }
+  alert((res&&res.ok) ? (res.data&&res.data.message||'Slot changed.') : ((res&&res.error)||'Could not change slot.'));
+  if(res&&res.ok) loadAccountPage();
 }
 
 async function doChangePassword(){

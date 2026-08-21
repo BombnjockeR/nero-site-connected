@@ -477,6 +477,14 @@ table.stat.big td{padding:15px 18px}
 .pill.failed{background:rgba(226,75,74,.18);color:#f0a3a3;border:1px solid rgba(226,75,74,.45)}
 .pill.on{background:rgba(70,209,127,.18);color:#8ce0b4;border:1px solid rgba(70,209,127,.45)}
 .pill.off{background:rgba(255,255,255,.08);color:var(--muted);border:1px solid var(--tline)}
+
+/* per-character action buttons (account page) */
+.row-actions{display:flex;gap:6px;flex-wrap:wrap}
+.act-btn{background:transparent;border:1px solid var(--tline);color:var(--muted);font-size:11.5px;
+  padding:4px 9px;border-radius:6px;cursor:pointer;transition:.2s;white-space:nowrap}
+.act-btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+.act-btn:disabled{opacity:.4;cursor:not-allowed}
+
 .pw-rules{list-style:none;margin:10px 0 4px;padding:0;display:grid;gap:5px}
 .pw-rules li{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);transition:color .2s}
 .pw-rules li i{font-size:14px;color:var(--muted);transition:color .2s}

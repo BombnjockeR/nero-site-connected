@@ -10,7 +10,7 @@
   <img class="hd-logo" src="../assets/logo.png" alt="Home" title="Home" onclick="location.href='../'">
   <nav class="hd-tabs"><a class="tab" href="../wiki/index.html">Wiki</a><a class="tab" href="../pages/stat-woe.html">WoE</a><a class="tab" href="../pages/stat-pvp.html">PvP</a><a class="tab" href="../pages/stat-mvp.html">MVP</a><a class="tab" href="../pages/stat-zeny.html">Zeny</a><a class="tab" href="../pages/marketplace.html">Market</a></nav>
   <div class="hd-right">
-    <div class="hd-online soon"><span class="dot"></span><span class="lbl">Coming Soon</span></div>
+    <div class="hd-online"><span class="dot"></span><span class="num" id="online-num">0</span><span class="lbl">online</span></div>
     <div class="hd-acct" id="hd-acct"></div>
   </div>
 </header>
@@ -66,10 +66,11 @@
         <table class="stat big" id="ac-chars">
           <thead><tr>
             <th>Character</th><th>Class</th><th>Base Lv</th><th>Job Lv</th>
-            <th>Zeny</th><th>Guild</th><th>Status</th>
+            <th>Zeny</th><th>Guild</th><th>Status</th><th>Actions</th>
           </tr></thead>
-          <tbody><tr><td colspan="7" class="norow">Loading…</td></tr></tbody>
+          <tbody><tr><td colspan="8" class="norow">Loading…</td></tr></tbody>
         </table>
+        <p class="subtitle" style="margin-top:10px">Characters must be offline to reset look, reset location, or change slot.</p>
       </div>
     </section>
 

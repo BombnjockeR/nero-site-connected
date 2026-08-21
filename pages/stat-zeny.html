@@ -10,16 +10,17 @@
   <img class="hd-logo" src="../assets/logo.png" alt="Home" title="Home" onclick="location.href='../'">
   <nav class="hd-tabs"><a class="tab" href="../wiki/index.html">Wiki</a><a class="tab" href="../pages/stat-woe.html">WoE</a><a class="tab" href="../pages/stat-pvp.html">PvP</a><a class="tab" href="../pages/stat-mvp.html">MVP</a><a class="tab on" href="../pages/stat-zeny.html">Zeny</a><a class="tab" href="../pages/marketplace.html">Market</a></nav>
   <div class="hd-right">
-    <div class="hd-online soon"><span class="dot"></span><span class="lbl">Coming Soon</span></div>
+    <div class="hd-online"><span class="dot"></span><span class="num" id="online-num">0</span><span class="lbl">online</span></div>
     <div class="hd-acct" id="hd-acct"></div>
   </div>
 </header>
 <div class="wrap">
-  <div class="soon-box"><i class="ti ti-clock-hour-4"></i>
-    <h2>Zeny Statistics — Coming Soon</h2>
-    <p>We're still putting the finishing touches on this page. Check back soon!</p>
-    <a class="btn-ghost" href="../">Back to Home</a>
-  </div>
+  <h1 class="pg-title">Zeny Statistics</h1>
+  <p class="subtitle">Top zeny holders on NeRO.</p>
+  <div class="searchbar"><i class="ti ti-search"></i>
+    <input id="tblsearch" placeholder="Search player name..." oninput="filterTable()">
+    <span class="hits" id="hits"></span></div>
+  <div class="tbl-wrap"><table class="stat" id="stbl" data-api="zeny"><thead><tr><th>#</th><th>Player</th><th>Zeny Holdings</th><th>Base Level</th><th>Guild</th></tr></thead><tbody><tr><td class="rank">1</td><td class="">TycoonTom</td><td class="">2,340,000,000</td><td class="">99</td><td class="">Valhalla</td></tr><tr><td class="rank">2</td><td class="">MerchantMei</td><td class="">1,980,000,000</td><td class="">99</td><td class="">Nidhogg</td></tr><tr><td class="rank">3</td><td class="">GoldHoarder</td><td class="">1,510,000,000</td><td class="">98</td><td class="">Ragnarok Elite</td></tr><tr><td class="rank">4</td><td class="">ZenyQueen</td><td class="">1,200,000,000</td><td class="">97</td><td class="">Prontera Knights</td></tr><tr><td class="rank">5</td><td class="">CoinCollector</td><td class="">980,000,000</td><td class="">96</td><td class="">Shadow Covenant</td></tr><tr><td class="rank">6</td><td class="">BazaarKing</td><td class="">870,000,000</td><td class="">95</td><td class="">—</td></tr><tr><td class="rank">7</td><td class="">SilkTrader</td><td class="">640,000,000</td><td class="">94</td><td class="">—</td></tr><tr><td class="rank">8</td><td class="">PoringBank</td><td class="">512,000,000</td><td class="">93</td><td class="">—</td></tr></tbody></table></div>
 </div>
 <div class="backdrop" id="backdrop" onclick="closePanel()"></div>
 <aside class="panel" id="panel">
