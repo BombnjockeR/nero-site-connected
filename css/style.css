@@ -535,3 +535,7 @@ table.stat.big td{padding:15px 18px}
 
 .hd-online.soon{opacity:.85}
 .hd-online.soon .dot{background:var(--gold);animation:none;box-shadow:0 0 6px rgba(228,184,75,.7)}
+
+/* live server status: green (default) / amber (partial) / red (down) */
+.hd-online.partial .dot{background:#ffab40;animation:none;box-shadow:0 0 6px rgba(255,171,64,.7)}
+.hd-online.down .dot{background:#ff5252;animation:none;box-shadow:0 0 6px rgba(255,82,82,.7)}
