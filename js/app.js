@@ -591,10 +591,9 @@ async function loadAccountPage(){
 
   /* ---- characters ---- */
   var chars=(d&&d.characters)||[];
-  var totalZeny=0;
-  chars.forEach(function(c){ totalZeny += Number(c.zeny)||0; });
+  var accZeny=(d&&d.account&&Number(d.account.zeny))||0;   /* zeny is account-wide on this server */
   set('ac-nchar', demo ? '—' : chars.length);
-  set('ac-zeny',  demo ? '—' : fmtNum(totalZeny));
+  set('ac-zeny',  demo ? '—' : fmtNum(accZeny));
 
   var cb=document.querySelector('#ac-chars tbody');
   if(cb){
