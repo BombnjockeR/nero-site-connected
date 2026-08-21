@@ -337,15 +337,15 @@ function filterItems(){
 
 /* ================= ONLINE COUNTER ================= */
 var ONLINE = null;                            /* null = not loaded yet, show "—" */
+var MERCHANTS = null;
 var PEAK = null;                              /* null = not loaded yet, hide */
 var SRV_STATUS = 'unknown';                   /* 'up' | 'partial' | 'down' | 'unknown' */
 function paintOnline(){
-  var el=document.getElementById('online-num');
-  if(el) el.textContent = (ONLINE===null) ? '—' : fmtNum(ONLINE);
-  document.querySelectorAll('#peak-num').forEach(function(e){
-    e.textContent = (PEAK===null) ? '—' : fmtNum(PEAK);
-  });
-  document.querySelectorAll('.hd-online').forEach(function(b){
+  var set=function(id,v){ document.querySelectorAll('#'+id).forEach(function(e){ e.textContent=v; }); };
+  set('online-num',   ONLINE===null    ? '—' : fmtNum(ONLINE));
+  set('merchant-num', MERCHANTS===null ? '—' : fmtNum(MERCHANTS));
+  set('peak-num',     PEAK===null      ? '—' : fmtNum(PEAK));
+  document.querySelectorAll('.hd-pill').forEach(function(b){
     b.classList.remove('down','partial');
     if(SRV_STATUS==='partial'||SRV_STATUS==='down') b.classList.add(SRV_STATUS);
     b.title = SRV_STATUS==='up' ? 'All servers online' :
@@ -358,12 +358,14 @@ async function refreshOnline(){
   var d = await NeroAPI.get('online');
   if(d && typeof d.characters === 'number'){
     ONLINE = d.characters;                      /* real number from the game DB */
+    MERCHANTS = typeof d.merchants === 'number' ? d.merchants : null;
     PEAK = typeof d.peak === 'number' ? d.peak : null;
     var allUp = d.login && d.char && d.map;
     var anyUp = d.login || d.char || d.map;
     SRV_STATUS = allUp ? 'up' : (anyUp ? 'partial' : 'down');
   }else{
     ONLINE = null;                              /* API unreachable: be honest, don't guess */
+    MERCHANTS = null;
     PEAK = null;
     SRV_STATUS = 'unknown';
   }
@@ -372,6 +374,18 @@ async function refreshOnline(){
 }
 setInterval(refreshOnline, NeroAPI.enabled()? 30000 : 5000);
 refreshOnline();
+
+function tickServerTime(){
+  var d=new Date();
+  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var mons=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var h=d.getHours(), ap=h>=12?'pm':'am'; h=h%12; if(h===0) h=12;
+  var mm=(d.getMinutes()<10?'0':'')+d.getMinutes();
+  var txt='Server time: '+days[d.getDay()]+' '+d.getDate()+' '+mons[d.getMonth()]+', '+h+':'+mm+' '+ap;
+  document.querySelectorAll('.hd-time').forEach(function(e){ e.textContent=txt; });
+}
+tickServerTime();
+setInterval(tickServerTime, 1000);
 
 /* ================= MUSIC PLAYER ================= */
 var bgm=document.getElementById('bgm');
