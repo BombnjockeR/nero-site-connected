@@ -336,30 +336,31 @@ function filterItems(){
 }
 
 /* ================= ONLINE COUNTER ================= */
-var ONLINE = parseInt(sessionStorage.getItem('nero_online')||'0',10) || (1180+Math.floor(Math.random()*180));
-var SRV_STATUS = sessionStorage.getItem('nero_srv')||'up';   /* 'up' | 'partial' | 'down' */
+var ONLINE = null;                            /* null = not loaded yet, show "—" */
+var SRV_STATUS = 'unknown';                   /* 'up' | 'partial' | 'down' | 'unknown' */
 function paintOnline(){
   var el=document.getElementById('online-num');
-  if(el) el.textContent=fmtNum(ONLINE);
+  if(el) el.textContent = (ONLINE===null) ? '—' : fmtNum(ONLINE);
   document.querySelectorAll('.hd-online').forEach(function(b){
     b.classList.remove('down','partial');
-    if(SRV_STATUS!=='up') b.classList.add(SRV_STATUS);
-    b.title = SRV_STATUS==='up' ? 'All servers online' : SRV_STATUS==='partial' ? 'Some servers are down' : 'Servers are offline';
+    if(SRV_STATUS==='partial'||SRV_STATUS==='down') b.classList.add(SRV_STATUS);
+    b.title = SRV_STATUS==='up' ? 'All servers online' :
+              SRV_STATUS==='partial' ? 'Some servers are down' :
+              SRV_STATUS==='down' ? 'Servers are offline' : 'Status unknown';
   });
 }
 async function refreshOnline(){
+  if(!NeroAPI.enabled()) return;                /* no backend configured: leave "—" */
   var d = await NeroAPI.get('online');
   if(d && typeof d.characters === 'number'){
     ONLINE = d.characters;                      /* real number from the game DB */
     var allUp = d.login && d.char && d.map;
     var anyUp = d.login || d.char || d.map;
     SRV_STATUS = allUp ? 'up' : (anyUp ? 'partial' : 'down');
-  }else if(!NeroAPI.enabled()){
-    ONLINE += Math.floor(Math.random()*7)-3;    /* demo drift only */
-    if(ONLINE<900) ONLINE=900;
-    SRV_STATUS='up';
+  }else{
+    ONLINE = null;                              /* API unreachable: be honest, don't guess */
+    SRV_STATUS = 'unknown';
   }
-  sessionStorage.setItem('nero_online',ONLINE);
   sessionStorage.setItem('nero_srv',SRV_STATUS);
   paintOnline();
 }
@@ -704,11 +705,19 @@ async function hydrateTable(){
   var tbl=document.getElementById('stbl');
   if(!tbl) return;
   var key=tbl.getAttribute('data-api');
-  if(!key || !NeroAPI.enabled()) return;          /* keep placeholder rows */
+  if(!key) return;
+  var cols=tbl.rows[0].cells.length;
 
+  if(!NeroAPI.enabled()){
+    tbl.tBodies[0].innerHTML = noDataRow(cols,'Backend not connected yet.');
+    return;
+  }
   var d=await NeroAPI.get(key);
-  if(!d) return;                                  /* API unreachable: keep placeholder rows */
-  var rows=[], i=1, cols=tbl.rows[0].cells.length;
+  if(!d){
+    tbl.tBodies[0].innerHTML = noDataRow(cols,'Could not load data — try again shortly.');
+    return;
+  }
+  var rows=[], i=1;
 
   if(key==='zeny' && Array.isArray(d)){
     d.forEach(function(r){
