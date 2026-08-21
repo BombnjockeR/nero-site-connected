@@ -30,10 +30,10 @@ body.page .sitehead{position:sticky;top:0;z-index:9;background:rgba(7,11,18,.86)
 .hd-time{color:var(--muted);font-size:13px;white-space:nowrap}
 .hd-peaklbl{color:var(--muted);font-size:13px;white-space:nowrap}
 .hd-peaklbl b{color:var(--text);font-weight:600}
-.hd-pill{display:flex;align-items:center;gap:6px;background:#0b0e14;color:#000;
+.hd-pill{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.8);color:#000;
  text-shadow:0 0 8px rgba(255,255,255,.2);
  font-size:13px;padding:8px 20px;white-space:nowrap;
- border-radius:20px;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+ border-radius:20px;border:1px solid var(--gold);box-shadow:0 2px 10px rgba(0,0,0,.35)}
 .hd-pill b{color:var(--gold);font-weight:700}
 .hd-pill .hd-sep{color:#445468;margin:0 2px}
 .hd-tabs{margin-left:auto;display:flex;gap:8px;align-items:center}
