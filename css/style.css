@@ -31,6 +31,8 @@ body.page .sitehead{position:sticky;top:0;z-index:9;background:rgba(7,11,18,.86)
 .hd-online .dot{width:9px;height:9px;border-radius:50%;background:#46d17f;animation:pulse 2s infinite}
 .hd-online .num{color:#fff;font-weight:600;font-size:14px;line-height:1}
 .hd-online .lbl{color:var(--muted);font-size:11px;letter-spacing:.4px}
+.hd-online .peak{color:var(--muted);font-size:11px;letter-spacing:.2px;margin-left:6px;padding-left:8px;border-left:1px solid var(--tline)}
+.hd-online .peak b{color:var(--gold);font-weight:600}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(70,209,127,.6)}70%{box-shadow:0 0 0 8px rgba(70,209,127,0)}100%{box-shadow:0 0 0 0 rgba(70,209,127,0)}}
 .hd-tabs{margin-left:auto;display:flex;gap:8px;align-items:center}
 .hd-tabs .tab{font-size:13px;letter-spacing:.4px;color:#fff;text-decoration:none;background:rgba(8,13,24,.55);
@@ -516,6 +518,7 @@ table.stat.big td{padding:15px 18px}
 @media (max-width:520px){
   .home-logo{height:78px !important}
   .hd-online .lbl{display:none}
+  .hd-online .peak{display:none}
 }
 
 

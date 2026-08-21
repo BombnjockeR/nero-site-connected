@@ -337,10 +337,14 @@ function filterItems(){
 
 /* ================= ONLINE COUNTER ================= */
 var ONLINE = null;                            /* null = not loaded yet, show "—" */
+var PEAK = null;                              /* null = not loaded yet, hide */
 var SRV_STATUS = 'unknown';                   /* 'up' | 'partial' | 'down' | 'unknown' */
 function paintOnline(){
   var el=document.getElementById('online-num');
   if(el) el.textContent = (ONLINE===null) ? '—' : fmtNum(ONLINE);
+  document.querySelectorAll('#peak-num').forEach(function(e){
+    e.textContent = (PEAK===null) ? '—' : fmtNum(PEAK);
+  });
   document.querySelectorAll('.hd-online').forEach(function(b){
     b.classList.remove('down','partial');
     if(SRV_STATUS==='partial'||SRV_STATUS==='down') b.classList.add(SRV_STATUS);
@@ -354,11 +358,13 @@ async function refreshOnline(){
   var d = await NeroAPI.get('online');
   if(d && typeof d.characters === 'number'){
     ONLINE = d.characters;                      /* real number from the game DB */
+    PEAK = typeof d.peak === 'number' ? d.peak : null;
     var allUp = d.login && d.char && d.map;
     var anyUp = d.login || d.char || d.map;
     SRV_STATUS = allUp ? 'up' : (anyUp ? 'partial' : 'down');
   }else{
     ONLINE = null;                              /* API unreachable: be honest, don't guess */
+    PEAK = null;
     SRV_STATUS = 'unknown';
   }
   sessionStorage.setItem('nero_srv',SRV_STATUS);
