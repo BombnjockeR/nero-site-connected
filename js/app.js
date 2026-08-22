@@ -70,9 +70,9 @@ function renderAcct(){
 function $panel(){ return document.getElementById('panel'); }
 function $backdrop(){ return document.getElementById('backdrop'); }
 var ICONS={server:'ti-scroll',download:'ti-download',marketplace:'ti-scale',donation:'ti-heart',
-           login:'ti-login',register:'ti-user-plus',account:'ti-user-circle'};
+           login:'ti-login',register:'ti-user-plus',account:'ti-user-circle',forgot:'ti-lock-question'};
 var TITLES={server:'Server Detail',download:'Download',donation:'Donation',
-            login:'Login',register:'Create Account',account:'My Account'};
+            login:'Login',register:'Create Account',account:'My Account',forgot:'Forgot Password'};
 
 function openPanel(type){
   if(type==='marketplace'){ location.href=ROOT+'pages/marketplace.html'; return; }
@@ -85,6 +85,7 @@ function openPanel(type){
   document.getElementById('pnl-body').innerHTML=render(type);
   if(type==='donation') selAmt=null;
   if(type==='account') loadAccountPanel();
+  if(type==='forgot') initForgotPanel();
   panel.classList.add('show'); backdrop.classList.add('show');
 }
 function closePanel(){
@@ -99,6 +100,7 @@ function render(t){
   if(t==='download') return downloadHTML();
   if(t==='server')   return serverHTML();
   if(t==='donation') return donationHTML();
+  if(t==='forgot')   return forgotHTML();
   return '';
 }
 
@@ -109,7 +111,7 @@ function loginHTML(){ return `
   <label class="fld">Account ID</label><input class="inp" id="login-id" placeholder="yourname">
   <label class="fld">Password</label><input class="inp" id="login-pw" type="password" placeholder="••••••••">
   <button class="btn-gold" id="login-btn" onclick="doLogin()">Login</button>
-  <div class="rowlinks"><a href="#" onclick="return false">Forgot password?</a>
+  <div class="rowlinks"><a href="#" onclick="openPanel('forgot');return false">Forgot password?</a>
   <a href="#" onclick="openPanel('register');return false">Register</a></div>`;
 }
 async function doLogin(){
@@ -137,6 +139,8 @@ function registerHTML(){
            autocomplete="username" oninput="regPwHint()">
     <label class="fld">Email</label>
     <input class="inp" id="reg-mail" type="email" placeholder="name@email.com" maxlength="39">
+    <label class="fld">Date of Birth</label>
+    <input class="inp" id="reg-dob" type="date">
     <label class="fld">Password</label>
     <input class="inp" id="reg-pw" type="password" placeholder="8-31 characters" maxlength="31"
            autocomplete="new-password" oninput="regPwHint()">
@@ -155,6 +159,130 @@ function registerHTML(){
     <div class="rowlinks"><span></span><a href="#" onclick="openPanel('login');return false">Already have an account?</a></div>`;
 }
 
+/* ---- Forgot password (no email — userid + birthdate + captcha) ---- */
+var FG_CAPTCHA='', FG_VERIFIED=false, FG_USERID='', FG_DOB='';
+
+function forgotHTML(){ return `
+  <p class="lead">Reset password tanpa email — verifikasi pakai User ID dan Tanggal Lahir yang kamu daftarkan.</p>
+  <div id="forgot-msg"></div>
+
+  <div id="forgot-step1">
+    <label class="fld">User ID</label>
+    <input class="inp" id="fg-id" placeholder="username kamu">
+    <label class="fld">Tanggal Lahir</label>
+    <input class="inp" id="fg-dob" type="date">
+    <label class="fld">Captcha</label>
+    <div class="captcha-row">
+      <canvas id="fg-captcha-canvas" width="140" height="46"></canvas>
+      <button type="button" class="captcha-refresh" onclick="drawCaptcha()" title="Refresh captcha"><i class="ti ti-refresh"></i></button>
+    </div>
+    <input class="inp" id="fg-captcha-input" placeholder="Ketik kode di atas" style="margin-top:8px" maxlength="6" autocomplete="off">
+    <button class="btn-gold" id="fg-verify-btn" onclick="doVerifyIdentity()">Continue</button>
+    <div class="rowlinks"><span></span><a href="#" onclick="openPanel('login');return false">Back to Sign In</a></div>
+  </div>
+
+  <div id="forgot-step2" style="display:none">
+    <p class="lead">Identitas terverifikasi. Masukkan password baru kamu.</p>
+    <label class="fld">New password</label>
+    <input class="inp" id="fg-pw" type="password" placeholder="8-31 characters" maxlength="31" autocomplete="new-password" oninput="fgPwHint()">
+    <ul class="pw-rules" id="fg-rules">
+      <li data-r="len"><i class="ti ti-circle"></i> 8 to 31 characters</li>
+      <li data-r="upper"><i class="ti ti-circle"></i> At least 1 uppercase letter</li>
+      <li data-r="lower"><i class="ti ti-circle"></i> At least 1 lowercase letter</li>
+      <li data-r="digit"><i class="ti ti-circle"></i> At least 1 number</li>
+      <li data-r="name"><i class="ti ti-circle"></i> Cannot contain your username</li>
+    </ul>
+    <label class="fld">Confirm new password</label>
+    <input class="inp" id="fg-pw2" type="password" placeholder="repeat password" maxlength="31" autocomplete="new-password">
+    <button class="btn-gold" id="fg-reset-btn" onclick="doResetNoEmail()">Confirm</button>
+  </div>`;
+}
+
+function initForgotPanel(){
+  FG_VERIFIED=false; FG_USERID=''; FG_DOB='';
+  var s1=document.getElementById('forgot-step1'), s2=document.getElementById('forgot-step2');
+  if(s1) s1.style.display=''; if(s2) s2.style.display='none';
+  drawCaptcha();
+}
+function randCaptchaCode(len){
+  var chars='ABCDEFGHJKMNPQRSTUVWXYZ23456789';   /* no ambiguous I/L/O/0/1 */
+  var s=''; for(var i=0;i<len;i++) s+=chars.charAt(Math.floor(Math.random()*chars.length));
+  return s;
+}
+function drawCaptcha(){
+  FG_CAPTCHA=randCaptchaCode(5);
+  var c=document.getElementById('fg-captcha-canvas'); if(!c) return;
+  var ctx=c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle='#101a2c'; ctx.fillRect(0,0,c.width,c.height);
+  for(var i=0;i<5;i++){
+    ctx.strokeStyle='rgba(228,184,75,'+(0.15+Math.random()*0.25)+')';
+    ctx.beginPath();
+    ctx.moveTo(Math.random()*c.width, Math.random()*c.height);
+    ctx.lineTo(Math.random()*c.width, Math.random()*c.height);
+    ctx.stroke();
+  }
+  var gap=c.width/(FG_CAPTCHA.length+1);
+  for(var j=0;j<FG_CAPTCHA.length;j++){
+    ctx.save();
+    var x=gap*(j+1), y=c.height/2+(Math.random()*10-5);
+    ctx.translate(x,y);
+    ctx.rotate(Math.random()*0.5-0.25);
+    ctx.fillStyle = Math.random()>0.5 ? '#E4B84B' : '#f2cf6e';
+    ctx.font='bold 24px monospace';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(FG_CAPTCHA[j],0,0);
+    ctx.restore();
+  }
+  var input=document.getElementById('fg-captcha-input'); if(input) input.value='';
+}
+async function doVerifyIdentity(){
+  var id=(document.getElementById('fg-id').value||'').trim();
+  var dob=document.getElementById('fg-dob').value||'';
+  var cap=(document.getElementById('fg-captcha-input').value||'').trim().toUpperCase();
+
+  if(!id)  return panelMsg('forgot-msg','Masukkan User ID kamu.',false);
+  if(!dob) return panelMsg('forgot-msg','Masukkan tanggal lahir kamu.',false);
+  if(!cap||cap!==FG_CAPTCHA){ drawCaptcha(); return panelMsg('forgot-msg','Kode captcha salah, coba lagi.',false); }
+
+  var btn=document.getElementById('fg-verify-btn'); btn.disabled=true; btn.textContent='Memeriksa...';
+  var res=await NeroAPI.post('/account.php',{action:'verify_reset',userid:id,birthdate:dob});
+  btn.disabled=false; btn.textContent='Continue';
+
+  if(res&&res.ok){
+    FG_VERIFIED=true; FG_USERID=id; FG_DOB=dob;
+    document.getElementById('forgot-step1').style.display='none';
+    document.getElementById('forgot-step2').style.display='';
+    document.getElementById('forgot-msg').innerHTML='';
+  }else{
+    drawCaptcha();
+    panelMsg('forgot-msg',(res&&res.error)||'User ID atau tanggal lahir tidak cocok.',false);
+  }
+}
+function fgPwHint(){
+  var pw=(document.getElementById('fg-pw')||{}).value||'';
+  pwPaintRules('fg-rules',pw,FG_USERID);
+}
+async function doResetNoEmail(){
+  if(!FG_VERIFIED) return;
+  var pw=document.getElementById('fg-pw').value||'';
+  var pw2=document.getElementById('fg-pw2').value||'';
+  var err=pwFirstError(pw,FG_USERID);
+  if(err) return panelMsg('forgot-msg',err,false);
+  if(pw!==pw2) return panelMsg('forgot-msg','Password tidak sama.',false);
+
+  var btn=document.getElementById('fg-reset-btn'); btn.disabled=true; btn.textContent='Menyimpan...';
+  var res=await NeroAPI.post('/account.php',{action:'reset_noemail',userid:FG_USERID,birthdate:FG_DOB,password:pw});
+  btn.disabled=false; btn.textContent='Confirm';
+
+  if(res&&res.ok){
+    panelMsg('forgot-msg','Password berhasil diubah. Silakan login dengan password baru.',true);
+    setTimeout(function(){ openPanel('login'); },1600);
+  }else{
+    panelMsg('forgot-msg',(res&&res.error)||'Gagal mengubah password.',false);
+  }
+}
+
 function panelMsg(id,text,ok){
   var el=document.getElementById(id); if(!el) return;
   el.innerHTML='<div class="note-login" style="'+
@@ -164,12 +292,14 @@ function panelMsg(id,text,ok){
 async function doRegister(){
   var id=(document.getElementById('reg-id').value||'').trim();
   var mail=(document.getElementById('reg-mail').value||'').trim();
+  var dob=document.getElementById('reg-dob').value||'';
   var pw=document.getElementById('reg-pw').value||'';
   var pw2=document.getElementById('reg-pw2').value||'';
   var sex=document.getElementById('reg-sex').value||'M';
 
   if(id.length<4)  return panelMsg('reg-msg','Username must be at least 4 characters.',false);
   if(!/^[A-Za-z0-9_]+$/.test(id)) return panelMsg('reg-msg','Username can only use letters, numbers and underscore.',false);
+  if(!dob) return panelMsg('reg-msg','Please select your date of birth.',false);
   var pwErr=pwFirstError(pw,id);
   if(pwErr)        return panelMsg('reg-msg',pwErr,false);
   if(pw!==pw2)     return panelMsg('reg-msg','Passwords do not match.',false);
@@ -178,7 +308,7 @@ async function doRegister(){
   var btn=document.getElementById('reg-btn');
   btn.disabled=true; btn.textContent='Creating...';
   var res=await NeroAPI.post('/account.php',
-    {action:'register', userid:id, password:pw, email:mail, sex:sex});
+    {action:'register', userid:id, password:pw, email:mail, sex:sex, birthdate:dob});
   btn.disabled=false; btn.textContent='Create Account';
 
   if(res && res.ok){
