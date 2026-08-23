@@ -27,12 +27,14 @@ const NeroAPI = {
       return j;
     }catch(e){ return {ok:false, error:"Could not reach the server"}; }
   },
-  async get(type){
+  async get(type, extra){
     if(!this.enabled()) return null;
     try{
       const ctl = new AbortController();
       const t = setTimeout(()=>ctl.abort(), 6000);       /* never hang the UI */
-      const r = await fetch(API_BASE + "/stats.php?type=" + encodeURIComponent(type),
+      var qs = "?type=" + encodeURIComponent(type);
+      if(extra) for(var k in extra) qs += "&" + encodeURIComponent(k) + "=" + encodeURIComponent(extra[k]);
+      const r = await fetch(API_BASE + "/stats.php" + qs,
                             {signal: ctl.signal, credentials: "omit", headers:this.authHeaders()});
       clearTimeout(t);
       if(!r.ok) return null;

@@ -22,6 +22,7 @@
     <button class="atab" onclick="woeTab('players',this)"><i class="ti ti-swords"></i> Top Players</button>
     <button class="atab" onclick="woeTab('guildkills',this)"><i class="ti ti-shield-half-filled"></i> Guild Kills</button>
     <button class="atab" onclick="woeTab('kills',this)"><i class="ti ti-activity"></i> Recent Kills</button>
+    <button class="atab" onclick="woeTab('me',this)"><i class="ti ti-user-circle"></i> My Status</button>
   </div>
 
   <section class="atab-panel show" id="woe-castles">
@@ -45,6 +46,21 @@
   <section class="atab-panel" id="woe-kills">
     <p class="subtitle">Live combat feed from the last WoE.</p>
     <div class="tbl-wrap"><table class="stat" data-api="woe_kills"><thead><tr><th>Time</th><th>Killer</th><th>Killed</th><th>Map</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="4">Loading…</td></tr></tbody></table></div>
+  </section>
+
+  <section class="atab-panel" id="woe-me">
+    <div id="woeme-guard" class="guard-box">
+      <i class="ti ti-lock"></i>
+      <div>
+        <h3>You are not signed in</h3>
+        <p>Log in to see every character on your account and how they did in WoE this month.</p>
+      </div>
+      <button class="btn-gold" style="max-width:180px" onclick="openPanel('login')">Log in</button>
+    </div>
+    <div id="woeme-content" style="display:none">
+      <p class="subtitle">Every character on your account this month, including ones that sat WoE out. Click a name for the full breakdown.</p>
+      <div class="tbl-wrap"><table class="stat" id="woeme-tbl"><thead><tr><th>Character</th><th>Guild</th><th>Kills</th><th>Deaths</th><th>Damage Dealt</th><th>Damage Taken</th><th>Role</th><th>Score</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="8">Loading…</td></tr></tbody></table></div>
+    </div>
   </section>
 </div>
 <div class="backdrop" id="backdrop" onclick="closePanel()"></div>

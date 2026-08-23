@@ -676,7 +676,7 @@ function woeTab(name, btn){
   var root=btn && btn.closest('.acct-tabs');
   (root || document).querySelectorAll('.atab').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
-  ['castles','players','guildkills','kills'].forEach(function(n){
+  ['castles','players','guildkills','kills','me'].forEach(function(n){
     var el=document.getElementById('woe-'+n);
     if(el) el.classList.toggle('show', n===name);
   });
@@ -862,6 +862,9 @@ function tdRow(cells){
 function noDataRow(cols,msg){
   return '<tr class="norow-row"><td class="norow" colspan="'+cols+'">'+msg+'</td></tr>';
 }
+function woeNameLink(charId,name){
+  return charId ? '<a href="#" onclick="openWoePlayerDetail('+parseInt(charId,10)+');return false">'+name+'</a>' : name;
+}
 function fmtWoeTime(t){
   if(!t) return '—';
   var d=new Date((''+t).replace(' ','T'));
@@ -901,7 +904,7 @@ async function hydrateOneTable(tbl){
       : noDataRow(cols,'No guilds have been created yet — check back once guilds start forming.');
   } else if(key==='woe_players' && d.rows){
     d.rows.forEach(function(r){
-      rows.push(tdRow([i++, r.name, r.guild||'—', fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.damage), fmtNum(r.damage_taken), r.role||'—', fmtNum(r.score)]));
+      rows.push(tdRow([i++, woeNameLink(r.char_id,r.name), r.guild||'—', fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.damage), fmtNum(r.damage_taken), r.role||'—', fmtNum(r.score)]));
     });
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
       : noDataRow(cols,'No WoE combat data recorded yet this month.');
@@ -936,6 +939,77 @@ async function hydrateTable(){
   for(var t=0;t<tables.length;t++){ await hydrateOneTable(tables[t]); }
 }
 
+/* ================= WOE PLAYER DETAIL PANEL ================= */
+function statRow(label,value){
+  return '<div class="info-item"><span>'+label+'</span><b>'+value+'</b></div>';
+}
+function renderWoePlayerDetail(d){
+  var c=d.combat||{}, o=d.objectives||{}, s=d.support||{}, r=d.resources||{};
+  return '<p class="lead">'+(d.guild?('<b>'+d.guild+'</b> — '):'')+(d.role||'No WoE activity')+
+      (d.days_played?' · '+d.days_played+' WoE day'+(d.days_played===1?'':'s')+' this month':'')+'</p>'+
+    '<h2 class="sec-title" style="margin-top:18px"><i class="ti ti-target-arrow"></i> Combat</h2>'+
+    '<div class="info-row">'+
+      statRow('Score',fmtNum(d.score||0))+statRow('Kills',fmtNum(c.kills||0))+statRow('Deaths',fmtNum(c.deaths||0))+statRow('Assists',fmtNum(c.assists||0))+
+      statRow('Damage Dealt',fmtNum(c.damage_dealt||0))+statRow('Damage Taken',fmtNum(c.damage_taken||0))+statRow('Biggest Hit',fmtNum(c.top_damage||0))+
+    '</div>'+
+    '<h2 class="sec-title" style="margin-top:18px"><i class="ti ti-flag"></i> Objectives</h2>'+
+    '<div class="info-row">'+
+      statRow('Emperium Dmg',fmtNum(o.emperium_damage||0))+statRow('Emperium Kills',fmtNum(o.emperium_kill||0))+
+      statRow('Guardian Dmg',fmtNum(o.guardian_damage||0))+statRow('Guardian Kills',fmtNum(o.guardian_kill||0))+
+      statRow('Barricade Dmg',fmtNum(o.barricade_damage||0))+statRow('Barricade Kills',fmtNum(o.barricade_kill||0))+
+    '</div>'+
+    '<h2 class="sec-title" style="margin-top:18px"><i class="ti ti-heart-plus"></i> Support &amp; Skills</h2>'+
+    '<div class="info-row">'+
+      statRow('Skill Casts',fmtNum(s.skill_casts||0))+statRow('Resurrects',fmtNum(s.resurrects||0))+
+      statRow('Support Casts',fmtNum(s.support_skills_used||0))+statRow('...On an Enemy',fmtNum(s.wrong_support_skills_used||0))+
+      statRow('Healing Done',fmtNum(s.healing_done||0))+statRow('...Wrong Target',fmtNum(s.wrong_healing_done||0))+
+      statRow('Acid Demonstration',fmtNum(s.acid_demonstration_used||0))+
+    '</div>'+
+    '<h2 class="sec-title" style="margin-top:18px"><i class="ti ti-flask"></i> Resources Used</h2>'+
+    '<div class="info-row">'+
+      statRow('SP Used',fmtNum(r.sp_used||0))+statRow('Spiritballs',fmtNum(r.spiritball_used||0))+
+      statRow('HP Potions',fmtNum(r.hp_heal_potions||0))+statRow('SP Potions',fmtNum(r.sp_heal_potions||0))+
+      statRow('Yellow Gems',fmtNum(r.yellow_gemstones||0))+statRow('Red Gems',fmtNum(r.red_gemstones||0))+statRow('Blue Gems',fmtNum(r.blue_gemstones||0))+
+      statRow('Poison Bottles',fmtNum(r.poison_bottles||0))+statRow('Ammo Used',fmtNum(r.ammo_used||0))+
+    '</div>';
+}
+async function openWoePlayerDetail(charId){
+  var panel=$panel(), backdrop=$backdrop();
+  if(!panel) return;
+  document.getElementById('pnl-icon').className='ti ti-swords';
+  document.getElementById('pnl-title').textContent='Loading…';
+  document.getElementById('pnl-body').innerHTML='<p class="lead">Loading player stats…</p>';
+  panel.classList.add('show'); backdrop.classList.add('show');
+
+  var d=await NeroAPI.get('woe_player',{char_id:charId});
+  if(!d){
+    document.getElementById('pnl-body').innerHTML='<p class="lead">Could not load this player’s WoE stats.</p>';
+    return;
+  }
+  document.getElementById('pnl-title').textContent=d.name||'Player';
+  document.getElementById('pnl-body').innerHTML=renderWoePlayerDetail(d);
+}
+
+/* ================= WOE "MY STATUS" TAB ================= */
+async function loadWoeMePage(){
+  var guard=document.getElementById('woeme-guard');
+  var content=document.getElementById('woeme-content');
+  if(!guard||!content) return;                     /* not on the WoE page */
+  if(!Auth.loggedIn){ guard.style.display=''; content.style.display='none'; return; }
+  guard.style.display='none'; content.style.display='';
+
+  var tbl=document.getElementById('woeme-tbl');
+  if(!tbl) return;
+  var cols=tbl.rows[0].cells.length;
+  var d=await NeroAPI.get('woe_me');
+  if(!d){ tbl.tBodies[0].innerHTML=noDataRow(cols,'Could not load your characters — try again shortly.'); return; }
+  var rows=d.rows.map(function(r){
+    return tdRow([woeNameLink(r.char_id,r.name), r.guild||'—', fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.damage), fmtNum(r.damage_taken), r.role||'—', fmtNum(r.score)]);
+  });
+  tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
+    : noDataRow(cols,'No characters found on this account.');
+}
+
 /* ================= SPA ROUTER ================= */
 function afterPageLoad(){
   renderAcct();
@@ -947,6 +1021,7 @@ function afterPageLoad(){
   selAmt=null;
   hydrateTable();                   /* pull live rows if the API is on */
   loadAccountPage();                /* account page, if we're on it */
+  loadWoeMePage();                  /* WoE "My Status" tab, if we're on it */
 
   /* pages like pages/register.html carry data-open-panel so a direct link
      (or a SPA nav to it) opens straight into that panel */
