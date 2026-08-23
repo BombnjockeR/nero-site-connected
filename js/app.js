@@ -901,7 +901,7 @@ async function hydrateOneTable(tbl){
       : noDataRow(cols,'No guilds have been created yet — check back once guilds start forming.');
   } else if(key==='woe_players' && d.rows){
     d.rows.forEach(function(r){
-      rows.push(tdRow([i++, r.name, r.guild||'—', fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.damage), r.role||'—', fmtNum(r.score)]));
+      rows.push(tdRow([i++, r.name, r.guild||'—', fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.damage), fmtNum(r.damage_taken), r.role||'—', fmtNum(r.score)]));
     });
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
       : noDataRow(cols,'No WoE combat data recorded yet this month.');
