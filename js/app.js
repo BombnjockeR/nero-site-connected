@@ -850,9 +850,16 @@ function tdRow(cells){
 function noDataRow(cols,msg){
   return '<tr class="norow-row"><td class="norow" colspan="'+cols+'">'+msg+'</td></tr>';
 }
-async function hydrateTable(){
-  var tbl=document.getElementById('stbl');
-  if(!tbl) return;
+function fmtWoeTime(t){
+  if(!t) return '—';
+  var d=new Date((''+t).replace(' ','T'));
+  if(isNaN(d)) return t;
+  var mons=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var h=d.getHours(), ap=h>=12?'pm':'am'; h=h%12; if(h===0) h=12;
+  var mm=(d.getMinutes()<10?'0':'')+d.getMinutes();
+  return d.getDate()+' '+mons[d.getMonth()]+' '+h+':'+mm+ap;
+}
+async function hydrateOneTable(tbl){
   var key=tbl.getAttribute('data-api');
   if(!key) return;
   var cols=tbl.rows[0].cells.length;
@@ -880,6 +887,24 @@ async function hydrateTable(){
     });
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
       : noDataRow(cols,'No guilds have been created yet — check back once guilds start forming.');
+  } else if(key==='woe_players' && d.rows){
+    d.rows.forEach(function(r){
+      rows.push(tdRow([i++, r.name, r.guild||'—', r.role||'—', fmtNum(r.score), fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.damage)]));
+    });
+    tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
+      : noDataRow(cols,'No WoE combat data recorded yet this month.');
+  } else if(key==='woe_guild_kills' && d.rows){
+    d.rows.forEach(function(r){
+      rows.push(tdRow([i++, r.name, fmtNum(r.kills), fmtNum(r.deaths)]));
+    });
+    tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
+      : noDataRow(cols,'No guild WoE kills recorded yet this month.');
+  } else if(key==='woe_kills' && d.rows){
+    d.rows.forEach(function(r){
+      rows.push(tdRow([fmtWoeTime(r.time), r.killer, r.killed, r.map||'—']));
+    });
+    tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
+      : noDataRow(cols,'No kills logged yet this WoE.');
   } else if(key==='mvp'){
     if(!d.available) return;                      /* keep the honest "no tracking" row already in the HTML */
     d.rows.forEach(function(r){
@@ -893,6 +918,10 @@ async function hydrateTable(){
     });
     if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
   }
+}
+async function hydrateTable(){
+  var tables=document.querySelectorAll('table.stat[data-api]');
+  for(var t=0;t<tables.length;t++){ await hydrateOneTable(tables[t]); }
 }
 
 /* ================= SPA ROUTER ================= */

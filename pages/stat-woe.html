@@ -21,6 +21,18 @@
     <input id="tblsearch" placeholder="Search guild name..." oninput="filterTable()">
     <span class="hits" id="hits"></span></div>
   <div class="tbl-wrap"><table class="stat" id="stbl" data-api="woe"><thead><tr><th>#</th><th>Guild</th><th>Castles Held</th><th>Average Level</th><th>Members Online</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="5">Loading…</td></tr></tbody></table></div>
+
+  <h2 class="sec-title" style="margin-top:36px"><i class="ti ti-swords"></i> Top WoE Players This Month</h2>
+  <p class="subtitle">Ranked by score — damage dealt/taken, objective damage, kills, assists and support all count. Role is each player's best-scoring day this month.</p>
+  <div class="tbl-wrap"><table class="stat" data-api="woe_players"><thead><tr><th>#</th><th>Player</th><th>Guild</th><th>Role</th><th>Score</th><th>Kills</th><th>Deaths</th><th>Damage Dealt</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="8">Loading…</td></tr></tbody></table></div>
+
+  <h2 class="sec-title" style="margin-top:36px"><i class="ti ti-shield-half-filled"></i> Guild WoE Kill Leaderboard</h2>
+  <p class="subtitle">Total player kills/deaths by guild this month.</p>
+  <div class="tbl-wrap"><table class="stat" data-api="woe_guild_kills"><thead><tr><th>#</th><th>Guild</th><th>Kills</th><th>Deaths</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="4">Loading…</td></tr></tbody></table></div>
+
+  <h2 class="sec-title" style="margin-top:36px"><i class="ti ti-activity"></i> Recent WoE Kills</h2>
+  <p class="subtitle">Live combat feed from the last WoE.</p>
+  <div class="tbl-wrap"><table class="stat" data-api="woe_kills"><thead><tr><th>Time</th><th>Killer</th><th>Killed</th><th>Map</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="4">Loading…</td></tr></tbody></table></div>
 </div>
 <div class="backdrop" id="backdrop" onclick="closePanel()"></div>
 <aside class="panel" id="panel">
