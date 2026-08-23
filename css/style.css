@@ -35,7 +35,10 @@ body.page .sitehead{position:sticky;top:0;z-index:9;background:rgba(7,11,18,.86)
  border-radius:20px;border:1px solid var(--gold);box-shadow:0 2px 10px rgba(0,0,0,.35)}
 .hd-pill b{color:var(--gold);font-weight:700}
 .hd-pill .hd-sep{color:#445468;margin:0 2px}
-.hd-tabs{margin-left:auto;display:flex;gap:8px;align-items:center}
+.hd-tabs{display:flex;gap:8px;align-items:center}
+@media(min-width:901px){
+  .hd-tabs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1}
+}
 .hd-tabs .tab{font-size:13px;letter-spacing:.4px;color:#fff;text-decoration:none;background:rgba(8,13,24,.55);
  border:1px solid var(--line);padding:8px 16px;border-radius:20px;backdrop-filter:blur(6px);transition:.2s;white-space:nowrap}
 .hd-tabs .tab:hover{background:var(--gold);color:#1a1206}
@@ -391,7 +394,6 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
 
 /* ================= BIG HOME LOGO + RIGHT CLUSTER ================= */
 .hd-right{margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;z-index:10}
-.sitehead .hd-tabs{margin-left:auto}
 .sitehead .hd-right{margin-left:16px}
 .home-logo{height:150px !important;position:relative;z-index:10}
 .homebar{align-items:flex-start;padding-top:18px}

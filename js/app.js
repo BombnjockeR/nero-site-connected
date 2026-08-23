@@ -899,6 +899,7 @@ async function hydrateTable(){
 function afterPageLoad(){
   renderAcct();
   paintOnline();
+  tickServerTime();                 /* avoid a flash of the static "—" placeholder after SPA nav */
   /* mobile: close the wiki contents drawer after navigating */
   wikiNav(false);
   curF='all';                       /* reset marketplace filter state */
