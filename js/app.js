@@ -159,18 +159,18 @@ function registerHTML(){
     <div class="rowlinks"><span></span><a href="#" onclick="openPanel('login');return false">Already have an account?</a></div>`;
 }
 
-/* ---- Forgot password (no email — userid + birthdate + captcha) ---- */
-var FG_CAPTCHA='', FG_VERIFIED=false, FG_USERID='', FG_DOB='';
+/* ---- Forgot password (userid + email + captcha) ---- */
+var FG_CAPTCHA='', FG_VERIFIED=false, FG_USERID='', FG_EMAIL='';
 
 function forgotHTML(){ return `
-  <p class="lead">Reset password tanpa email — verifikasi pakai User ID dan Tanggal Lahir yang kamu daftarkan.</p>
+  <p class="lead">Reset password — verifikasi pakai User ID dan Email yang kamu daftarkan.</p>
   <div id="forgot-msg"></div>
 
   <div id="forgot-step1">
     <label class="fld">User ID</label>
     <input class="inp" id="fg-id" placeholder="username kamu">
-    <label class="fld">Tanggal Lahir</label>
-    <input class="inp" id="fg-dob" type="date">
+    <label class="fld">Email</label>
+    <input class="inp" id="fg-email" type="email" placeholder="name@email.com">
     <label class="fld">Captcha</label>
     <div class="captcha-row">
       <canvas id="fg-captcha-canvas" width="140" height="46"></canvas>
@@ -199,7 +199,7 @@ function forgotHTML(){ return `
 }
 
 function initForgotPanel(){
-  FG_VERIFIED=false; FG_USERID=''; FG_DOB='';
+  FG_VERIFIED=false; FG_USERID=''; FG_EMAIL='';
   var s1=document.getElementById('forgot-step1'), s2=document.getElementById('forgot-step2');
   if(s1) s1.style.display=''; if(s2) s2.style.display='none';
   drawCaptcha();
@@ -238,25 +238,25 @@ function drawCaptcha(){
 }
 async function doVerifyIdentity(){
   var id=(document.getElementById('fg-id').value||'').trim();
-  var dob=document.getElementById('fg-dob').value||'';
+  var email=(document.getElementById('fg-email').value||'').trim();
   var cap=(document.getElementById('fg-captcha-input').value||'').trim().toUpperCase();
 
-  if(!id)  return panelMsg('forgot-msg','Masukkan User ID kamu.',false);
-  if(!dob) return panelMsg('forgot-msg','Masukkan tanggal lahir kamu.',false);
+  if(!id)    return panelMsg('forgot-msg','Masukkan User ID kamu.',false);
+  if(!email) return panelMsg('forgot-msg','Masukkan email kamu.',false);
   if(!cap||cap!==FG_CAPTCHA){ drawCaptcha(); return panelMsg('forgot-msg','Kode captcha salah, coba lagi.',false); }
 
   var btn=document.getElementById('fg-verify-btn'); btn.disabled=true; btn.textContent='Memeriksa...';
-  var res=await NeroAPI.post('/account.php',{action:'verify_reset',userid:id,birthdate:dob});
+  var res=await NeroAPI.post('/account.php',{action:'verify_reset',userid:id,email:email});
   btn.disabled=false; btn.textContent='Continue';
 
   if(res&&res.ok){
-    FG_VERIFIED=true; FG_USERID=id; FG_DOB=dob;
+    FG_VERIFIED=true; FG_USERID=id; FG_EMAIL=email;
     document.getElementById('forgot-step1').style.display='none';
     document.getElementById('forgot-step2').style.display='';
     document.getElementById('forgot-msg').innerHTML='';
   }else{
     drawCaptcha();
-    panelMsg('forgot-msg',(res&&res.error)||'User ID atau tanggal lahir tidak cocok.',false);
+    panelMsg('forgot-msg',(res&&res.error)||'User ID atau email tidak cocok.',false);
   }
 }
 function fgPwHint(){
@@ -272,7 +272,7 @@ async function doResetNoEmail(){
   if(pw!==pw2) return panelMsg('forgot-msg','Password tidak sama.',false);
 
   var btn=document.getElementById('fg-reset-btn'); btn.disabled=true; btn.textContent='Menyimpan...';
-  var res=await NeroAPI.post('/account.php',{action:'reset_noemail',userid:FG_USERID,birthdate:FG_DOB,password:pw});
+  var res=await NeroAPI.post('/account.php',{action:'reset_noemail',userid:FG_USERID,email:FG_EMAIL,password:pw});
   btn.disabled=false; btn.textContent='Confirm';
 
   if(res&&res.ok){
