@@ -906,6 +906,12 @@ function afterPageLoad(){
   selAmt=null;
   hydrateTable();                   /* pull live rows if the API is on */
   loadAccountPage();                /* account page, if we're on it */
+
+  /* pages like pages/register.html carry data-open-panel so a direct link
+     (or a SPA nav to it) opens straight into that panel */
+  var app=document.getElementById('app');
+  var wantPanel=app && app.getAttribute('data-open-panel');
+  if(wantPanel) openPanel(wantPanel);
 }
 
 (function router(){
