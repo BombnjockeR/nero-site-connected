@@ -394,7 +394,6 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
 
 /* ================= BIG HOME LOGO + RIGHT CLUSTER ================= */
 .hd-right{margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;z-index:10}
-.sitehead .hd-right{margin-left:16px}
 .home-logo{height:150px !important;position:relative;z-index:10}
 .homebar{align-items:flex-start;padding-top:18px}
 .homebar .hd-right{margin-top:16px}
