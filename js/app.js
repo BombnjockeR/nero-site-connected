@@ -883,7 +883,7 @@ async function hydrateTable(){
   } else if(key==='mvp'){
     if(!d.available) return;                      /* keep the honest "no tracking" row already in the HTML */
     d.rows.forEach(function(r){
-      rows.push(tdRow([i++, r.name, fmtNum(r.kills), '—', fmtNum(r.kills*2)]));
+      rows.push(tdRow([i++, r.name, fmtNum(r.kills), r.favorite||'—', fmtNum(r.kills*2)]));
     });
     if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
   } else if(key==='pvp'){
