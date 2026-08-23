@@ -669,6 +669,18 @@ const JOB_NAMES={0:'Novice',1:'Swordman',2:'Mage',3:'Archer',4:'Acolyte',5:'Merc
  4019:'Creator',4020:'Clown',4021:'Gypsy'};
 function jobName(c){ return JOB_NAMES[c] || ('Class '+c); }
 
+/* WoE stats page: same tab look as acctTab(), but its own tiny switcher
+   (no sessionStorage) since "castles"/"players"/etc. don't belong in the
+   Account page's remembered-tab state. */
+function woeTab(name, btn){
+  var root=btn && btn.closest('.acct-tabs');
+  (root || document).querySelectorAll('.atab').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  ['castles','players','guildkills','kills'].forEach(function(n){
+    var el=document.getElementById('woe-'+n);
+    if(el) el.classList.toggle('show', n===name);
+  });
+}
 function acctTab(name, btn){
   document.querySelectorAll('.atab').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
@@ -889,7 +901,7 @@ async function hydrateOneTable(tbl){
       : noDataRow(cols,'No guilds have been created yet — check back once guilds start forming.');
   } else if(key==='woe_players' && d.rows){
     d.rows.forEach(function(r){
-      rows.push(tdRow([i++, r.name, r.guild||'—', r.role||'—', fmtNum(r.score), fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.damage)]));
+      rows.push(tdRow([i++, r.name, r.guild||'—', fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.damage), r.role||'—', fmtNum(r.score)]));
     });
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
       : noDataRow(cols,'No WoE combat data recorded yet this month.');
