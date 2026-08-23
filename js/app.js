@@ -904,7 +904,10 @@ async function hydrateOneTable(tbl){
       : noDataRow(cols,'No guilds have been created yet — check back once guilds start forming.');
   } else if(key==='woe_players' && d.rows){
     d.rows.forEach(function(r){
-      rows.push(tdRow([i++, woeNameLink(r.char_id,r.name), r.guild||'—', fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.damage), fmtNum(r.damage_taken), r.role||'—', fmtNum(r.score)]));
+      rows.push(tdRow([i++, woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0),
+        fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.assists), fmtNum(r.damage), fmtNum(r.damage_taken),
+        fmtNum(r.skill_casts), fmtNum(r.healing_done), fmtNum(r.wrong_healing_done), fmtNum(r.healing_items),
+        r.role||'—', fmtNum(r.score)]));
     });
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
       : noDataRow(cols,'No WoE combat data recorded yet this month.');
@@ -945,7 +948,7 @@ function statRow(label,value){
 }
 function renderWoePlayerDetail(d){
   var c=d.combat||{}, o=d.objectives||{}, s=d.support||{}, r=d.resources||{};
-  return '<p class="lead">'+(d.guild?('<b>'+d.guild+'</b> — '):'')+(d.role||'No WoE activity')+
+  return '<p class="lead">'+jobName(d.class||0)+(d.guild?(' · <b>'+d.guild+'</b>'):'')+' — '+(d.role||'No WoE activity')+
       (d.days_played?' · '+d.days_played+' WoE day'+(d.days_played===1?'':'s')+' this month':'')+'</p>'+
     '<h2 class="sec-title" style="margin-top:18px"><i class="ti ti-target-arrow"></i> Combat</h2>'+
     '<div class="info-row">'+
@@ -1004,7 +1007,10 @@ async function loadWoeMePage(){
   var d=await NeroAPI.get('woe_me');
   if(!d){ tbl.tBodies[0].innerHTML=noDataRow(cols,'Could not load your characters — try again shortly.'); return; }
   var rows=d.rows.map(function(r){
-    return tdRow([woeNameLink(r.char_id,r.name), r.guild||'—', fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.damage), fmtNum(r.damage_taken), r.role||'—', fmtNum(r.score)]);
+    return tdRow([woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0),
+      fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.assists), fmtNum(r.damage), fmtNum(r.damage_taken),
+      fmtNum(r.skill_casts), fmtNum(r.healing_done), fmtNum(r.wrong_healing_done), fmtNum(r.healing_items),
+      r.role||'—', fmtNum(r.score)]);
   });
   tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
     : noDataRow(cols,'No characters found on this account.');
