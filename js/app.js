@@ -1007,10 +1007,17 @@ async function loadWoeMePage(){
   var d=await NeroAPI.get('woe_me');
   if(!d){ tbl.tBodies[0].innerHTML=noDataRow(cols,'Could not load your characters — try again shortly.'); return; }
   var rows=d.rows.map(function(r){
-    return tdRow([woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0),
-      fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.assists), fmtNum(r.damage), fmtNum(r.damage_taken),
-      fmtNum(r.skill_casts), fmtNum(r.healing_done), fmtNum(r.wrong_healing_done), fmtNum(r.healing_items),
-      r.role||'—', fmtNum(r.score)]);
+    return tdRow([
+      woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0), fmtNum(r.days_played),
+      fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.assists),
+      fmtNum(r.damage), fmtNum(r.damage_taken), fmtNum(r.top_damage),
+      fmtNum(r.emperium_damage), fmtNum(r.emperium_kill), fmtNum(r.guardian_damage), fmtNum(r.guardian_kill), fmtNum(r.barricade_damage), fmtNum(r.barricade_kill),
+      fmtNum(r.skill_casts), fmtNum(r.resurrects), fmtNum(r.acid_demonstration_used),
+      fmtNum(r.support_skills_used), fmtNum(r.wrong_support_skills_used), fmtNum(r.healing_done), fmtNum(r.wrong_healing_done),
+      fmtNum(r.sp_used), fmtNum(r.spiritball_used), fmtNum(r.hp_heal_potions), fmtNum(r.sp_heal_potions),
+      fmtNum(r.yellow_gemstones), fmtNum(r.red_gemstones), fmtNum(r.blue_gemstones), fmtNum(r.poison_bottles), fmtNum(r.ammo_used),
+      r.role||'—', fmtNum(r.score)
+    ]);
   });
   tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
     : noDataRow(cols,'No characters found on this account.');
