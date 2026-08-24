@@ -915,7 +915,9 @@ async function hydrateOneTable(tbl){
     d.rows.forEach(function(r){
       rows.push(tdRow([i++, woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0),
         fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.assists), fmtNum(r.damage), fmtNum(r.damage_taken),
-        fmtNum(r.skill_casts), fmtNum(r.healing_done), fmtNum(r.wrong_healing_done), fmtNum(r.healing_items),
+        fmtNum(r.emperium_damage), fmtNum(r.barricade_damage),
+        fmtNum(r.skill_casts), fmtNum(r.support_skills_used), fmtNum(r.acid_demonstration_used),
+        fmtNum(r.healing_done), fmtNum(r.sp_used), fmtNum(r.healing_items),
         r.role||'—', fmtNum(r.score)]));
     });
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')

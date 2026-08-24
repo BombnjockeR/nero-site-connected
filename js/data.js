@@ -76,4 +76,7 @@ const Auth = {
   logout(){ sessionStorage.removeItem("nero_login"); sessionStorage.removeItem("nero_user"); sessionStorage.removeItem("nero_token"); }
 };
 function fmtRp(n){ return "Rp " + n.toLocaleString("id-ID"); }
-function fmtNum(n){ return n.toLocaleString("en-US"); }
+/* Tolerates a missing field: a table column can go live before the bridge that
+   feeds it is redeployed, and n.toLocaleString() on undefined would throw and
+   leave the whole table stuck on "Loading...". */
+function fmtNum(n){ return (n===null||n===undefined||isNaN(n)) ? "0" : Number(n).toLocaleString("en-US"); }

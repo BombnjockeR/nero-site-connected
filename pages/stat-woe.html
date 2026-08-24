@@ -14,7 +14,7 @@
     <div class="hd-acct" id="hd-acct"></div>
   </div>
 </header>
-<div class="wrap">
+<div class="wrap full">
   <h1 class="pg-title">WoE Statistics</h1>
 
   <div class="acct-tabs">
@@ -25,7 +25,7 @@
     <button class="atab" onclick="woeTab('me',this)"><i class="ti ti-user-circle"></i> My Status</button>
   </div>
 
-  <section class="atab-panel show" id="woe-castles">
+  <section class="atab-panel narrow show" id="woe-castles">
     <p class="subtitle">Current castle ownership on NeRO.</p>
     <div class="searchbar"><i class="ti ti-search"></i>
       <input id="tblsearch" placeholder="Search guild name..." oninput="filterTable()">
@@ -36,15 +36,15 @@
   <section class="atab-panel" id="woe-players">
     <p class="subtitle">Ranked by score — damage dealt/taken, objective damage, kills, assists and support all count. Role is each player's best-scoring day this month.</p>
     <p class="subtitle woe-est" id="woeplayers-est" style="display:none"><i class="ti ti-alert-triangle"></i> The game server hasn't written its own WoE scores yet, so these scores and roles are the website's own estimate from the raw stats.</p>
-    <div class="tbl-wrap"><table class="stat" data-api="woe_players"><thead><tr><th>#</th><th>Player</th><th>Guild</th><th>Job</th><th>Kills</th><th>Deaths</th><th>Assist</th><th>Damage Dealt</th><th>Damage Taken</th><th>Skill Used</th><th>Healing Done</th><th>Wrong Heal</th><th>Heal Items</th><th>Role</th><th>Score</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="15">Loading…</td></tr></tbody></table></div>
+    <div class="tbl-wrap"><table class="stat" data-api="woe_players"><thead><tr><th>#</th><th>Player</th><th>Guild</th><th>Job</th><th>Kills</th><th>Deaths</th><th>Assist</th><th>Damage Dealt</th><th>Damage Taken</th><th>Emperium Dmg</th><th>Barricade Dmg</th><th>Skill Used</th><th>Support Casts</th><th>Acid Demo</th><th>Healing Done</th><th>SP Used</th><th>Heal Items</th><th>Role</th><th>Score</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="19">Loading…</td></tr></tbody></table></div>
   </section>
 
-  <section class="atab-panel" id="woe-guildkills">
+  <section class="atab-panel narrow" id="woe-guildkills">
     <p class="subtitle">Total player kills/deaths by guild this month.</p>
     <div class="tbl-wrap"><table class="stat" data-api="woe_guild_kills"><thead><tr><th>#</th><th>Guild</th><th>Kills</th><th>Deaths</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="4">Loading…</td></tr></tbody></table></div>
   </section>
 
-  <section class="atab-panel" id="woe-kills">
+  <section class="atab-panel narrow" id="woe-kills">
     <p class="subtitle">Live combat feed from the last WoE.</p>
     <div class="tbl-wrap"><table class="stat" data-api="woe_kills"><thead><tr><th>Time</th><th>Killer</th><th>Killed</th><th>Map</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="4">Loading…</td></tr></tbody></table></div>
   </section>

@@ -319,6 +319,7 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
 
   /* --- content pages --- */
   .wrap{padding:20px 16px 130px}
+  .wrap.full{padding-left:16px;padding-right:16px}
   .pg-title{font-size:22px}
   .mkt-banner{padding:18px;gap:14px}
   .mkt-banner i{font-size:30px}
@@ -402,6 +403,20 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
 
 /* ================= ACCOUNT PAGE ================= */
 .wrap.wide{max-width:1280px}
+
+/* Stat pages carrying wide tables (WoE: 19 columns on Top Players, 34 on My
+   Status) — near-full-bleed with a thin gutter, and tighter cells so more of
+   the board is readable before .tbl-wrap's horizontal scrollbar kicks in.
+   nowrap matters as much as the width here: without it a name like "Kakek
+   Metal Slug" wraps onto three lines and every row grows to match. */
+.wrap.full{max-width:1860px;padding-left:18px;padding-right:18px}
+.wrap.full table.stat{font-size:13.5px}
+.wrap.full table.stat th{padding:12px 11px;font-size:12.5px}
+.wrap.full table.stat td{padding:11px 11px}
+.wrap.full table.stat th,.wrap.full table.stat td{white-space:nowrap}
+/* ...but a 4-5 column board stretched over 1860px is just empty cells, so the
+   narrow panels keep the normal reading width. */
+.wrap.full .atab-panel.narrow{max-width:1120px}
 
 /* not-signed-in box */
 .guard-box{display:flex;align-items:center;gap:18px;flex-wrap:wrap;
