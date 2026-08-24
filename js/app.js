@@ -862,6 +862,14 @@ function tdRow(cells){
 function noDataRow(cols,msg){
   return '<tr class="norow-row"><td class="norow" colspan="'+cols+'">'+msg+'</td></tr>';
 }
+/* The game server only writes woe_stats.score/role_label at WoE end; when it
+   hasn't, the bridge derives both from the raw counters and flags the payload
+   as estimated. Surface that instead of silently passing an estimate off as
+   the server's own score. */
+function woeEstNote(id,on){
+  var el=document.getElementById(id);
+  if(el) el.style.display = on ? '' : 'none';
+}
 function woeNameLink(charId,name){
   return charId ? '<a href="#" onclick="openWoePlayerDetail('+parseInt(charId,10)+');return false">'+name+'</a>' : name;
 }
@@ -903,6 +911,7 @@ async function hydrateOneTable(tbl){
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
       : noDataRow(cols,'No guilds have been created yet — check back once guilds start forming.');
   } else if(key==='woe_players' && d.rows){
+    woeEstNote('woeplayers-est', !!d.estimated && d.rows.length>0);
     d.rows.forEach(function(r){
       rows.push(tdRow([i++, woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0),
         fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.assists), fmtNum(r.damage), fmtNum(r.damage_taken),
@@ -952,7 +961,7 @@ function renderWoePlayerDetail(d){
       (d.days_played?' · '+d.days_played+' WoE day'+(d.days_played===1?'':'s')+' this month':'')+'</p>'+
     '<h2 class="sec-title" style="margin-top:18px"><i class="ti ti-target-arrow"></i> Combat</h2>'+
     '<div class="info-row">'+
-      statRow('Score',fmtNum(d.score||0))+statRow('Kills',fmtNum(c.kills||0))+statRow('Deaths',fmtNum(c.deaths||0))+statRow('Assists',fmtNum(c.assists||0))+
+      statRow('Score',fmtNum(d.score||0)+(d.estimated?' <em style="opacity:.65;font-size:.82em">est.</em>':''))+statRow('Kills',fmtNum(c.kills||0))+statRow('Deaths',fmtNum(c.deaths||0))+statRow('Assists',fmtNum(c.assists||0))+
       statRow('Damage Dealt',fmtNum(c.damage_dealt||0))+statRow('Damage Taken',fmtNum(c.damage_taken||0))+statRow('Biggest Hit',fmtNum(c.top_damage||0))+
     '</div>'+
     '<h2 class="sec-title" style="margin-top:18px"><i class="ti ti-flag"></i> Objectives</h2>'+
@@ -1006,6 +1015,7 @@ async function loadWoeMePage(){
   var cols=tbl.rows[0].cells.length;
   var d=await NeroAPI.get('woe_me');
   if(!d){ tbl.tBodies[0].innerHTML=noDataRow(cols,'Could not load your characters — try again shortly.'); return; }
+  woeEstNote('woeme-est', !!d.estimated);
   var rows=d.rows.map(function(r){
     return tdRow([
       woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0), fmtNum(r.days_played),

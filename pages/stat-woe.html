@@ -35,6 +35,7 @@
 
   <section class="atab-panel" id="woe-players">
     <p class="subtitle">Ranked by score — damage dealt/taken, objective damage, kills, assists and support all count. Role is each player's best-scoring day this month.</p>
+    <p class="subtitle woe-est" id="woeplayers-est" style="display:none"><i class="ti ti-alert-triangle"></i> The game server hasn't written its own WoE scores yet, so these scores and roles are the website's own estimate from the raw stats.</p>
     <div class="tbl-wrap"><table class="stat" data-api="woe_players"><thead><tr><th>#</th><th>Player</th><th>Guild</th><th>Job</th><th>Kills</th><th>Deaths</th><th>Assist</th><th>Damage Dealt</th><th>Damage Taken</th><th>Skill Used</th><th>Healing Done</th><th>Wrong Heal</th><th>Heal Items</th><th>Role</th><th>Score</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="15">Loading…</td></tr></tbody></table></div>
   </section>
 
@@ -59,6 +60,7 @@
     </div>
     <div id="woeme-content" style="display:none">
       <p class="subtitle">Every character on your account this month, including ones that sat WoE out — every stat script/woe_stats.txt tracks.</p>
+      <p class="subtitle woe-est" id="woeme-est" style="display:none"><i class="ti ti-alert-triangle"></i> The game server hasn't written its own WoE scores yet, so Score and Role are the website's own estimate from the raw stats.</p>
       <div class="tbl-wrap"><table class="stat" id="woeme-tbl"><thead><tr>
         <th>Character</th><th>Guild</th><th>Job</th><th>Days Played</th>
         <th>Kills</th><th>Deaths</th><th>Assist</th>
