@@ -613,6 +613,12 @@ function wikiNav(open){
   else    { side.classList.remove('open'); if(scrim) scrim.classList.remove('show'); document.body.style.overflow=''; }
 }
 
+/* ================= WIKI SIDEBAR GROUP TOGGLE ================= */
+function wkToggleGroup(btn){
+  var grp=btn.closest('.wk-group');
+  if(grp) grp.classList.toggle('open');
+}
+
 /* ================= WIKI SEARCH ================= */
 function esc(t){ return t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 function wikiSearch(){
@@ -1138,6 +1144,12 @@ afterPageLoad();
     var cur=norm(location.href);
     document.querySelectorAll('.wiki-side .wk-nav a').forEach(function(a){
       a.classList.toggle('active', norm(a.href)===cur);
+    });
+    /* the sidebar DOM isn't rebuilt on SPA nav (only #wiki-main is swapped),
+       so make sure whichever group now contains the active link is opened —
+       otherwise the highlighted page could be hidden inside a collapsed dropdown. */
+    document.querySelectorAll('.wiki-side .wk-group').forEach(function(g){
+      if(g.querySelector('a.active')) g.classList.add('open');
     });
   }
 

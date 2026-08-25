@@ -187,6 +187,16 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
 .wiki-side a:hover{background:rgba(255,255,255,.07);color:#fff}
 .wiki-side a.active{background:rgba(228,184,75,.2);color:var(--gold);font-weight:500}
 .wiki-side a.sub{padding-left:26px;font-size:13px}
+.wk-group{margin:0}
+.wk-grouprow{display:flex;align-items:center;gap:2px}
+.wk-grouprow .wk-grouplink{flex:1;min-width:0}
+.wk-chevbtn{flex-shrink:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+ background:none;border:none;color:var(--muted);cursor:pointer;border-radius:7px;transition:.15s}
+.wk-chevbtn:hover{background:rgba(255,255,255,.07);color:#fff}
+.wk-chevbtn i{transition:transform .2s ease;font-size:15px}
+.wk-group.open .wk-chevbtn i{transform:rotate(180deg)}
+.wk-subwrap{max-height:0;overflow:hidden;transition:max-height .25s ease}
+.wk-group.open .wk-subwrap{max-height:600px}
 .wiki-main{flex:1;min-width:0;padding:30px 38px 120px}
 .wiki-main h1{font-size:29px;color:var(--gold);margin-bottom:16px;font-weight:600}
 .wiki-main h2{font-size:21px;color:#fff;margin:28px 0 12px;font-weight:600;border-bottom:1px solid rgba(255,255,255,.22);padding-bottom:6px}
