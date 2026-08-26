@@ -888,6 +888,20 @@ function fmtWoeTime(t){
   var mm=(d.getMinutes()<10?'0':'')+d.getMinutes();
   return d.getDate()+' '+mons[d.getMonth()]+' '+h+':'+mm+ap;
 }
+/* A player counts as having participated in WoE if any of their activity
+   counters is non-zero. Used to keep no-shows (all zeros) out of the public
+   Top Players ranking. Deliberately covers offensive, defensive and support
+   activity so e.g. a pure healer who dealt no damage still counts. */
+function woeParticipated(r){
+  var keys=['kills','deaths','assists','damage','damage_taken','emperium_damage',
+            'barricade_damage','skill_casts','support_skills_used',
+            'acid_demonstration_used','healing_done','sp_used','healing_items','score'];
+  for(var k=0;k<keys.length;k++){
+    var v=Number(r[keys[k]]);
+    if(!isNaN(v) && v>0) return true;
+  }
+  return false;
+}
 async function hydrateOneTable(tbl){
   var key=tbl.getAttribute('data-api');
   if(!key) return;
@@ -918,7 +932,10 @@ async function hydrateOneTable(tbl){
       : noDataRow(cols,'No guilds have been created yet — check back once guilds start forming.');
   } else if(key==='woe_players' && d.rows){
     woeEstNote('woeplayers-est', !!d.estimated && d.rows.length>0);
-    d.rows.forEach(function(r){
+    /* Hide non-participants: a player with every combat counter at zero never
+       actually showed up to WoE, so they'd just be noise in the rankings. This
+       is a display filter only — the data itself is untouched. */
+    d.rows.filter(woeParticipated).forEach(function(r){
       rows.push(tdRow([i++, woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0),
         fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.assists), fmtNum(r.damage), fmtNum(r.damage_taken),
         fmtNum(r.emperium_damage), fmtNum(r.barricade_damage),
