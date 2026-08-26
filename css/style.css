@@ -289,6 +289,20 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
 .tbl-wrap table{margin:0}
 .wiki-main .tbl-wrap{margin:16px 0}
 
+/* Stat pages (WoE etc.): long result sets scroll inside their own panel with
+   a pinned header, instead of relying on the whole page growing very tall —
+   makes it obvious there's more to scroll to, and keeps the header in view. */
+.wrap.full .tbl-wrap{max-height:70vh;overflow-y:auto}
+.wrap.full table.stat thead th{position:sticky;top:0;z-index:2;
+  background-color:#0d1420;background-image:linear-gradient(rgba(228,184,75,.20),rgba(228,184,75,.20))}
+
+/* Sortable column headers */
+table.stat th.sortable{cursor:pointer;user-select:none;position:relative;padding-right:26px}
+table.stat th.sortable:hover{background-color:#131f30}
+table.stat th.sortable::after{content:'\2195';position:absolute;right:9px;top:50%;transform:translateY(-50%);opacity:.4;font-size:11px}
+table.stat th.sortable.sort-asc::after{content:'\2191';opacity:1;color:#fff}
+table.stat th.sortable.sort-desc::after{content:'\2193';opacity:1;color:#fff}
+
 /* ================= MOBILE ================= */
 /* pin-area is invisible on desktop so pins still position against .stage */
 .pin-area{display:contents}

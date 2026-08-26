@@ -959,6 +959,50 @@ async function hydrateTable(){
   for(var t=0;t<tables.length;t++){ await hydrateOneTable(tables[t]); }
 }
 
+/* ================= SORTABLE STAT TABLES ================= */
+/* Click a column header to sort A-Z (numeric columns sort low-high); click
+   again to reverse. Purely a display reorder — never touches the data source. */
+function sortTableRows(table, colIdx, dir){
+  var tbody = table.tBodies[0];
+  if(!tbody) return;
+  var rows = Array.prototype.slice.call(tbody.rows);
+  if(!rows.length || rows[0].classList.contains('norow-row')) return;   /* nothing loaded yet */
+  rows.sort(function(a,b){
+    var ca = a.cells[colIdx], cb = b.cells[colIdx];
+    var ta = ca ? ca.textContent.trim() : '';
+    var tb = cb ? cb.textContent.trim() : '';
+    var na = parseFloat(ta.replace(/[,%]/g,''));
+    var nb = parseFloat(tb.replace(/[,%]/g,''));
+    var isNum = ta!=='' && tb!=='' && !isNaN(na) && !isNaN(nb) &&
+                /^-?[\d.,%\s]+$/.test(ta) && /^-?[\d.,%\s]+$/.test(tb);
+    var cmp = isNum ? (na-nb) : ta.localeCompare(tb, undefined, {sensitivity:'base', numeric:true});
+    return dir==='asc' ? cmp : -cmp;
+  });
+  rows.forEach(function(r){ tbody.appendChild(r); });
+}
+function enableSortableTables(){
+  document.querySelectorAll('table.stat').forEach(function(table){
+    var thead = table.tHead;
+    if(!thead || !thead.rows.length) return;
+    var headRow = thead.rows[0];
+    var ths = headRow.cells;
+    for(var i=0;i<ths.length;i++){
+      var th = ths[i];
+      if(th.dataset.sortBound) continue;      /* avoid double-binding across SPA nav */
+      th.dataset.sortBound = '1';
+      th.classList.add('sortable');
+      (function(idx, th){
+        th.addEventListener('click', function(){
+          var dir = th.classList.contains('sort-asc') ? 'desc' : 'asc';
+          for(var j=0;j<headRow.cells.length;j++){ headRow.cells[j].classList.remove('sort-asc','sort-desc'); }
+          th.classList.add(dir==='asc' ? 'sort-asc' : 'sort-desc');
+          sortTableRows(table, idx, dir);
+        });
+      })(i, th);
+    }
+  });
+}
+
 /* ================= WOE PLAYER DETAIL PANEL ================= */
 function statRow(label,value){
   return '<div class="info-item"><span>'+label+'</span><b>'+value+'</b></div>';
@@ -1053,6 +1097,7 @@ function afterPageLoad(){
   hydrateTable();                   /* pull live rows if the API is on */
   loadAccountPage();                /* account page, if we're on it */
   loadWoeMePage();                  /* WoE "My Status" tab, if we're on it */
+  enableSortableTables();           /* click-to-sort headers on any stat table present */
 
   /* pages like pages/register.html carry data-open-panel so a direct link
      (or a SPA nav to it) opens straight into that panel */
