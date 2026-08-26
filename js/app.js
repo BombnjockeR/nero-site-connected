@@ -876,6 +876,70 @@ function woeEstNote(id,on){
   var el=document.getElementById(id);
   if(el) el.style.display = on ? '' : 'none';
 }
+/* ---- Top Players paging ----
+   The board lists every character who scored this month, so it's paged
+   (20 rows a page) rather than cut off at a top-N. Page state lives here
+   and is reset on every SPA navigation, same as the marketplace filter. */
+var WOE_PLAYERS_PER_PAGE=20;
+var woePlayersPage=1;
+
+/* Per-table query string for the paged endpoints. */
+function tableParams(key){
+  if(key==='woe_players') return {page:woePlayersPage, per_page:WOE_PLAYERS_PER_PAGE};
+  return null;
+}
+
+/* Windowed page list: 1 … 4 5 [6] 7 8 … 20 */
+function pagerNumbers(cur,last){
+  var out=[], span=2, i;
+  for(i=1;i<=last;i++){
+    if(i===1 || i===last || (i>=cur-span && i<=cur+span)) out.push(i);
+    else if(out[out.length-1]!=='…') out.push('…');
+  }
+  return out;
+}
+function renderPager(id,meta,goFn,noun){
+  var el=document.getElementById(id);
+  if(!el) return;
+  var total=Number(meta.total)||0, per=Number(meta.per_page)||WOE_PLAYERS_PER_PAGE;
+  var last=Math.max(1,Number(meta.pages)||1), cur=Math.min(Math.max(1,Number(meta.page)||1),last);
+  if(total<=per){ el.innerHTML=''; el.style.display='none'; return; }
+  el.style.display='';
+
+  var from=(cur-1)*per+1, to=Math.min(cur*per,total);
+  var btn=function(label,page,cls){
+    if(page===null) return '<span class="pg-gap">'+label+'</span>';
+    var dis=(page<1||page>last||page===cur);
+    return '<button class="pg-btn'+(cls?' '+cls:'')+(page===cur?' on':'')+'"'+
+           (dis?' disabled':'')+' onclick="'+goFn+'('+page+')">'+label+'</button>';
+  };
+  var mid=pagerNumbers(cur,last).map(function(p){
+    return p==='…' ? btn('…',null) : btn(p,p);
+  }).join('');
+
+  el.innerHTML='<div class="pg-count">Showing <b>'+fmtNum(from)+'</b>–<b>'+fmtNum(to)+
+      '</b> of <b>'+fmtNum(total)+'</b> '+noun+'</div>'+
+    '<div class="pg-btns">'+
+      btn('<i class="ti ti-chevron-left"></i>',cur-1,'pg-nav')+mid+
+      btn('<i class="ti ti-chevron-right"></i>',cur+1,'pg-nav')+
+    '</div>';
+}
+async function goWoePlayersPage(n){
+  var tbl=document.querySelector('table.stat[data-api="woe_players"]');
+  if(!tbl) return;
+  woePlayersPage=Math.max(1,parseInt(n,10)||1);
+  /* A new page arrives in the server's own score order, so drop any
+     click-to-sort arrow still lit on a header — leaving it would claim a
+     sort that no longer applies to the rows on screen. */
+  if(tbl.tHead && tbl.tHead.rows.length){
+    var hc=tbl.tHead.rows[0].cells;
+    for(var c=0;c<hc.length;c++){ hc[c].classList.remove('sort-asc','sort-desc'); }
+  }
+  tbl.tBodies[0].innerHTML=noDataRow(tbl.rows[0].cells.length,'Loading…');
+  await hydrateOneTable(tbl);
+  var panel=document.getElementById('woe-players');
+  if(panel && panel.scrollIntoView) panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
 function woeNameLink(charId,name){
   return charId ? '<a href="#" onclick="openWoePlayerDetail('+parseInt(charId,10)+');return false">'+name+'</a>' : name;
 }
@@ -911,12 +975,14 @@ async function hydrateOneTable(tbl){
     tbl.tBodies[0].innerHTML = noDataRow(cols,'Backend not connected yet.');
     return;
   }
-  var d=await NeroAPI.get(key);
+  var d=await NeroAPI.get(key,tableParams(key));
   if(!d){
     tbl.tBodies[0].innerHTML = noDataRow(cols,'Could not load data — try again shortly.');
     return;
   }
-  var rows=[], i=1;
+  /* paged endpoints number their rows from where the page starts, so #21 on
+     page 2 stays #21 rather than restarting at #1 */
+  var rows=[], i=(Number(d.offset)||0)+1;
 
   if(key==='zeny' && Array.isArray(d)){
     d.forEach(function(r){
@@ -932,9 +998,16 @@ async function hydrateOneTable(tbl){
       : noDataRow(cols,'No guilds have been created yet — check back once guilds start forming.');
   } else if(key==='woe_players' && d.rows){
     woeEstNote('woeplayers-est', !!d.estimated && d.rows.length>0);
+    /* the bridge clamps a page number past the end back to the last real
+       page — follow it, so the next click counts from what's on screen */
+    if(d.page) woePlayersPage=Number(d.page);
+    renderPager('woeplayers-pager', d, 'goWoePlayersPage', 'players');
     /* Hide non-participants: a player with every combat counter at zero never
        actually showed up to WoE, so they'd just be noise in the rankings. This
-       is a display filter only — the data itself is untouched. */
+       is a display filter only — the data itself is untouched. (With the paged
+       bridge this is belt-and-braces: it only ever returns rows scoring above
+       zero, so nothing here is actually dropped and the pager's "of N" count
+       stays true to what's listed.) */
     d.rows.filter(woeParticipated).forEach(function(r){
       rows.push(tdRow([i++, woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0),
         fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.assists), fmtNum(r.damage), fmtNum(r.damage_taken),
@@ -1110,6 +1183,7 @@ function afterPageLoad(){
   /* mobile: close the wiki contents drawer after navigating */
   wikiNav(false);
   curF='all';                       /* reset marketplace filter state */
+  woePlayersPage=1;                 /* ...and the WoE Top Players page */
   selAmt=null;
   hydrateTable();                   /* pull live rows if the API is on */
   loadAccountPage();                /* account page, if we're on it */

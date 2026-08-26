@@ -150,6 +150,26 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
 .rank{font-weight:600;color:var(--gold)}
 .norow{text-align:center;color:var(--muted);padding:26px;font-size:14px}
 
+/* pagination (WoE Top Players) */
+.pager{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:16px}
+.pg-count{font-size:13px;color:var(--muted)}
+.pg-count b{color:#fff;font-weight:600}
+.pg-btns{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:auto}
+.pg-btn{min-width:36px;height:36px;padding:0 10px;border-radius:9px;cursor:pointer;
+ background:rgba(255,255,255,.07);border:1px solid var(--tline);color:#dfe6f2;
+ font-size:13px;font-weight:600;line-height:1;transition:.15s}
+.pg-btn:hover:not(:disabled){background:rgba(228,184,75,.18);border-color:var(--gold);color:#fff}
+.pg-btn:disabled{opacity:.4;cursor:default}
+/* the current page is a disabled button too — it should read as selected, not greyed out */
+.pg-btn.on,.pg-btn.on:disabled{background:rgba(228,184,75,.24);border-color:var(--gold);
+ color:var(--gold);opacity:1;cursor:default}
+.pg-btn.pg-nav i{font-size:16px;vertical-align:middle}
+.pg-gap{color:var(--muted);padding:0 2px;font-size:13px;user-select:none}
+@media(max-width:640px){
+  .pager{justify-content:center}
+  .pg-btns{margin-left:0}
+}
+
 /* marketplace */
 .mkt-banner{background:linear-gradient(120deg,rgba(19,37,64,.85),rgba(29,51,88,.85));border:1.5px solid var(--tline);
  border-radius:14px;padding:24px 28px;margin-bottom:22px;display:flex;align-items:center;gap:20px}
