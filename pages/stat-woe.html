@@ -23,13 +23,13 @@
     <button class="atab" onclick="woeTab('guildkills',this)"><i class="ti ti-shield-half-filled"></i> Guild Kills</button>
     <button class="atab" onclick="woeTab('kills',this)"><i class="ti ti-activity"></i> Recent Kills</button>
     <button class="atab" onclick="woeTab('me',this)"><i class="ti ti-user-circle"></i> My Status</button>
+    <div class="searchbar woe-tabsearch"><i class="ti ti-search"></i>
+      <input id="tblsearch" placeholder="Search this table..." oninput="filterTable()" autocomplete="off">
+      <span class="hits" id="hits"></span></div>
   </div>
 
   <section class="atab-panel narrow show" id="woe-castles">
     <p class="subtitle">Current castle ownership on NeRO.</p>
-    <div class="searchbar"><i class="ti ti-search"></i>
-      <input id="tblsearch" placeholder="Search guild name..." oninput="filterTable()">
-      <span class="hits" id="hits"></span></div>
     <div class="tbl-wrap"><table class="stat" id="stbl" data-api="woe"><thead><tr><th>#</th><th>Guild</th><th>Castles Held</th><th>Average Level</th><th>Members Online</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="5">Loading…</td></tr></tbody></table></div>
   </section>
 

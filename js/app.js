@@ -435,7 +435,11 @@ async function doDonate(){
 /* ================= TABLE / GRID SEARCH ================= */
 function filterTable(){
   var q=(document.getElementById('tblsearch').value||'').toLowerCase();
-  var tbl=document.getElementById('stbl'); if(!tbl) return;
+  /* Search the table inside whichever WoE tab is currently open. */
+  var panel=document.querySelector('.atab-panel.show');
+  var tbl=panel && panel.querySelector('table.stat');
+  if(!tbl){ tbl=document.getElementById('stbl'); }
+  if(!tbl) return;
   var rows=tbl.tBodies[0].rows, shown=0;
   for(var i=0;i<rows.length;i++){
     if(rows[i].classList.contains('norow-row')) continue;
@@ -444,11 +448,24 @@ function filterTable(){
   }
   var hits=document.getElementById('hits');
   if(hits) hits.textContent=q?shown+' result'+(shown===1?'':'s'):'';
-  var empty=tbl.querySelector('.norow-row');
-  if(shown===0){
-    if(!empty){ var r=tbl.tBodies[0].insertRow(); r.className='norow-row';
+  /* manage a "no results" placeholder, but only for a live query so we don't
+     fight the table's own loading/empty row */
+  var typed=q.length>0;
+  var placeholder=tbl.querySelector('.norow-row.search-empty');
+  if(typed && shown===0){
+    if(!placeholder){ var r=tbl.tBodies[0].insertRow(); r.className='norow-row search-empty';
       var c=r.insertCell(); c.colSpan=tbl.rows[0].cells.length; c.className='norow'; c.textContent='No results found.'; }
-  } else if(empty){ empty.remove(); }
+  } else if(placeholder){ placeholder.remove(); }
+}
+/* Reset the shared search box when moving between tabs so a query typed on one
+   tab doesn't silently hide rows on the next. */
+function resetTableSearch(){
+  var box=document.getElementById('tblsearch');
+  if(box) box.value='';
+  var hits=document.getElementById('hits');
+  if(hits) hits.textContent='';
+  document.querySelectorAll('.atab-panel table.stat tr.search-empty').forEach(function(r){ r.remove(); });
+  document.querySelectorAll('.atab-panel table.stat tbody tr').forEach(function(r){ r.style.display=''; });
 }
 var curF='all';
 function setFilter(f,el){ curF=f;
@@ -686,6 +703,7 @@ function woeTab(name, btn){
     var el=document.getElementById('woe-'+n);
     if(el) el.classList.toggle('show', n===name);
   });
+  resetTableSearch();
 }
 function acctTab(name, btn){
   document.querySelectorAll('.atab').forEach(function(b){ b.classList.remove('on'); });

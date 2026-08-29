@@ -138,6 +138,11 @@ select.inp option{background:#101a2c;color:#fff}
 .searchbar .hits{font-size:12px;color:var(--muted);white-space:nowrap}
 .searchbar.flex1{flex:1;min-width:220px;margin-bottom:0}
 
+/* Search field that lives on the WoE tab row, pushed to the right edge so it
+   sits next to "My Status". Filters whichever tab's table is on screen. */
+.woe-tabsearch{margin:0 0 0 auto;margin-bottom:-1.5px;align-self:center;min-width:200px;max-width:280px;padding:0 12px}
+.woe-tabsearch input{padding:9px 0;font-size:13.5px}
+
 /* brighter tables */
 table.stat{width:100%;border-collapse:collapse;font-size:14px;background:rgba(10,16,28,.55);
  border:1.5px solid var(--tline);border-radius:12px;overflow:hidden}
@@ -587,6 +592,9 @@ table.stat.big td{padding:15px 18px}
   .acct-tabs{gap:2px}
   .atab{padding:11px 14px;font-size:13.5px}
   .atab i{font-size:16px}
+  /* On phones the tab row wraps; give the search its own full-width line below the tabs. */
+  .woe-tabsearch{order:99;flex:1 0 100%;max-width:none;margin:12px 0 0 0;padding:0 14px}
+  .woe-tabsearch input{padding:12px 0;font-size:14px}
   table.stat.big{font-size:13.5px;min-width:620px}
   table.stat.big th,table.stat.big td{padding:12px 14px}
   .cp-value{font-size:24px}
