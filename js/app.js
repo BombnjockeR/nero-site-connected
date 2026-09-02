@@ -390,9 +390,43 @@ function serverHTML(){ var s=SERVER_INFO; return `
 /* ---- Donation (1 CP : 1 Rp) ---- */
 var selAmt=null;
 function donationHTML(){
-  return `<div class="soon-panel"><i class="ti ti-clock-hour-4"></i>
-    <h3>Coming Soon</h3>
-    <p>Donations and Cash Point top-ups are being finished up. Check back soon!</p></div>`;
+  var amts=DONATE_AMOUNTS.map(function(a,i){
+    return '<button class="amt" data-i="'+i+'" onclick="pickAmt('+i+')">'+fmtRp(a.cp)+'</button>';
+  }).join('');
+  var streamerOpts='<option value="">None</option>'+STREAMERS.map(function(s){
+    return '<option value="'+s+'">'+s+'</option>';
+  }).join('');
+  return `
+  <p class="lead">Support NeRO and get Cash Points to spend in the Item Mall. <b>1 CP = Rp 1.</b></p>
+  <div id="don-msg"></div>
+
+  <label class="fld">1 · Choose an amount</label>
+  <div class="amt-grid">`+amts+`</div>
+
+  <label class="fld">2 · Referral code <span class="fld-opt">(optional — adds bonus CP)</span></label>
+  <select class="inp" id="don-streamer" onchange="updateSummary()">`+streamerOpts+`</select>
+  <div class="don-guildrow">
+    <select class="inp" id="don-guild" disabled>
+      <option>Guild royalty — coming soon</option>
+    </select>
+  </div>
+
+  <div class="don-summary" id="don-summary">Select an amount to see your total.</div>
+
+  <div class="don-pay" id="don-pay" style="display:none">
+    <label class="fld">3 · Scan &amp; pay with QRIS</label>
+    <p class="don-hint">Open any QRIS-supported app (GoPay, OVO, DANA, ShopeePay, bank apps…), scan the code, and enter <b id="don-payamt">the exact amount</b>.</p>
+    <div class="qris-card"><img src="`+ROOT+`assets/qris-newera.png" alt="NewEraRO QRIS payment code" loading="lazy"></div>
+    <div class="don-steps">
+      <p><b>After paying:</b></p>
+      <ol>
+        <li>Screenshot your payment receipt.</li>
+        <li>Note your account name: <b>`+ (Auth.user()||'your account') +`</b></li>
+        <li>Submit the receipt in our <a href="`+DISCORD_URL+`" target="_blank" rel="noopener">Discord</a> <b>#top-up</b> channel to get your CP credited.</li>
+      </ol>
+      <p class="don-note"><i class="ti ti-info-circle"></i> Cash Points are credited manually after we verify your payment (usually within a few hours). This keeps top-ups secure.</p>
+    </div>
+  </div>`;
 }
 
 function pickAmt(i){ selAmt=i;
@@ -401,34 +435,19 @@ function pickAmt(i){ selAmt=i;
 }
 function updateSummary(){
   var box=document.getElementById('don-summary'); if(!box) return;
-  if(selAmt===null){ box.innerHTML='Select an amount to see your total.'; return; }
+  var pay=document.getElementById('don-pay');
+  if(selAmt===null){ box.innerHTML='Select an amount to see your total.'; if(pay)pay.style.display='none'; return; }
   var cp=DONATE_AMOUNTS[selAmt].cp;
   var streamer=document.getElementById('don-streamer').value;
-  var guild=document.getElementById('don-guild').value;
   var bonus=streamer?Math.round(cp*0.10):0;
   box.innerHTML='Base: <b>'+fmtNum(cp)+' CP</b><br>'+
     (streamer?'Streamer bonus (+10%): <b>+'+fmtNum(bonus)+' CP</b> → '+streamer+'<br>':'')+
-    (guild?'Guild: <b>'+guild+'</b><br>':'')+
-    '<hr style="border:none;border-top:1px solid rgba(228,184,75,.3);margin:8px 0">'+
-    'You receive: <b>'+fmtNum(cp+bonus)+' CP</b><br>You pay: <b>'+fmtRp(cp)+'</b>';
-}
-
-async function doDonate(){
-  if(selAmt===null) return panelMsg('don-msg','Please choose an amount first.',false);
-  var amount=DONATE_AMOUNTS[selAmt].cp;
-  var streamer=document.getElementById('don-streamer').value;
-  var guild=document.getElementById('don-guild').value;
-
-  var btn=document.getElementById('don-btn');
-  btn.disabled=true; btn.textContent='Preparing...';
-  var res=await NeroAPI.post('/donate.php',
-    {userid:Auth.user(), amount:amount, streamer:streamer, guild:guild});
-  btn.disabled=false; btn.textContent='Proceed to Payment';
-
-  if(res && res.ok && res.data && res.data.pay_url){
-    window.location.href=res.data.pay_url;      /* hand off to the gateway */
-  }else{
-    panelMsg('don-msg',(res && res.error) || 'Payment is not connected yet.',false);
+    '<hr class="don-hr">'+
+    'You receive: <b class="don-total">'+fmtNum(cp+bonus)+' CP</b><br>You pay: <b>'+fmtRp(cp)+'</b>';
+  if(pay){
+    pay.style.display='';
+    var pa=document.getElementById('don-payamt');
+    if(pa) pa.textContent=fmtRp(cp);
   }
 }
 

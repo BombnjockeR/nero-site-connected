@@ -45,8 +45,8 @@ const NeroAPI = {
 };
 
 /* ================= MOCK DATA — used until API_BASE is set ================= */
-const STREAMERS = ["AsuraLive","PoringTV","ValkyrieVODs","MidgardMaster","BraninRO"];
-const GUILDS    = ["Valhalla","Nidhogg","Ragnarok Elite","Prontera Knights","Shadow Covenant"];
+const STREAMERS = ["Hatred","JuneGaming","PEA"];
+const GUILDS    = [];   /* guild royalty referral — not enabled yet */
 
 /* Donation: CP and Rupiah are 1 : 1 */
 const DONATE_AMOUNTS = [

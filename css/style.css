@@ -110,6 +110,27 @@ select.inp option{background:#101a2c;color:#fff}
 .amt.sel .lbl{color:#5a4410}
 .summary{margin-top:18px;padding:14px;background:rgba(255,255,255,.05);border:1px solid var(--tline);border-radius:10px;font-size:13px;line-height:1.7}
 .summary b{color:var(--gold)}
+
+/* ---- Donation panel ---- */
+.fld-opt{text-transform:none;letter-spacing:0;color:var(--muted);opacity:.8;font-weight:400}
+.don-guildrow{margin-top:8px}
+.don-summary{margin-top:18px;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid var(--tline);border-radius:10px;font-size:13.5px;line-height:1.75;color:var(--muted)}
+.don-summary b{color:#fff}
+.don-summary b.don-total{color:var(--gold);font-size:16px}
+.don-hr{border:none;border-top:1px solid rgba(228,184,75,.3);margin:9px 0}
+.don-pay{margin-top:22px;padding-top:20px;border-top:1px solid var(--tline)}
+.don-hint{font-size:12.5px;color:var(--muted);line-height:1.6;margin:2px 0 12px}
+.don-hint b{color:var(--gold)}
+.qris-card{background:#fff;border-radius:14px;padding:10px;max-width:320px;margin:0 auto;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.qris-card img{width:100%;display:block;border-radius:6px}
+.don-steps{margin-top:16px;font-size:13px;color:var(--muted);line-height:1.65}
+.don-steps b{color:#fff}
+.don-steps ol{margin:6px 0 0;padding-left:20px}
+.don-steps li{margin-bottom:6px}
+.don-steps a{color:var(--gold)}
+.don-note{margin-top:14px;padding:10px 12px;background:rgba(228,184,75,.10);border:1px solid rgba(228,184,75,.28);
+ border-radius:9px;font-size:12px;line-height:1.55;color:var(--muted);display:flex;gap:8px;align-items:flex-start}
+.don-note i{color:var(--gold);font-size:15px;flex-shrink:0;margin-top:1px}
 .statbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
 .statbtn{display:flex;align-items:center;gap:8px;justify-content:center;background:rgba(255,255,255,.06);
  border:1px solid var(--tline);border-radius:10px;padding:14px 8px;color:var(--text);text-decoration:none;font-size:13px;font-weight:500;transition:.2s}
