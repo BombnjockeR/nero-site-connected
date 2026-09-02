@@ -423,7 +423,7 @@ function donationHTML(){
       <ol>
         <li>Screenshot your payment receipt.</li>
         <li>Note your account name: <b>`+ (Auth.user()||'your account') +`</b></li>
-        <li>Submit the receipt in our <a href="`+DISCORD_URL+`" target="_blank" rel="noopener">Discord</a> <b>#top-up</b> channel to get your CP credited.</li>
+        <li>Open a ticket in our <a href="`+DISCORD_URL+`" target="_blank" rel="noopener">Discord</a> and submit your transaction receipt to get your CP credited.</li>
       </ol>
       <p class="don-note"><i class="ti ti-info-circle"></i> Cash Points are credited manually after we verify your payment (usually within a few hours). This keeps top-ups secure.</p>
     </div>
