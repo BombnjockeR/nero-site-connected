@@ -439,9 +439,9 @@ function updateSummary(){
   if(selAmt===null){ box.innerHTML='Select an amount to see your total.'; if(pay)pay.style.display='none'; return; }
   var cp=DONATE_AMOUNTS[selAmt].cp;
   var streamer=document.getElementById('don-streamer').value;
-  var bonus=streamer?Math.round(cp*0.10):0;
+  var bonus=streamer?Math.round(cp*0.20):0;
   box.innerHTML='Base: <b>'+fmtNum(cp)+' CP</b><br>'+
-    (streamer?'Streamer bonus (+10%): <b>+'+fmtNum(bonus)+' CP</b> → '+streamer+'<br>':'')+
+    (streamer?'Streamer bonus (+20%): <b>+'+fmtNum(bonus)+' CP</b> → '+streamer+'<br>':'')+
     '<hr class="don-hr">'+
     'You receive: <b class="don-total">'+fmtNum(cp+bonus)+' CP</b><br>You pay: <b>'+fmtRp(cp)+'</b>';
   if(pay){
