@@ -45,7 +45,11 @@ const NeroAPI = {
 };
 
 /* ================= MOCK DATA — used until API_BASE is set ================= */
-const STREAMERS = ["Hatred","JuneGaming","PEA"];
+const STREAMERS = [
+  {name:"Hatred",     code:"311"},
+  {name:"JuneGaming", code:"108"},
+  {name:"PEA",        code:"449"}
+];
 const GUILDS    = [];   /* guild royalty referral — not enabled yet */
 
 /* Donation: CP and Rupiah are 1 : 1 */

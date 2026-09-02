@@ -394,7 +394,7 @@ function donationHTML(){
     return '<button class="amt" data-i="'+i+'" onclick="pickAmt('+i+')">'+fmtRp(a.cp)+'</button>';
   }).join('');
   var streamerOpts='<option value="">None</option>'+STREAMERS.map(function(s){
-    return '<option value="'+s+'">'+s+'</option>';
+    return '<option value="'+s.code+'" data-name="'+s.name+'">'+s.name+' — Code '+s.code+'</option>';
   }).join('');
   return `
   <p class="lead">Support NeRO and get Cash Points to spend in the Item Mall. <b>1 CP = Rp 1.</b></p>
@@ -438,10 +438,12 @@ function updateSummary(){
   var pay=document.getElementById('don-pay');
   if(selAmt===null){ box.innerHTML='Select an amount to see your total.'; if(pay)pay.style.display='none'; return; }
   var cp=DONATE_AMOUNTS[selAmt].cp;
-  var streamer=document.getElementById('don-streamer').value;
-  var bonus=streamer?Math.round(cp*0.20):0;
+  var sel=document.getElementById('don-streamer');
+  var code=sel.value;
+  var name=code ? sel.options[sel.selectedIndex].getAttribute('data-name') : '';
+  var bonus=code?Math.round(cp*0.20):0;
   box.innerHTML='Base: <b>'+fmtNum(cp)+' CP</b><br>'+
-    (streamer?'Streamer bonus (+20%): <b>+'+fmtNum(bonus)+' CP</b> → '+streamer+'<br>':'')+
+    (code?'Streamer bonus (+20%): <b>+'+fmtNum(bonus)+' CP</b> → '+name+' (code '+code+')<br>':'')+
     '<hr class="don-hr">'+
     'You receive: <b class="don-total">'+fmtNum(cp+bonus)+' CP</b><br>You pay: <b>'+fmtRp(cp)+'</b>';
   if(pay){
