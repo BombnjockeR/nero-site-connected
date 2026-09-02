@@ -1,0 +1,364 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Marketplace (Preview) — NeRO</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+/* ===== Marketplace preview — scoped styles (mp-*), matches NeRO tokens ===== */
+.mp-wrap{max-width:1240px;margin:0 auto;padding:26px 22px 90px}
+.mp-preview-flag{display:flex;align-items:center;gap:9px;margin-bottom:18px;padding:9px 14px;
+  background:rgba(228,184,75,.10);border:1px solid rgba(228,184,75,.35);border-radius:10px;
+  font-size:12.5px;color:var(--gold-soft)}
+.mp-preview-flag i{font-size:16px}
+
+.mp-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:6px}
+.mp-title{font-size:30px;font-weight:800;letter-spacing:.3px;margin:0}
+.mp-title .mp-zeny{color:var(--gold)}
+.mp-sub{color:var(--muted);font-size:13.5px;margin:4px 0 0}
+.mp-live{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.mp-live .dot{width:7px;height:7px;border-radius:50%;background:#46d17f;box-shadow:0 0 0 0 rgba(70,209,127,.5);animation:mp-pulse 2s infinite}
+@keyframes mp-pulse{0%{box-shadow:0 0 0 0 rgba(70,209,127,.5)}70%{box-shadow:0 0 0 7px rgba(70,209,127,0)}100%{box-shadow:0 0 0 0 rgba(70,209,127,0)}}
+
+/* tabs */
+.mp-tabs{display:flex;gap:4px;margin:20px 0 16px;border-bottom:1px solid var(--tline)}
+.mp-tab{background:none;border:none;color:var(--muted);font-size:14px;font-weight:600;padding:11px 16px;cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;display:flex;align-items:center;gap:7px}
+.mp-tab:hover{color:var(--text)}
+.mp-tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* toolbar */
+.mp-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+.mp-search{flex:1;min-width:220px;display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.05);
+  border:1px solid var(--tline);border-radius:11px;padding:0 13px}
+.mp-search i{color:var(--muted);font-size:17px}
+.mp-search input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px;padding:12px 0}
+.mp-select{background:rgba(255,255,255,.05);border:1px solid var(--tline);border-radius:11px;color:var(--text);
+  font-size:13.5px;padding:11px 13px;cursor:pointer;outline:none}
+.mp-select:focus{border-color:var(--line)}
+
+/* category chips */
+.mp-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.mp-chip{background:rgba(255,255,255,.045);border:1px solid var(--tline);color:var(--muted);border-radius:999px;
+  padding:7px 15px;font-size:12.5px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:6px}
+.mp-chip:hover{color:var(--text);border-color:var(--line)}
+.mp-chip.on{background:var(--gold);border-color:var(--gold);color:#241a07;font-weight:700}
+
+/* result count */
+.mp-count{color:var(--muted);font-size:12.5px;margin-bottom:14px}
+.mp-count b{color:var(--text)}
+
+/* card grid */
+.mp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.mp-card{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+  border:1px solid var(--tline);border-radius:14px;padding:14px;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s;text-align:left;overflow:hidden}
+.mp-card:hover{transform:translateY(-3px);border-color:var(--line);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.mp-card-top{display:flex;gap:12px;align-items:flex-start}
+.mp-icon{width:52px;height:52px;flex-shrink:0;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:26px;background:rgba(228,184,75,.10);border:1px solid rgba(228,184,75,.25)}
+.mp-card-name{font-size:14.5px;font-weight:700;line-height:1.3;margin:0}
+.mp-refine{color:var(--gold);font-weight:800}
+.mp-card-slots{color:var(--muted);font-size:12px;margin-top:2px}
+.mp-rarity{position:absolute;top:0;right:0;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  padding:4px 9px;border-bottom-left-radius:10px}
+.r-common{background:rgba(170,180,198,.18);color:#c3ccd9}
+.r-rare{background:rgba(90,150,255,.16);color:#8fb6ff}
+.r-epic{background:rgba(180,110,240,.18);color:#cf9cf5}
+.r-legend{background:rgba(228,184,75,.18);color:var(--gold-soft)}
+.mp-price{margin-top:13px;display:flex;align-items:baseline;justify-content:space-between}
+.mp-price .z{font-size:17px;font-weight:800;color:var(--gold)}
+.mp-price .z small{font-size:11px;color:var(--muted);font-weight:500;margin-left:2px}
+.mp-qty{font-size:11.5px;color:var(--muted)}
+.mp-card-foot{margin-top:11px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);display:flex;
+  align-items:center;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+.mp-shop{display:flex;align-items:center;gap:5px;min-width:0}
+.mp-shop b{color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-loc{display:flex;align-items:center;gap:4px;flex-shrink:0}
+
+.mp-empty{text-align:center;color:var(--muted);padding:70px 20px;font-size:14px}
+.mp-empty i{font-size:34px;display:block;margin-bottom:12px;opacity:.5}
+
+/* detail modal */
+.mp-modal-bg{position:fixed;inset:0;background:rgba(3,6,12,.72);backdrop-filter:blur(3px);z-index:60;
+  display:none;align-items:center;justify-content:center;padding:20px}
+.mp-modal-bg.show{display:flex}
+.mp-modal{width:min(640px,100%);max-height:88vh;overflow-y:auto;background:#0c1420;border:1px solid var(--line);
+  border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.mp-modal-head{display:flex;gap:15px;align-items:flex-start;padding:20px 22px;border-bottom:1px solid var(--tline);position:relative}
+.mp-modal-icon{width:64px;height:64px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:32px;
+  background:rgba(228,184,75,.10);border:1px solid rgba(228,184,75,.28);flex-shrink:0}
+.mp-modal-title{font-size:19px;font-weight:800;margin:0;line-height:1.25}
+.mp-modal-meta{color:var(--muted);font-size:12.5px;margin-top:5px}
+.mp-x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:26px;cursor:pointer;line-height:1}
+.mp-x:hover{color:#fff}
+.mp-modal-body{padding:20px 22px}
+.mp-secttl{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--gold);font-weight:700;margin:0 0 10px}
+.mp-stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13.5px}
+.mp-stat-row span{color:var(--muted)}
+.mp-stat-row b{color:var(--text)}
+.mp-chart{margin:8px 0 4px;background:rgba(255,255,255,.03);border:1px solid var(--tline);border-radius:12px;padding:14px 12px 8px}
+.mp-chart svg{display:block;width:100%;height:auto}
+.mp-chart-legend{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+.mp-listings{margin-top:22px}
+.mp-listing{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--tline);border-radius:11px;margin-bottom:8px}
+.mp-listing:hover{border-color:var(--line)}
+.mp-listing .lz{font-size:15px;font-weight:800;color:var(--gold);min-width:110px}
+.mp-listing .lshop{flex:1;font-size:13px}
+.mp-listing .lshop small{color:var(--muted);display:block;margin-top:1px}
+.mp-listing .lqty{font-size:12px;color:var(--muted)}
+.mp-buy-note{margin-top:18px;font-size:11.5px;color:var(--muted);display:flex;gap:8px;align-items:flex-start;
+  background:rgba(255,255,255,.03);border:1px solid var(--tline);border-radius:10px;padding:11px 13px}
+.mp-buy-note i{color:var(--gold);flex-shrink:0;margin-top:1px}
+
+@media(max-width:640px){
+  .mp-title{font-size:24px}
+  .mp-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px}
+  .mp-icon{width:44px;height:44px;font-size:22px}
+}
+</style>
+</head><body class="page">
+<div class="pagebg"><video autoplay muted loop playsinline><source src="../assets/nero_landingpage.mp4" type="video/mp4"></video><div class="pagebg-veil"></div></div>
+<div id="app">
+<header class="sitehead">
+  <img class="hd-logo" src="../assets/logo.png" alt="Home" title="Home" onclick="location.href='../'">
+  <nav class="hd-tabs"><a class="tab" href="../wiki/index.html">Wiki</a><a class="tab" href="../pages/stat-woe.html">WoE</a><a class="tab" href="../pages/stat-pvp.html">PvP</a><a class="tab" href="../pages/stat-mvp.html">MVP</a><a class="tab" href="../pages/stat-zeny.html">Zeny</a><a class="tab" href="../pages/marketplace.html">Market</a></nav>
+  <div class="hd-right">
+    <div class="hd-status"><span class="hd-time" id="hd-time">Server time: —</span><div class="hd-pill" id="hd-pill"><b id="online-num">—</b><span>Players</span><span class="hd-sep">|</span><b id="merchant-num">—</b><span>Merchants</span></div></div>
+    <div class="hd-acct" id="hd-acct"></div>
+  </div>
+</header>
+
+<div class="mp-wrap">
+  <div class="mp-preview-flag"><i class="ti ti-eye-cog"></i> Private preview — dummy data only, not linked anywhere public. Nothing here is live; your developer will connect it to the game database later.</div>
+
+  <div class="mp-head">
+    <div>
+      <h1 class="mp-title">Player <span class="mp-zeny">Market</span></h1>
+      <p class="mp-sub">Browse live vending shops across NeRO. Find an item here, then buy it in-game from the seller.</p>
+    </div>
+    <span class="mp-live"><span class="dot"></span> <span id="mp-updated">updated just now</span></span>
+  </div>
+
+  <div class="mp-tabs">
+    <button class="mp-tab on" data-tab="vending" onclick="mpTab('vending',this)"><i class="ti ti-building-store"></i> Vending</button>
+    <button class="mp-tab" data-tab="movers" onclick="mpTab('movers',this)"><i class="ti ti-trending-up"></i> Price Movers</button>
+  </div>
+
+  <div class="mp-toolbar">
+    <div class="mp-search"><i class="ti ti-search"></i><input id="mp-q" placeholder="Search item or shop name..." oninput="mpRender()"></div>
+    <select class="mp-select" id="mp-sort" onchange="mpRender()">
+      <option value="recent">Newest first</option>
+      <option value="price-asc">Price: low to high</option>
+      <option value="price-desc">Price: high to low</option>
+      <option value="name">Name A–Z</option>
+    </select>
+  </div>
+
+  <div class="mp-cats" id="mp-cats"></div>
+  <div class="mp-count" id="mp-count"></div>
+  <div class="mp-grid" id="mp-grid"></div>
+</div>
+
+<!-- item detail modal -->
+<div class="mp-modal-bg" id="mp-modal-bg" onclick="if(event.target===this)mpCloseModal()">
+  <div class="mp-modal" id="mp-modal"></div>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+</div>
+
+<div class="music" id="music">
+  <button class="mus-toggle" id="mus-toggle" title="Play / pause"><i class="ti ti-player-play"></i></button>
+  <div class="mus-mid"><div class="mus-track" id="mus-track">—</div></div>
+  <button class="mus-next" id="mus-next" title="Next track"><i class="ti ti-player-track-next"></i></button>
+  <button class="mus-list" id="mus-list-btn" title="Playlist"><i class="ti ti-playlist"></i></button>
+  <div class="mus-panel" id="mus-panel"></div>
+</div>
+<audio id="bgm" preload="auto"></audio>
+
+<script src="../js/data.js"></script><script src="../js/wiki-index.js"></script><script src="../js/app.js"></script>
+<script>
+/* ============================================================
+   MARKETPLACE PREVIEW — fully self-contained dummy data + logic.
+   Does not call the API or touch production data. When the dev
+   wires the real DB, they replace MP_DATA with a fetch() and keep
+   the same field names (see the shape below).
+   ============================================================ */
+var MP_CATS = [
+  {id:'all',   name:'All',        icon:'ti-apps'},
+  {id:'weapon',name:'Weapons',    icon:'ti-sword'},
+  {id:'armor', name:'Armor',      icon:'ti-shirt'},
+  {id:'card',  name:'Cards',      icon:'ti-cards'},
+  {id:'usable',name:'Usables',    icon:'ti-flask'},
+  {id:'etc',   name:'Etc / Loot', icon:'ti-diamond'}
+];
+
+/* each item: id, name, cat, icon(emoji), refine, slots, rarity, price(z), qty, shop, char, map, x, y, sold(recency rank), history[7] */
+var MP_DATA = [
+  {id:1, name:'Doppelganger Card', cat:'card', icon:'🃏', refine:0, slots:0, rarity:'legend', price:145000000, qty:1, shop:'CardHaven', char:'MvPHunter', map:'prontera', x:151, y:88, sold:2, history:[120,128,132,130,138,142,145]},
+  {id:2, name:'Sword Mace', cat:'weapon', icon:'⚔️', refine:9, slots:2, rarity:'epic', price:38500000, qty:1, shop:'BladeWorks', char:'ForgeKing', map:'prontera', x:143, y:96, sold:1, history:[30,31,33,35,34,37,38]},
+  {id:3, name:'Valkyrie Armor', cat:'armor', icon:'🛡️', refine:7, slots:1, rarity:'epic', price:52000000, qty:1, shop:'GodGear', char:'DivineSmith', map:'payon', x:178, y:106, sold:4, history:[48,49,50,51,50,51,52]},
+  {id:4, name:'White Potion', cat:'usable', icon:'🧪', refine:0, slots:0, rarity:'common', price:1200, qty:999, shop:'PotStop', char:'Alchemixx', map:'prontera', x:155, y:180, sold:3, history:[1.1,1.15,1.2,1.2,1.18,1.2,1.2]},
+  {id:5, name:'Elunium', cat:'etc', icon:'💎', refine:0, slots:0, rarity:'rare', price:185000, qty:120, shop:'OreDepot', char:'MinerJoe', map:'geffen', x:120, y:66, sold:5, history:[210,205,198,192,188,186,185]},
+  {id:6, name:'Oridecon', cat:'etc', icon:'💠', refine:0, slots:0, rarity:'rare', price:172000, qty:88, shop:'OreDepot', char:'MinerJoe', map:'geffen', x:120, y:66, sold:6, history:[160,164,168,170,171,172,172]},
+  {id:7, name:'Jellopy', cat:'etc', icon:'🟢', refine:0, slots:0, rarity:'common', price:35, qty:9999, shop:'LootBarn', char:'Farmer21', map:'morocc', x:159, y:98, sold:12, history:[40,39,38,37,36,35,35]},
+  {id:8, name:'Muffler', cat:'armor', icon:'🧣', refine:4, slots:1, rarity:'common', price:2800000, qty:2, shop:'ClothLine', char:'TailorTom', map:'prontera', x:146, y:92, sold:9, history:[2.5,2.6,2.7,2.7,2.75,2.8,2.8]},
+  {id:9, name:'Poring Card', cat:'card', icon:'🃏', refine:0, slots:0, rarity:'rare', price:6500000, qty:3, shop:'CardHaven', char:'MvPHunter', map:'prontera', x:151, y:88, sold:7, history:[5.8,6.0,6.1,6.2,6.3,6.4,6.5]},
+  {id:10, name:'Fire Blade', cat:'weapon', icon:'🗡️', refine:10, slots:0, rarity:'legend', price:98000000, qty:1, shop:'BladeWorks', char:'ForgeKing', map:'prontera', x:143, y:96, sold:8, history:[85,88,90,92,95,96,98]},
+  {id:11, name:'Bathory Card', cat:'card', icon:'🃏', refine:0, slots:0, rarity:'epic', price:24000000, qty:1, shop:'Nightfall', char:'ShadowSel', map:'geffen', x:132, y:120, sold:10, history:[22,22,23,23,24,24,24]},
+  {id:12, name:'Blue Herb', cat:'usable', icon:'🌿', refine:0, slots:0, rarity:'common', price:9500, qty:500, shop:'HerbHut', char:'GreenThumb', map:'payon', x:112, y:145, sold:11, history:[10,9.8,9.6,9.5,9.5,9.5,9.5]},
+  {id:13, name:'Guard', cat:'armor', icon:'🛡️', refine:6, slots:1, rarity:'common', price:1500000, qty:4, shop:'ShieldWall', char:'Defenda', map:'prontera', x:149, y:90, sold:14, history:[1.3,1.35,1.4,1.42,1.45,1.48,1.5]},
+  {id:14, name:'Hunter Bow', cat:'weapon', icon:'🏹', refine:8, slots:0, rarity:'rare', price:14500000, qty:1, shop:'ArrowShop', char:'DeadEye', map:'payon', x:88, y:110, sold:13, history:[12,12.5,13,13.5,14,14.2,14.5]},
+  {id:15, name:'Yggdrasil Berry', cat:'usable', icon:'🍓', refine:0, slots:0, rarity:'rare', price:220000, qty:60, shop:'PotStop', char:'Alchemixx', map:'prontera', x:155, y:180, sold:15, history:[240,235,230,228,225,222,220]},
+  {id:16, name:'Angel Wing Ears', cat:'armor', icon:'👼', refine:0, slots:0, rarity:'legend', price:310000000, qty:1, shop:'RareFinds', char:'Collector7', map:'prontera', x:150, y:100, sold:16, history:[280,288,295,300,305,308,310]},
+];
+
+var mpTabState='vending', mpCat='all';
+
+function mpFmtZ(n){
+  if(n>=1e6) return (n/1e6).toFixed(n%1e6?1:0).replace(/\.0$/,'')+'M';
+  if(n>=1e3) return (n/1e3).toFixed(n%1e3?1:0).replace(/\.0$/,'')+'k';
+  return ''+n;
+}
+function mpFmtFull(n){ return n.toLocaleString('en-US'); }
+function mpRarityLabel(r){ return {common:'Common',rare:'Rare',epic:'Epic',legend:'Legendary'}[r]||r; }
+
+function mpBuildCats(){
+  var counts={};
+  MP_DATA.forEach(function(it){ counts[it.cat]=(counts[it.cat]||0)+1; });
+  document.getElementById('mp-cats').innerHTML = MP_CATS.map(function(c){
+    var n = c.id==='all'? MP_DATA.length : (counts[c.id]||0);
+    return '<button class="mp-chip'+(mpCat===c.id?' on':'')+'" onclick="mpSetCat(\''+c.id+'\')">'+
+      '<i class="ti '+c.icon+'"></i> '+c.name+' ('+n+')</button>';
+  }).join('');
+}
+function mpSetCat(id){ mpCat=id; mpBuildCats(); mpRender(); }
+function mpTab(t,btn){
+  mpTabState=t;
+  document.querySelectorAll('.mp-tab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  mpRender();
+}
+
+function mpFilteredSorted(){
+  var q=(document.getElementById('mp-q').value||'').toLowerCase();
+  var sort=document.getElementById('mp-sort').value;
+  var rows=MP_DATA.filter(function(it){
+    if(mpCat!=='all' && it.cat!==mpCat) return false;
+    if(q && it.name.toLowerCase().indexOf(q)<0 && it.shop.toLowerCase().indexOf(q)<0) return false;
+    return true;
+  });
+  if(mpTabState==='movers'){
+    /* biggest % change over the 7-point history */
+    rows=rows.slice().sort(function(a,b){ return Math.abs(mpPct(b))-Math.abs(mpPct(a)); });
+  } else {
+    rows.sort(function(a,b){
+      if(sort==='price-asc') return a.price-b.price;
+      if(sort==='price-desc') return b.price-a.price;
+      if(sort==='name') return a.name.localeCompare(b.name);
+      return a.sold-b.sold; /* recent */
+    });
+  }
+  return rows;
+}
+function mpPct(it){
+  var h=it.history; if(!h||h.length<2) return 0;
+  return ((h[h.length-1]-h[0])/h[0])*100;
+}
+
+function mpRender(){
+  var rows=mpFilteredSorted();
+  var grid=document.getElementById('mp-grid');
+  document.getElementById('mp-count').innerHTML='<b>'+rows.length+'</b> '+(rows.length===1?'listing':'listings')+
+    (mpTabState==='movers'?' · sorted by biggest price change':'');
+  if(!rows.length){
+    grid.innerHTML='<div class="mp-empty" style="grid-column:1/-1"><i class="ti ti-mood-empty"></i>No shops match that search.<br>Try a different item or category.</div>';
+    return;
+  }
+  grid.innerHTML=rows.map(function(it){
+    var name=(it.refine>0?'<span class="mp-refine">+'+it.refine+'</span> ':'')+it.name+(it.slots>0?' ['+it.slots+']':'');
+    var mv = mpTabState==='movers' ? mpMoverBadge(it) : '';
+    return '<button class="mp-card" onclick="mpOpen('+it.id+')">'+
+      '<span class="mp-rarity r-'+it.rarity+'">'+mpRarityLabel(it.rarity)+'</span>'+
+      '<div class="mp-card-top"><div class="mp-icon">'+it.icon+'</div>'+
+        '<div style="min-width:0"><p class="mp-card-name">'+name+'</p>'+
+        '<div class="mp-card-slots">'+mpCatName(it.cat)+mv+'</div></div></div>'+
+      '<div class="mp-price"><span class="z">'+mpFmtZ(it.price)+'<small>z</small></span>'+
+        '<span class="mp-qty">×'+mpFmtFull(it.qty)+'</span></div>'+
+      '<div class="mp-card-foot"><span class="mp-shop"><i class="ti ti-building-store"></i> <b>'+it.shop+'</b></span>'+
+        '<span class="mp-loc"><i class="ti ti-map-pin"></i> '+it.map+'</span></div>'+
+      '</button>';
+  }).join('');
+  document.getElementById('mp-updated').textContent='updated just now';
+}
+function mpCatName(id){ var c=MP_CATS.find(function(x){return x.id===id;}); return c?c.name:id; }
+function mpMoverBadge(it){
+  var p=mpPct(it); var up=p>=0;
+  return ' · <span style="color:'+(up?'#46d17f':'#f2705a')+'">'+(up?'▲':'▼')+' '+Math.abs(p).toFixed(1)+'%</span>';
+}
+
+/* ---- detail modal with price chart ---- */
+function mpOpen(id){
+  var it=MP_DATA.find(function(x){return x.id===id;}); if(!it) return;
+  /* other shops selling the same-named item */
+  var listings=MP_DATA.filter(function(x){return x.name===it.name;})
+    .sort(function(a,b){return a.price-b.price;});
+  var name=(it.refine>0?'<span class="mp-refine">+'+it.refine+'</span> ':'')+it.name+(it.slots>0?' ['+it.slots+']':'');
+  var p=mpPct(it), up=p>=0;
+  document.getElementById('mp-modal').innerHTML=
+    '<div class="mp-modal-head">'+
+      '<div class="mp-modal-icon">'+it.icon+'</div>'+
+      '<div><h2 class="mp-modal-title">'+name+'</h2>'+
+        '<div class="mp-modal-meta">'+mpCatName(it.cat)+' · '+mpRarityLabel(it.rarity)+' · '+listings.length+' shop'+(listings.length>1?'s':'')+' selling</div></div>'+
+      '<button class="mp-x" onclick="mpCloseModal()">&times;</button>'+
+    '</div>'+
+    '<div class="mp-modal-body">'+
+      '<p class="mp-secttl">Price history (7 days)</p>'+
+      mpChart(it.history)+
+      '<div class="mp-chart-legend"><span>7d ago</span>'+
+        '<span style="color:'+(up?'#46d17f':'#f2705a')+'">'+(up?'▲':'▼')+' '+Math.abs(p).toFixed(1)+'% this week</span>'+
+        '<span>today</span></div>'+
+      '<div class="mp-stat-row" style="margin-top:16px"><span>Lowest right now</span><b>'+mpFmtFull(listings[0].price)+' z</b></div>'+
+      '<div class="mp-stat-row"><span>Highest right now</span><b>'+mpFmtFull(listings[listings.length-1].price)+' z</b></div>'+
+      '<div class="mp-stat-row"><span>Total quantity listed</span><b>'+mpFmtFull(listings.reduce(function(s,x){return s+x.qty;},0))+'</b></div>'+
+      '<div class="mp-listings"><p class="mp-secttl">Shops selling this</p>'+
+        listings.map(function(l){
+          return '<div class="mp-listing"><span class="lz">'+mpFmtFull(l.price)+' z</span>'+
+            '<span class="lshop"><b>'+l.shop+'</b><small>'+l.char+' · '+l.map+' '+l.x+','+l.y+'</small></span>'+
+            '<span class="lqty">×'+mpFmtFull(l.qty)+'</span></div>';
+        }).join('')+
+      '</div>'+
+      '<div class="mp-buy-note"><i class="ti ti-info-circle"></i> To buy, log in and head to the shop location in-game. This page is for browsing prices — trades always happen in-game.</div>'+
+    '</div>';
+  document.getElementById('mp-modal-bg').classList.add('show');
+}
+function mpCloseModal(){ document.getElementById('mp-modal-bg').classList.remove('show'); }
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') mpCloseModal(); });
+
+/* tiny inline SVG line chart, no library */
+function mpChart(h){
+  var W=560,H=120,pad=6;
+  var min=Math.min.apply(null,h), max=Math.max.apply(null,h);
+  var rng=(max-min)||1;
+  var pts=h.map(function(v,i){
+    var x=pad+(W-2*pad)*(i/(h.length-1));
+    var y=pad+(H-2*pad)*(1-(v-min)/rng);
+    return [x,y];
+  });
+  var line=pts.map(function(p,i){return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(' ');
+  var area=line+' L'+pts[pts.length-1][0].toFixed(1)+' '+(H-pad)+' L'+pts[0][0].toFixed(1)+' '+(H-pad)+' Z';
+  var up=h[h.length-1]>=h[0];
+  var col=up?'#46d17f':'#f2705a';
+  var dots=pts.map(function(p){return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.5" fill="'+col+'"/>';}).join('');
+  return '<div class="mp-chart"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" style="height:120px">'+
+    '<defs><linearGradient id="mpg" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0" stop-color="'+col+'" stop-opacity="0.25"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs>'+
+    '<path d="'+area+'" fill="url(#mpg)"/>'+
+    '<path d="'+line+'" fill="none" stroke="'+col+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+
+    dots+'</svg></div>';
+}
+
+mpBuildCats();
+mpRender();
+</script>
+</body></html>
