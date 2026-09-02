@@ -416,6 +416,7 @@ function donationHTML(){
   <div class="don-pay" id="don-pay" style="display:none">
     <label class="fld">3 · Scan &amp; pay with QRIS</label>
     <p class="don-hint">Open any QRIS-supported app (GoPay, OVO, DANA, ShopeePay, bank apps…), scan the code, and enter <b id="don-payamt">the exact amount</b>.</p>
+    <p class="don-kode-note" id="don-kode-note" style="display:none"></p>
     <div class="qris-card"><img src="`+ROOT+`assets/qris-newera.png" alt="NewEraRO QRIS payment code" loading="lazy"></div>
     <div class="don-steps">
       <p><b>After paying:</b></p>
@@ -442,14 +443,30 @@ function updateSummary(){
   var code=sel.value;
   var name=code ? sel.options[sel.selectedIndex].getAttribute('data-name') : '';
   var bonus=code?Math.round(cp*0.20):0;
+  /* When a referral is used, append its code as the last 3 digits of the amount
+     paid (Indonesian "kode unik" style) so an incoming payment can be traced
+     back to the streamer. CP received is still based on the base tier — the
+     extra rupiah are only a tracking tag. */
+  var payTotal=cp+(code?Number(code):0);
   box.innerHTML='Base: <b>'+fmtNum(cp)+' CP</b><br>'+
     (code?'Streamer bonus (+20%): <b>+'+fmtNum(bonus)+' CP</b> → '+name+' (code '+code+')<br>':'')+
     '<hr class="don-hr">'+
-    'You receive: <b class="don-total">'+fmtNum(cp+bonus)+' CP</b><br>You pay: <b>'+fmtRp(cp)+'</b>';
+    'You receive: <b class="don-total">'+fmtNum(cp+bonus)+' CP</b><br>'+
+    'You pay: <b>'+fmtRp(payTotal)+'</b>'+
+    (code?' <span class="don-kode">· last 3 digits = code '+code+'</span>':'');
   if(pay){
     pay.style.display='';
     var pa=document.getElementById('don-payamt');
-    if(pa) pa.textContent=fmtRp(cp);
+    if(pa) pa.textContent=fmtRp(payTotal);
+    var kn=document.getElementById('don-kode-note');
+    if(kn){
+      if(code){
+        kn.style.display='';
+        kn.innerHTML='<i class="ti ti-alert-triangle"></i> Please pay <b>exactly '+fmtRp(payTotal)+'</b>. The last 3 digits (<b>'+code+'</b>) tag this top-up to <b>'+name+'</b> — rounding the amount means we can\'t credit the referral bonus.';
+      }else{
+        kn.style.display='none';
+      }
+    }
   }
 }
 

@@ -131,6 +131,11 @@ select.inp option{background:#101a2c;color:#fff}
 .don-note{margin-top:14px;padding:10px 12px;background:rgba(228,184,75,.10);border:1px solid rgba(228,184,75,.28);
  border-radius:9px;font-size:12px;line-height:1.55;color:var(--muted);display:flex;gap:8px;align-items:flex-start}
 .don-note i{color:var(--gold);font-size:15px;flex-shrink:0;margin-top:1px}
+.don-kode{color:var(--gold);font-size:12px;font-weight:400;white-space:nowrap}
+.don-kode-note{margin:2px 0 12px;padding:9px 12px;background:rgba(228,120,60,.12);border:1px solid rgba(228,120,60,.4);
+ border-radius:9px;font-size:12px;line-height:1.55;color:#f0c9a8}
+.don-kode-note i{color:#e8905a;margin-right:5px}
+.don-kode-note b{color:#fff}
 .statbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
 .statbtn{display:flex;align-items:center;gap:8px;justify-content:center;background:rgba(255,255,255,.06);
  border:1px solid var(--tline);border-radius:10px;padding:14px 8px;color:var(--text);text-decoration:none;font-size:13px;font-weight:500;transition:.2s}
