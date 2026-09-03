@@ -5,37 +5,40 @@
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <style>
-.mp-wrap{max-width:1240px;margin:0 auto;padding:22px 22px 90px}
+/* ---- FIX: give this page's content its own stacking layer above .pagebg ---- */
+.mp-wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:22px 22px 90px}
+.mp-modal-bg{z-index:80}
+
 .mp-preview-flag{display:flex;align-items:center;gap:9px;margin-bottom:14px;padding:9px 14px;
-  background:rgba(228,184,75,.10);border:1px solid rgba(228,184,75,.35);border-radius:10px;font-size:12.5px;color:var(--gold-soft)}
+  background:rgba(228,184,75,.12);border:1px solid rgba(228,184,75,.4);border-radius:10px;font-size:12.5px;color:var(--gold-soft)}
 .mp-preview-flag i{font-size:16px}
 
-/* account bar */
+/* account bar — solid dark so it's clearly visible over the video */
 .mp-accountbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
-  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid var(--tline);
-  border-radius:14px;padding:13px 16px;margin-bottom:20px}
-.mp-acct-left{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted)}
-.mp-acct-left i{font-size:19px;color:var(--gold)}
+  background:#111a28;border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:22px}
+.mp-acct-left{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--muted)}
+.mp-acct-left i{font-size:20px;color:var(--gold)}
 .mp-acct-left b{color:var(--text)}
-.mp-demo-tag{font-size:9.5px;font-weight:800;letter-spacing:.6px;background:rgba(228,120,60,.2);color:#f0a878;
-  border:1px solid rgba(228,120,60,.4);border-radius:5px;padding:2px 6px}
+.mp-demo-tag{font-size:9.5px;font-weight:800;letter-spacing:.6px;background:rgba(228,120,60,.22);color:#f0a878;
+  border:1px solid rgba(228,120,60,.5);border-radius:5px;padding:2px 6px}
 .mp-acct-right{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-.mp-balance{display:flex;align-items:center;gap:7px;background:rgba(228,184,75,.10);border:1px solid rgba(228,184,75,.3);
-  border-radius:10px;padding:9px 14px;font-size:14px;color:var(--muted)}
-.mp-balance i{color:var(--gold);font-size:17px}
-.mp-balance b{color:var(--gold);font-size:15px}
+.mp-balance{display:flex;align-items:center;gap:7px;background:rgba(228,184,75,.14);border:1px solid rgba(228,184,75,.45);
+  border-radius:10px;padding:9px 15px;font-size:14px;color:#e7ecf5}
+.mp-balance i{color:var(--gold);font-size:18px}
+.mp-balance b{color:var(--gold);font-size:16px}
 .mp-btn{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#241a07;border:none;border-radius:10px;
-  padding:10px 15px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+  padding:10px 15px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap}
 .mp-btn:hover{background:var(--gold-soft)}
-.mp-btn.ghost{background:rgba(255,255,255,.05);color:var(--text);border:1px solid var(--tline)}
-.mp-btn.ghost:hover{border-color:var(--line);background:rgba(255,255,255,.08)}
+.mp-btn.ghost{background:#1b2636;color:var(--text);border:1px solid var(--line)}
+.mp-btn.ghost:hover{background:#243247}
 .mp-btn.full{width:100%;justify-content:center;padding:13px;font-size:14.5px}
-.mp-btn:disabled{opacity:.5;cursor:not-allowed}
+.mp-btn:disabled{opacity:.45;cursor:not-allowed}
 
 .mp-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:6px}
 .mp-title{font-size:30px;font-weight:800;letter-spacing:.3px;margin:0}
 .mp-title .mp-zeny{color:var(--gold)}
 .mp-sub{color:var(--muted);font-size:13.5px;margin:4px 0 0;max-width:640px;line-height:1.5}
+.mp-sub b{color:var(--text)}
 .mp-live{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
 .mp-live .dot{width:7px;height:7px;border-radius:50%;background:#46d17f;animation:mp-pulse 2s infinite}
 @keyframes mp-pulse{0%{box-shadow:0 0 0 0 rgba(70,209,127,.5)}70%{box-shadow:0 0 0 7px rgba(70,209,127,0)}100%{box-shadow:0 0 0 0 rgba(70,209,127,0)}}
@@ -47,15 +50,14 @@
 .mp-tab.on{color:var(--gold);border-bottom-color:var(--gold)}
 
 .mp-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
-.mp-search{flex:1;min-width:220px;display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.05);
+.mp-search{flex:1;min-width:220px;display:flex;align-items:center;gap:9px;background:#111a28;
   border:1px solid var(--tline);border-radius:11px;padding:0 13px}
 .mp-search i{color:var(--muted);font-size:17px}
 .mp-search input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px;padding:12px 0}
-.mp-select{background:rgba(255,255,255,.05);border:1px solid var(--tline);border-radius:11px;color:var(--text);
-  font-size:13.5px;padding:11px 13px;cursor:pointer;outline:none}
+.mp-select{background:#111a28;border:1px solid var(--tline);border-radius:11px;color:var(--text);font-size:13.5px;padding:11px 13px;cursor:pointer;outline:none}
 
 .mp-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.mp-chip{background:rgba(255,255,255,.045);border:1px solid var(--tline);color:var(--muted);border-radius:999px;
+.mp-chip{background:#111a28;border:1px solid var(--tline);color:var(--muted);border-radius:999px;
   padding:7px 15px;font-size:12.5px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:6px}
 .mp-chip:hover{color:var(--text);border-color:var(--line)}
 .mp-chip.on{background:var(--gold);border-color:var(--gold);color:#241a07;font-weight:700}
@@ -63,45 +65,53 @@
 .mp-count b{color:var(--text)}
 
 .mp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
-.mp-card{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
-  border:1px solid var(--tline);border-radius:14px;padding:14px;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s;text-align:left;overflow:hidden}
-.mp-card:hover{transform:translateY(-3px);border-color:var(--line);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.mp-card{position:relative;background:#111a28;border:1px solid var(--tline);border-radius:14px;padding:14px;cursor:pointer;
+  transition:transform .15s,border-color .15s,box-shadow .15s;text-align:left;overflow:hidden}
+.mp-card:hover{transform:translateY(-3px);border-color:var(--line);box-shadow:0 12px 30px rgba(0,0,0,.5)}
 .mp-card-top{display:flex;gap:12px;align-items:flex-start}
 .mp-icon{width:52px;height:52px;flex-shrink:0;border-radius:11px;display:flex;align-items:center;justify-content:center;
-  font-size:26px;background:rgba(228,184,75,.10);border:1px solid rgba(228,184,75,.25)}
-.mp-card-name{font-size:14.5px;font-weight:700;line-height:1.3;margin:0}
+  font-size:26px;background:rgba(228,184,75,.12);border:1px solid rgba(228,184,75,.3)}
+.mp-card-name{font-size:14.5px;font-weight:700;line-height:1.3;margin:0;color:var(--text)}
 .mp-refine{color:var(--gold);font-weight:800}
 .mp-card-slots{color:var(--muted);font-size:12px;margin-top:2px}
 .mp-rarity{position:absolute;top:0;right:0;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 9px;border-bottom-left-radius:10px}
-.r-common{background:rgba(170,180,198,.18);color:#c3ccd9}
-.r-rare{background:rgba(90,150,255,.16);color:#8fb6ff}
-.r-epic{background:rgba(180,110,240,.18);color:#cf9cf5}
-.r-legend{background:rgba(228,184,75,.18);color:var(--gold-soft)}
+.r-common{background:rgba(170,180,198,.2);color:#c3ccd9}
+.r-rare{background:rgba(90,150,255,.2);color:#8fb6ff}
+.r-epic{background:rgba(180,110,240,.22);color:#cf9cf5}
+.r-legend{background:rgba(228,184,75,.22);color:var(--gold-soft)}
 .mp-price{margin-top:13px;display:flex;align-items:baseline;justify-content:space-between}
 .mp-price .z{font-size:17px;font-weight:800;color:var(--gold)}
 .mp-price .z small{font-size:11px;color:var(--muted);font-weight:500;margin-left:2px}
 .mp-qty{font-size:11.5px;color:var(--muted)}
-.mp-card-foot{margin-top:11px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+.mp-card-foot{margin-top:11px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--muted)}
 .mp-shop{display:flex;align-items:center;gap:5px;min-width:0}
 .mp-shop b{color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mp-loc{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .mp-empty{text-align:center;color:var(--muted);padding:70px 20px;font-size:14px}
 .mp-empty i{font-size:34px;display:block;margin-bottom:12px;opacity:.5}
 
-/* modals (shared) */
-.mp-modal-bg{position:fixed;inset:0;background:rgba(3,6,12,.72);backdrop-filter:blur(3px);z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
+/* pagination */
+.mp-pager{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:26px}
+.mp-page{min-width:40px;height:40px;padding:0 12px;background:#111a28;border:1px solid var(--tline);color:var(--text);
+  border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:5px}
+.mp-page:hover:not(:disabled){border-color:var(--line);background:#1b2636}
+.mp-page.on{background:var(--gold);border-color:var(--gold);color:#241a07}
+.mp-page:disabled{opacity:.4;cursor:not-allowed}
+
+/* modals */
+.mp-modal-bg{position:fixed;inset:0;background:rgba(3,6,12,.75);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px}
 .mp-modal-bg.show{display:flex}
 .mp-modal{width:min(640px,100%);max-height:88vh;overflow-y:auto;background:#0c1420;border:1px solid var(--line);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
-.mp-modal.narrow{width:min(460px,100%)}
+.mp-modal.narrow{width:min(470px,100%)}
 .mp-modal-head{display:flex;gap:15px;align-items:flex-start;padding:20px 22px;border-bottom:1px solid var(--tline);position:relative}
-.mp-modal-icon{width:64px;height:64px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:32px;background:rgba(228,184,75,.10);border:1px solid rgba(228,184,75,.28);flex-shrink:0}
+.mp-modal-icon{width:64px;height:64px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:32px;background:rgba(228,184,75,.12);border:1px solid rgba(228,184,75,.3);flex-shrink:0}
 .mp-modal-title{font-size:19px;font-weight:800;margin:0;line-height:1.25}
 .mp-modal-meta{color:var(--muted);font-size:12.5px;margin-top:5px}
 .mp-x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:26px;cursor:pointer;line-height:1}
 .mp-x:hover{color:#fff}
 .mp-modal-body{padding:20px 22px}
 .mp-secttl{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--gold);font-weight:700;margin:0 0 10px}
-.mp-stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13.5px}
+.mp-stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13.5px}
 .mp-stat-row span{color:var(--muted)}
 .mp-stat-row b{color:var(--text)}
 .mp-chart{margin:8px 0 4px;background:rgba(255,255,255,.03);border:1px solid var(--tline);border-radius:12px;padding:14px 12px 8px}
@@ -110,61 +120,59 @@
 .mp-listings{margin-top:22px}
 .mp-listing{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--tline);border-radius:11px;margin-bottom:8px}
 .mp-listing .lz{font-size:15px;font-weight:800;color:var(--gold);min-width:120px}
-.mp-listing .lshop{flex:1;font-size:13px}
+.mp-listing .lshop{flex:1;font-size:13px;color:var(--text)}
 .mp-listing .lshop small{color:var(--muted);display:block;margin-top:1px}
 .mp-listing .lqty{font-size:12px;color:var(--muted)}
 
-/* buy box */
-.mp-buybox{margin-top:20px;padding:16px;background:rgba(228,184,75,.06);border:1px solid rgba(228,184,75,.3);border-radius:13px}
+.mp-buybox{margin-top:20px;padding:16px;background:rgba(228,184,75,.07);border:1px solid rgba(228,184,75,.35);border-radius:13px}
 .mp-buybox .row{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;color:var(--muted);margin-bottom:6px}
 .mp-buybox .row b{color:var(--text)}
 .mp-buybox .total b{color:var(--gold);font-size:19px}
 .mp-rodex-note{margin:12px 0 14px;font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:flex-start;line-height:1.5}
 .mp-rodex-note i{color:var(--gold);flex-shrink:0;margin-top:1px;font-size:15px}
-.mp-inline-warn{margin-top:10px;font-size:12px;color:#f0c9a8;background:rgba(228,120,60,.12);border:1px solid rgba(228,120,60,.4);border-radius:9px;padding:9px 12px;display:flex;gap:8px;align-items:center}
+.mp-rodex-note b{color:var(--text)}
+.mp-inline-warn{margin-top:10px;font-size:12px;color:#f0c9a8;background:rgba(228,120,60,.14);border:1px solid rgba(228,120,60,.45);border-radius:9px;padding:9px 12px;display:flex;gap:8px;align-items:center}
 .mp-inline-warn i{color:#e8905a}
 
-/* success */
 .mp-success{text-align:center;padding:36px 22px}
-.mp-success .ok{width:70px;height:70px;border-radius:50%;background:rgba(70,209,127,.14);border:1px solid rgba(70,209,127,.5);
-  display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:38px;color:#46d17f}
+.mp-success .ok{width:70px;height:70px;border-radius:50%;background:rgba(70,209,127,.16);border:1px solid rgba(70,209,127,.55);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:38px;color:#46d17f}
 .mp-success h3{font-size:20px;margin:0 0 8px}
-.mp-success p{color:var(--muted);font-size:13.5px;line-height:1.6;margin:0 auto;max-width:380px}
-.mp-success .rodex{margin-top:16px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);
-  border:1px solid var(--tline);border-radius:10px;padding:10px 15px;font-size:13px}
+.mp-success p{color:var(--muted);font-size:13.5px;line-height:1.6;margin:0 auto;max-width:390px}
+.mp-success p b{color:var(--text)}
+.mp-success .rodex{margin-top:16px;display:inline-flex;align-items:center;gap:8px;background:#111a28;border:1px solid var(--tline);border-radius:10px;padding:10px 15px;font-size:13px}
 .mp-success .rodex i{color:var(--gold)}
 
-/* top-up */
 .mp-fld{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700;margin:16px 0 8px}
 .mp-fld:first-child{margin-top:0}
+.mp-fld .opt{text-transform:none;letter-spacing:0;color:var(--muted);font-weight:400}
 .mp-amtgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
-.mp-amt{background:rgba(255,255,255,.05);border:1px solid var(--tline);border-radius:10px;padding:13px 8px;text-align:center;cursor:pointer;font-size:15px;font-weight:700;color:var(--text);transition:.15s}
+.mp-amt{background:#111a28;border:1px solid var(--tline);border-radius:10px;padding:13px 8px;text-align:center;cursor:pointer;font-size:15px;font-weight:700;color:var(--text);transition:.15s}
 .mp-amt:hover{border-color:var(--line)}
 .mp-amt.sel{background:var(--gold);border-color:var(--gold);color:#241a07}
-.mp-inp{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--tline);border-radius:10px;color:var(--text);font-size:14px;padding:12px 13px;outline:none;box-sizing:border-box}
+.mp-inp{width:100%;background:#111a28;border:1px solid var(--tline);border-radius:10px;color:var(--text);font-size:14px;padding:12px 13px;outline:none;box-sizing:border-box}
 .mp-inp:focus{border-color:var(--line)}
-.mp-summary{margin-top:16px;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid var(--tline);border-radius:11px;font-size:13.5px;line-height:1.75;color:var(--muted)}
+.mp-summary{margin-top:16px;padding:14px 16px;background:#111a28;border:1px solid var(--tline);border-radius:11px;font-size:13.5px;line-height:1.75;color:var(--muted)}
 .mp-summary b{color:#fff}
 .mp-summary .tot{color:var(--gold);font-size:16px}
 .mp-hr{border:none;border-top:1px solid rgba(228,184,75,.3);margin:9px 0}
 .mp-qris{background:#fff;border-radius:12px;padding:9px;max-width:230px;margin:12px auto 0;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 .mp-qris img{width:100%;display:block;border-radius:5px}
-.mp-demo-credit{margin-top:14px;padding-top:14px;border-top:1px dashed rgba(255,255,255,.2)}
+.mp-demo-credit{margin-top:14px;padding-top:14px;border-top:1px dashed rgba(255,255,255,.22)}
 .mp-demo-credit p{font-size:11.5px;color:var(--muted);margin:0 0 10px;line-height:1.5}
+.mp-fee-note{margin:12px 0;font-size:12px;color:#f0c9a8;background:rgba(228,120,60,.14);border:1px solid rgba(228,120,60,.45);border-radius:10px;padding:11px 13px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.mp-fee-note i{color:#e8905a;flex-shrink:0;margin-top:1px;font-size:15px}
 
-/* profile / cashout */
-.mp-bal-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
-.mp-bal-card{background:rgba(255,255,255,.04);border:1px solid var(--tline);border-radius:12px;padding:13px}
+/* seller dashboard */
+.mp-bal-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px}
+.mp-bal-card{background:#111a28;border:1px solid var(--tline);border-radius:12px;padding:14px}
 .mp-bal-card .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600}
 .mp-bal-card .val{font-size:18px;font-weight:800;color:var(--text);margin-top:5px}
 .mp-bal-card.hi .val{color:var(--gold)}
-.mp-hist{margin-top:8px}
-.mp-hist-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:12.5px}
+.mp-hist-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:12.5px}
 .mp-hist-row .h-main{color:var(--text)}
-.mp-hist-row .h-sub{color:var(--muted);font-size:11px}
+.mp-hist-row .h-sub{color:var(--muted);font-size:11px;margin-top:2px}
 .mp-hist-row .h-amt{font-weight:700;white-space:nowrap}
-.mp-pending{color:#f0c9a8}
-.mp-done{color:#46d17f}
+.mp-pending{color:#f0c9a8}.mp-done{color:#46d17f}.mp-pos{color:#46d17f}.mp-neg{color:#f2705a}
 .mp-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:640px){
   .mp-title{font-size:24px}
@@ -172,6 +180,8 @@
   .mp-icon{width:44px;height:44px;font-size:22px}
   .mp-bal-cards{grid-template-columns:1fr}
   .mp-two{grid-template-columns:1fr}
+  .mp-acct-right{width:100%}
+  .mp-acct-right .mp-btn{flex:1;justify-content:center}
 }
 </style>
 </head><body class="page">
@@ -180,28 +190,26 @@
 <header class="sitehead">
   <img class="hd-logo" src="../assets/logo.png" alt="Home" title="Home" onclick="location.href='../'">
   <nav class="hd-tabs"><a class="tab" href="../wiki/index.html">Wiki</a><a class="tab" href="../pages/stat-woe.html">WoE</a><a class="tab" href="../pages/stat-pvp.html">PvP</a><a class="tab" href="../pages/stat-mvp.html">MVP</a><a class="tab" href="../pages/stat-zeny.html">Zeny</a><a class="tab" href="../pages/marketplace.html">Market</a></nav>
-  <div class="hd-right">
-    <div class="hd-status"><span class="hd-time" id="hd-time">Server time: —</span></div>
-    <div class="hd-acct" id="hd-acct"></div>
-  </div>
+  <div class="hd-right"><div class="hd-status"><span class="hd-time" id="hd-time">Server time: —</span></div><div class="hd-acct" id="hd-acct"></div></div>
 </header>
 
 <div class="mp-wrap">
-  <div class="mp-preview-flag"><i class="ti ti-eye-cog"></i> Private preview — dummy data &amp; a simulated wallet. Nothing is real: no money moves, no items are sent. Your developer connects the database later.</div>
+  <div class="mp-preview-flag"><i class="ti ti-eye-cog"></i> Private preview — dummy data &amp; a simulated wallet. Nothing is real: no money moves, no items are sent. This wallet (<b>Balance</b>) is separate from the main-menu Cash Points.</div>
 
   <div class="mp-accountbar">
     <div class="mp-acct-left"><i class="ti ti-user-circle"></i> Signed in as <b id="mp-user">whoRyou</b> <span class="mp-demo-tag">DEMO</span></div>
     <div class="mp-acct-right">
-      <span class="mp-balance"><i class="ti ti-coins"></i> <b id="mp-balance">0</b> CP</span>
+      <span class="mp-balance"><i class="ti ti-wallet"></i> Balance <b id="mp-balance">0</b></span>
       <button class="mp-btn" onclick="mpOpenTopup()"><i class="ti ti-plus"></i> Top Up</button>
-      <button class="mp-btn ghost" onclick="mpOpenProfile()"><i class="ti ti-settings"></i> Profile</button>
+      <button class="mp-btn ghost" onclick="mpOpenCashout()"><i class="ti ti-cash-banknote"></i> Cash Out</button>
+      <button class="mp-btn ghost" onclick="mpOpenShop()"><i class="ti ti-building-store"></i> My Shop</button>
     </div>
   </div>
 
   <div class="mp-head">
     <div>
       <h1 class="mp-title">Player <span class="mp-zeny">Market</span></h1>
-      <p class="mp-sub">Buy items with your Cash Points. Anything you purchase is delivered straight to your character's <b>RODEX</b> mailbox in-game.</p>
+      <p class="mp-sub">Buy items with your <b>Balance</b>. Anything you purchase is delivered straight to your character's <b>RODEX</b> mailbox in-game.</p>
     </div>
     <span class="mp-live"><span class="dot"></span> <span id="mp-updated">updated just now</span></span>
   </div>
@@ -212,7 +220,7 @@
   </div>
 
   <div class="mp-toolbar">
-    <div class="mp-search"><i class="ti ti-search"></i><input id="mp-q" placeholder="Search item or shop name..." oninput="mpRender()"></div>
+    <div class="mp-search"><i class="ti ti-search"></i><input id="mp-q" placeholder="Search item or shop name..." oninput="mpPage=1;mpRender()"></div>
     <select class="mp-select" id="mp-sort" onchange="mpRender()">
       <option value="recent">Newest first</option>
       <option value="price-asc">Price: low to high</option>
@@ -224,11 +232,13 @@
   <div class="mp-cats" id="mp-cats"></div>
   <div class="mp-count" id="mp-count"></div>
   <div class="mp-grid" id="mp-grid"></div>
+  <div class="mp-pager" id="mp-pager"></div>
 </div>
 
 <div class="mp-modal-bg" id="mp-modal-bg" onclick="if(event.target===this)mpCloseModal()"><div class="mp-modal" id="mp-modal"></div></div>
 <div class="mp-modal-bg" id="mp-topup-bg" onclick="if(event.target===this)mpClose('mp-topup-bg')"><div class="mp-modal narrow" id="mp-topup"></div></div>
-<div class="mp-modal-bg" id="mp-profile-bg" onclick="if(event.target===this)mpClose('mp-profile-bg')"><div class="mp-modal" id="mp-profile"></div></div>
+<div class="mp-modal-bg" id="mp-cash-bg" onclick="if(event.target===this)mpClose('mp-cash-bg')"><div class="mp-modal narrow" id="mp-cash"></div></div>
+<div class="mp-modal-bg" id="mp-shop-bg" onclick="if(event.target===this)mpClose('mp-shop-bg')"><div class="mp-modal" id="mp-shop"></div></div>
 
 <div class="backdrop" id="backdrop"></div>
 </div>
@@ -245,104 +255,111 @@
 <script src="../js/data.js"></script><script src="../js/wiki-index.js"></script><script src="../js/app.js"></script>
 <script>
 /* =========================================================================
-   MARKETPLACE PREVIEW — fully self-contained DEMO (dummy data + simulated
-   wallet in localStorage). No API calls, no real money, no real items.
-   When the dev builds the backend, replace MP_DATA with a fetch() and the
-   demo wallet/purchase/cashout functions with real authenticated calls,
-   keeping the same field names.
+   MARKETPLACE PREVIEW — self-contained DEMO. Wallet currency is "Balance",
+   separate from main-menu Cash Points. No referral bonus here. No API calls.
+   Dev replaces MP_DATA/MP_SELLER with fetch() and the wallet/buy/cashout
+   functions with real authenticated server calls (same field names).
    ========================================================================= */
-var MP_CATS = [
-  {id:'all',   name:'All',        icon:'ti-apps'},
-  {id:'weapon',name:'Weapons',    icon:'ti-sword'},
-  {id:'armor', name:'Armor',      icon:'ti-shirt'},
-  {id:'card',  name:'Cards',      icon:'ti-cards'},
-  {id:'usable',name:'Usables',    icon:'ti-flask'},
-  {id:'etc',   name:'Etc / Loot', icon:'ti-diamond'}
+var MP_CATS=[
+  {id:'all',name:'All',icon:'ti-apps'},{id:'weapon',name:'Weapons',icon:'ti-sword'},
+  {id:'armor',name:'Armor',icon:'ti-shirt'},{id:'card',name:'Cards',icon:'ti-cards'},
+  {id:'usable',name:'Usables',icon:'ti-flask'},{id:'etc',name:'Etc / Loot',icon:'ti-diamond'}
 ];
-/* price now in CP (1 CP = Rp 1) since purchases are paid from the wallet */
-var MP_DATA = [
-  {id:1, name:'Doppelganger Card', cat:'card', icon:'🃏', refine:0, slots:0, rarity:'legend', price:2500000, qty:1, shop:'CardHaven', char:'MvPHunter', map:'prontera', x:151, y:88, sold:2, history:[120,128,132,130,138,142,145]},
-  {id:2, name:'Sword Mace', cat:'weapon', icon:'⚔️', refine:9, slots:2, rarity:'epic', price:450000, qty:1, shop:'BladeWorks', char:'ForgeKing', map:'prontera', x:143, y:96, sold:1, history:[30,31,33,35,34,37,38]},
-  {id:3, name:'Valkyrie Armor', cat:'armor', icon:'🛡️', refine:7, slots:1, rarity:'epic', price:750000, qty:1, shop:'GodGear', char:'DivineSmith', map:'payon', x:178, y:106, sold:4, history:[48,49,50,51,50,51,52]},
-  {id:4, name:'White Potion', cat:'usable', icon:'🧪', refine:0, slots:0, rarity:'common', price:45000, qty:999, shop:'PotStop', char:'Alchemixx', map:'prontera', x:155, y:180, sold:3, history:[1.1,1.15,1.2,1.2,1.18,1.2,1.2]},
-  {id:5, name:'Elunium', cat:'etc', icon:'💎', refine:0, slots:0, rarity:'rare', price:240000, qty:120, shop:'OreDepot', char:'MinerJoe', map:'geffen', x:120, y:66, sold:5, history:[210,205,198,192,188,186,185]},
-  {id:6, name:'Oridecon', cat:'etc', icon:'💠', refine:0, slots:0, rarity:'rare', price:190000, qty:88, shop:'OreDepot', char:'MinerJoe', map:'geffen', x:120, y:66, sold:6, history:[160,164,168,170,171,172,172]},
-  {id:7, name:'Jellopy', cat:'etc', icon:'🟢', refine:0, slots:0, rarity:'common', price:12000, qty:9999, shop:'LootBarn', char:'Farmer21', map:'morocc', x:159, y:98, sold:12, history:[40,39,38,37,36,35,35]},
-  {id:8, name:'Muffler', cat:'armor', icon:'🧣', refine:4, slots:1, rarity:'common', price:120000, qty:2, shop:'ClothLine', char:'TailorTom', map:'prontera', x:146, y:92, sold:9, history:[2.5,2.6,2.7,2.7,2.75,2.8,2.8]},
-  {id:9, name:'Poring Card', cat:'card', icon:'🃏', refine:0, slots:0, rarity:'rare', price:85000, qty:3, shop:'CardHaven', char:'MvPHunter', map:'prontera', x:151, y:88, sold:7, history:[5.8,6.0,6.1,6.2,6.3,6.4,6.5]},
-  {id:10, name:'Fire Blade', cat:'weapon', icon:'🗡️', refine:10, slots:0, rarity:'legend', price:1800000, qty:1, shop:'BladeWorks', char:'ForgeKing', map:'prontera', x:143, y:96, sold:8, history:[85,88,90,92,95,96,98]},
-  {id:11, name:'Bathory Card', cat:'card', icon:'🃏', refine:0, slots:0, rarity:'epic', price:600000, qty:1, shop:'Nightfall', char:'ShadowSel', map:'geffen', x:132, y:120, sold:10, history:[22,22,23,23,24,24,24]},
-  {id:12, name:'Blue Herb', cat:'usable', icon:'🌿', refine:0, slots:0, rarity:'common', price:40000, qty:500, shop:'HerbHut', char:'GreenThumb', map:'payon', x:112, y:145, sold:11, history:[10,9.8,9.6,9.5,9.5,9.5,9.5]},
-  {id:13, name:'Guard', cat:'armor', icon:'🛡️', refine:6, slots:1, rarity:'common', price:60000, qty:4, shop:'ShieldWall', char:'Defenda', map:'prontera', x:149, y:90, sold:14, history:[1.3,1.35,1.4,1.42,1.45,1.48,1.5]},
-  {id:14, name:'Hunter Bow', cat:'weapon', icon:'🏹', refine:8, slots:0, rarity:'rare', price:350000, qty:1, shop:'ArrowShop', char:'DeadEye', map:'payon', x:88, y:110, sold:13, history:[12,12.5,13,13.5,14,14.2,14.5]},
-  {id:15, name:'Yggdrasil Berry', cat:'usable', icon:'🍓', refine:0, slots:0, rarity:'rare', price:175000, qty:60, shop:'PotStop', char:'Alchemixx', map:'prontera', x:155, y:180, sold:15, history:[240,235,230,228,225,222,220]},
-  {id:16, name:'Angel Wing Ears', cat:'armor', icon:'👼', refine:0, slots:0, rarity:'legend', price:5000000, qty:1, shop:'RareFinds', char:'Collector7', map:'prontera', x:150, y:100, sold:16, history:[280,288,295,300,305,308,310]},
+var MP_DATA=[
+  {id:1,name:'Doppelganger Card',cat:'card',icon:'🃏',refine:0,slots:0,rarity:'legend',price:2500000,qty:1,shop:'CardHaven',char:'MvPHunter',map:'prontera',x:151,y:88,sold:2,history:[120,128,132,130,138,142,145]},
+  {id:2,name:'Sword Mace',cat:'weapon',icon:'⚔️',refine:9,slots:2,rarity:'epic',price:450000,qty:1,shop:'BladeWorks',char:'ForgeKing',map:'prontera',x:143,y:96,sold:1,history:[30,31,33,35,34,37,38]},
+  {id:3,name:'Valkyrie Armor',cat:'armor',icon:'🛡️',refine:7,slots:1,rarity:'epic',price:750000,qty:1,shop:'GodGear',char:'DivineSmith',map:'payon',x:178,y:106,sold:4,history:[48,49,50,51,50,51,52]},
+  {id:4,name:'White Potion',cat:'usable',icon:'🧪',refine:0,slots:0,rarity:'common',price:45000,qty:999,shop:'PotStop',char:'Alchemixx',map:'prontera',x:155,y:180,sold:3,history:[1.1,1.15,1.2,1.2,1.18,1.2,1.2]},
+  {id:5,name:'Elunium',cat:'etc',icon:'💎',refine:0,slots:0,rarity:'rare',price:240000,qty:120,shop:'OreDepot',char:'MinerJoe',map:'geffen',x:120,y:66,sold:5,history:[210,205,198,192,188,186,185]},
+  {id:6,name:'Oridecon',cat:'etc',icon:'💠',refine:0,slots:0,rarity:'rare',price:190000,qty:88,shop:'OreDepot',char:'MinerJoe',map:'geffen',x:120,y:66,sold:6,history:[160,164,168,170,171,172,172]},
+  {id:7,name:'Jellopy',cat:'etc',icon:'🟢',refine:0,slots:0,rarity:'common',price:12000,qty:9999,shop:'LootBarn',char:'Farmer21',map:'morocc',x:159,y:98,sold:12,history:[40,39,38,37,36,35,35]},
+  {id:8,name:'Muffler',cat:'armor',icon:'🧣',refine:4,slots:1,rarity:'common',price:120000,qty:2,shop:'ClothLine',char:'TailorTom',map:'prontera',x:146,y:92,sold:9,history:[2.5,2.6,2.7,2.7,2.75,2.8,2.8]},
+  {id:9,name:'Poring Card',cat:'card',icon:'🃏',refine:0,slots:0,rarity:'rare',price:85000,qty:3,shop:'CardHaven',char:'MvPHunter',map:'prontera',x:151,y:88,sold:7,history:[5.8,6.0,6.1,6.2,6.3,6.4,6.5]},
+  {id:10,name:'Fire Blade',cat:'weapon',icon:'🗡️',refine:10,slots:0,rarity:'legend',price:1800000,qty:1,shop:'BladeWorks',char:'ForgeKing',map:'prontera',x:143,y:96,sold:8,history:[85,88,90,92,95,96,98]},
+  {id:11,name:'Bathory Card',cat:'card',icon:'🃏',refine:0,slots:0,rarity:'epic',price:600000,qty:1,shop:'Nightfall',char:'ShadowSel',map:'geffen',x:132,y:120,sold:10,history:[22,22,23,23,24,24,24]},
+  {id:12,name:'Blue Herb',cat:'usable',icon:'🌿',refine:0,slots:0,rarity:'common',price:40000,qty:500,shop:'HerbHut',char:'GreenThumb',map:'payon',x:112,y:145,sold:11,history:[10,9.8,9.6,9.5,9.5,9.5,9.5]},
+  {id:13,name:'Guard',cat:'armor',icon:'🛡️',refine:6,slots:1,rarity:'common',price:60000,qty:4,shop:'ShieldWall',char:'Defenda',map:'prontera',x:149,y:90,sold:14,history:[1.3,1.35,1.4,1.42,1.45,1.48,1.5]},
+  {id:14,name:'Hunter Bow',cat:'weapon',icon:'🏹',refine:8,slots:0,rarity:'rare',price:350000,qty:1,shop:'ArrowShop',char:'DeadEye',map:'payon',x:88,y:110,sold:13,history:[12,12.5,13,13.5,14,14.2,14.5]},
+  {id:15,name:'Yggdrasil Berry',cat:'usable',icon:'🍓',refine:0,slots:0,rarity:'rare',price:175000,qty:60,shop:'PotStop',char:'Alchemixx',map:'prontera',x:155,y:180,sold:15,history:[240,235,230,228,225,222,220]},
+  {id:16,name:'Angel Wing Ears',cat:'armor',icon:'👼',refine:0,slots:0,rarity:'legend',price:5000000,qty:1,shop:'RareFinds',char:'Collector7',map:'prontera',x:150,y:100,sold:16,history:[280,288,295,300,305,308,310]},
 ];
 
+/* seller data for the logged-in demo user (in production keyed to the account) */
+var MP_SELLER={
+  shop:'whoRyou\u2019s Wares',
+  listings:[
+    {name:'Elunium',icon:'💎',qty:120,price:240000},
+    {name:'Hunter Bow +8',icon:'🏹',qty:1,price:350000},
+    {name:'Blue Herb',icon:'🌿',qty:500,price:40000}
+  ],
+  sales:[
+    {name:'Poring Card',icon:'🃏',buyer:'RagnaFan',price:85000,when:Date.now()-1000*60*60*20},
+    {name:'Muffler +4',icon:'🧣',buyer:'KnightX',price:120000,when:Date.now()-1000*60*60*44},
+    {name:'Guard +6',icon:'🛡️',buyer:'TankMain',price:60000,when:Date.now()-1000*60*60*70},
+    {name:'White Potion ×200',icon:'🧪',buyer:'AlchLover',price:9000,when:Date.now()-1000*60*60*96}
+  ]
+};
 var MP_TIERS=[100000,250000,500000,1000000,5000000];
-var MP_STREAMERS=[{name:'Hatred',code:'311'},{name:'JuneGaming',code:'108'},{name:'PEA',code:'449'}];
-var MP_FEE=0.10;   /* cash-out fee (placeholder) */
+var MP_FEE=0.10;             /* platform fee on cash-out */
+var MP_PER_PAGE=12;
 
-/* ---------------- simulated wallet (localStorage) ---------------- */
-var MP_KEY='nero_market_demo_wallet_v2';
+/* ---------------- wallet (localStorage) ---------------- */
+var MP_KEY='nero_market_demo_wallet_v3';
 function mpWallet(){
-  try{ var w=JSON.parse(localStorage.getItem(MP_KEY)); if(w&&typeof w.balance==='number') return w; }catch(e){}
-  return {user:'whoRyou', balance:500000, paidIn:500000, bonus:0, withdrawn:0, purchases:[], cashouts:[]};
+  try{var w=JSON.parse(localStorage.getItem(MP_KEY)); if(w&&typeof w.balance==='number') return w;}catch(e){}
+  var rev=MP_SELLER.sales.reduce(function(s,x){return s+x.price;},0);
+  return {user:'whoRyou', balance:200000+rev, purchases:[], cashouts:[], salesRevenue:rev};
 }
-function mpSave(w){ try{localStorage.setItem(MP_KEY,JSON.stringify(w));}catch(e){} }
-function mpWithdrawable(w){ return Math.max(0, Math.min(w.balance, w.paidIn - w.withdrawn)); }
-function mpResetDemo(){ localStorage.removeItem(MP_KEY); mpRefreshBar(); mpClose('mp-profile-bg'); }
-function mpRefreshBar(){
-  var w=mpWallet();
-  document.getElementById('mp-balance').textContent=mpFmtFull(w.balance);
-  document.getElementById('mp-user').textContent=w.user;
-}
+function mpSave(w){try{localStorage.setItem(MP_KEY,JSON.stringify(w));}catch(e){}}
+function mpResetDemo(){localStorage.removeItem(MP_KEY);mpRefreshBar();mpClose('mp-shop-bg');mpClose('mp-cash-bg');}
+function mpRefreshBar(){var w=mpWallet();document.getElementById('mp-balance').textContent=mpFmtFull(w.balance);document.getElementById('mp-user').textContent=w.user;}
 
 /* ---------------- formatters ---------------- */
-function mpFmtShort(n){
-  if(n>=1e6) return (n/1e6).toFixed(n%1e6?1:0).replace(/\.0$/,'')+'M';
-  if(n>=1e3) return (n/1e3).toFixed(n%1e3?1:0).replace(/\.0$/,'')+'k';
-  return ''+n;
-}
-function mpFmtFull(n){ return Number(n).toLocaleString('en-US'); }
-function mpRp(n){ return 'Rp '+Number(n).toLocaleString('id-ID'); }
-function mpRarityLabel(r){ return {common:'Common',rare:'Rare',epic:'Epic',legend:'Legendary'}[r]||r; }
-function mpCatName(id){ var c=MP_CATS.find(function(x){return x.id===id;}); return c?c.name:id; }
+function mpFmtShort(n){if(n>=1e6)return (n/1e6).toFixed(n%1e6?1:0).replace(/\.0$/,'')+'M';if(n>=1e3)return (n/1e3).toFixed(n%1e3?1:0).replace(/\.0$/,'')+'k';return ''+n;}
+function mpFmtFull(n){return Number(n).toLocaleString('en-US');}
+function mpRp(n){return 'Rp '+Number(n).toLocaleString('id-ID');}
+function mpRarityLabel(r){return {common:'Common',rare:'Rare',epic:'Epic',legend:'Legendary'}[r]||r;}
+function mpCatName(id){var c=MP_CATS.find(function(x){return x.id===id;});return c?c.name:id;}
+function mpAgo(t){var d=Math.floor((Date.now()-t)/3600000);if(d<1)return 'just now';if(d<24)return d+'h ago';return Math.floor(d/24)+'d ago';}
 
 /* ---------------- browse ---------------- */
-var mpTabState='vending', mpCat='all';
+var mpTabState='vending', mpCat='all', mpPage=1;
 function mpBuildCats(){
-  var counts={}; MP_DATA.forEach(function(it){counts[it.cat]=(counts[it.cat]||0)+1;});
-  document.getElementById('mp-cats').innerHTML = MP_CATS.map(function(c){
+  var counts={};MP_DATA.forEach(function(it){counts[it.cat]=(counts[it.cat]||0)+1;});
+  document.getElementById('mp-cats').innerHTML=MP_CATS.map(function(c){
     var n=c.id==='all'?MP_DATA.length:(counts[c.id]||0);
     return '<button class="mp-chip'+(mpCat===c.id?' on':'')+'" onclick="mpSetCat(\''+c.id+'\')"><i class="ti '+c.icon+'"></i> '+c.name+' ('+n+')</button>';
   }).join('');
 }
-function mpSetCat(id){ mpCat=id; mpBuildCats(); mpRender(); }
-function mpTab(t,btn){ mpTabState=t; document.querySelectorAll('.mp-tab').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on'); mpRender(); }
-function mpPct(it){ var h=it.history; if(!h||h.length<2) return 0; return ((h[h.length-1]-h[0])/h[0])*100; }
+function mpSetCat(id){mpCat=id;mpPage=1;mpBuildCats();mpRender();}
+function mpTab(t,btn){mpTabState=t;mpPage=1;document.querySelectorAll('.mp-tab').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');mpRender();}
+function mpPct(it){var h=it.history;if(!h||h.length<2)return 0;return ((h[h.length-1]-h[0])/h[0])*100;}
 function mpFilteredSorted(){
   var q=(document.getElementById('mp-q').value||'').toLowerCase();
   var sort=document.getElementById('mp-sort').value;
   var rows=MP_DATA.filter(function(it){
-    if(mpCat!=='all'&&it.cat!==mpCat) return false;
-    if(q&&it.name.toLowerCase().indexOf(q)<0&&it.shop.toLowerCase().indexOf(q)<0) return false;
+    if(mpCat!=='all'&&it.cat!==mpCat)return false;
+    if(q&&it.name.toLowerCase().indexOf(q)<0&&it.shop.toLowerCase().indexOf(q)<0)return false;
     return true;
   });
-  if(mpTabState==='movers'){ rows=rows.slice().sort(function(a,b){return Math.abs(mpPct(b))-Math.abs(mpPct(a));}); }
+  if(mpTabState==='movers')rows=rows.slice().sort(function(a,b){return Math.abs(mpPct(b))-Math.abs(mpPct(a));});
   else rows.sort(function(a,b){
-    if(sort==='price-asc') return a.price-b.price;
-    if(sort==='price-desc') return b.price-a.price;
-    if(sort==='name') return a.name.localeCompare(b.name);
+    if(sort==='price-asc')return a.price-b.price;
+    if(sort==='price-desc')return b.price-a.price;
+    if(sort==='name')return a.name.localeCompare(b.name);
     return a.sold-b.sold;
   });
   return rows;
 }
-function mpMoverBadge(it){ var p=mpPct(it),up=p>=0; return ' · <span style="color:'+(up?'#46d17f':'#f2705a')+'">'+(up?'▲':'▼')+' '+Math.abs(p).toFixed(1)+'%</span>'; }
+function mpMoverBadge(it){var p=mpPct(it),up=p>=0;return ' · <span style="color:'+(up?'#46d17f':'#f2705a')+'">'+(up?'▲':'▼')+' '+Math.abs(p).toFixed(1)+'%</span>';}
 function mpRender(){
-  var rows=mpFilteredSorted(), grid=document.getElementById('mp-grid');
-  document.getElementById('mp-count').innerHTML='<b>'+rows.length+'</b> '+(rows.length===1?'listing':'listings')+(mpTabState==='movers'?' · sorted by biggest price change':'');
-  if(!rows.length){ grid.innerHTML='<div class="mp-empty" style="grid-column:1/-1"><i class="ti ti-mood-empty"></i>No listings match that search.</div>'; return; }
+  var all=mpFilteredSorted();
+  var pages=Math.max(1,Math.ceil(all.length/MP_PER_PAGE));
+  if(mpPage>pages)mpPage=pages;
+  var rows=all.slice((mpPage-1)*MP_PER_PAGE, mpPage*MP_PER_PAGE);
+  var grid=document.getElementById('mp-grid');
+  document.getElementById('mp-count').innerHTML='<b>'+all.length+'</b> '+(all.length===1?'listing':'listings')+(mpTabState==='movers'?' · sorted by biggest price change':'')+(pages>1?' · page '+mpPage+' of '+pages:'');
+  if(!all.length){grid.innerHTML='<div class="mp-empty" style="grid-column:1/-1"><i class="ti ti-mood-empty"></i>No listings match that search.</div>';document.getElementById('mp-pager').innerHTML='';return;}
   grid.innerHTML=rows.map(function(it){
     var name=(it.refine>0?'<span class="mp-refine">+'+it.refine+'</span> ':'')+it.name+(it.slots>0?' ['+it.slots+']':'');
     var mv=mpTabState==='movers'?mpMoverBadge(it):'';
@@ -350,209 +367,197 @@ function mpRender(){
       '<span class="mp-rarity r-'+it.rarity+'">'+mpRarityLabel(it.rarity)+'</span>'+
       '<div class="mp-card-top"><div class="mp-icon">'+it.icon+'</div>'+
         '<div style="min-width:0"><p class="mp-card-name">'+name+'</p><div class="mp-card-slots">'+mpCatName(it.cat)+mv+'</div></div></div>'+
-      '<div class="mp-price"><span class="z">'+mpFmtShort(it.price)+'<small>CP</small></span><span class="mp-qty">×'+mpFmtFull(it.qty)+'</span></div>'+
+      '<div class="mp-price"><span class="z">'+mpFmtShort(it.price)+'<small>Balance</small></span><span class="mp-qty">×'+mpFmtFull(it.qty)+'</span></div>'+
       '<div class="mp-card-foot"><span class="mp-shop"><i class="ti ti-building-store"></i> <b>'+it.shop+'</b></span><span class="mp-loc"><i class="ti ti-map-pin"></i> '+it.map+'</span></div>'+
       '</button>';
   }).join('');
+  mpRenderPager(pages);
 }
+function mpRenderPager(pages){
+  var el=document.getElementById('mp-pager');
+  if(pages<=1){el.innerHTML='';return;}
+  var h='<button class="mp-page" '+(mpPage===1?'disabled':'')+' onclick="mpGoto('+(mpPage-1)+')"><i class="ti ti-chevron-left"></i> Prev</button>';
+  for(var i=1;i<=pages;i++) h+='<button class="mp-page'+(i===mpPage?' on':'')+'" onclick="mpGoto('+i+')">'+i+'</button>';
+  h+='<button class="mp-page" '+(mpPage===pages?'disabled':'')+' onclick="mpGoto('+(mpPage+1)+')">Next <i class="ti ti-chevron-right"></i></button>';
+  el.innerHTML=h;
+}
+function mpGoto(p){mpPage=p;mpRender();var g=document.getElementById('mp-grid');if(g&&g.scrollIntoView)g.scrollIntoView({behavior:'smooth',block:'start'});}
 
 /* ---------------- item detail + buy ---------------- */
 function mpChart(h){
   var W=560,H=120,pad=6,min=Math.min.apply(null,h),max=Math.max.apply(null,h),rng=(max-min)||1;
-  var pts=h.map(function(v,i){return [pad+(W-2*pad)*(i/(h.length-1)), pad+(H-2*pad)*(1-(v-min)/rng)];});
+  var pts=h.map(function(v,i){return [pad+(W-2*pad)*(i/(h.length-1)),pad+(H-2*pad)*(1-(v-min)/rng)];});
   var line=pts.map(function(p,i){return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(' ');
   var area=line+' L'+pts[pts.length-1][0].toFixed(1)+' '+(H-pad)+' L'+pts[0][0].toFixed(1)+' '+(H-pad)+' Z';
-  var up=h[h.length-1]>=h[0], col=up?'#46d17f':'#f2705a';
+  var up=h[h.length-1]>=h[0],col=up?'#46d17f':'#f2705a';
   var dots=pts.map(function(p){return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.5" fill="'+col+'"/>';}).join('');
-  return '<div class="mp-chart"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" style="height:120px">'+
-    '<defs><linearGradient id="mpg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity="0.25"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs>'+
-    '<path d="'+area+'" fill="url(#mpg)"/><path d="'+line+'" fill="none" stroke="'+col+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+dots+'</svg></div>';
+  return '<div class="mp-chart"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" style="height:120px"><defs><linearGradient id="mpg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity="0.25"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs><path d="'+area+'" fill="url(#mpg)"/><path d="'+line+'" fill="none" stroke="'+col+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+dots+'</svg></div>';
 }
 function mpOpen(id){
-  var it=MP_DATA.find(function(x){return x.id===id;}); if(!it) return;
+  var it=MP_DATA.find(function(x){return x.id===id;});if(!it)return;
   var listings=MP_DATA.filter(function(x){return x.name===it.name;}).sort(function(a,b){return a.price-b.price;});
   var name=(it.refine>0?'<span class="mp-refine">+'+it.refine+'</span> ':'')+it.name+(it.slots>0?' ['+it.slots+']':'');
-  var p=mpPct(it),up=p>=0, w=mpWallet(), afford=w.balance>=it.price;
+  var p=mpPct(it),up=p>=0,w=mpWallet(),afford=w.balance>=it.price;
   document.getElementById('mp-modal').innerHTML=
-    '<div class="mp-modal-head"><div class="mp-modal-icon">'+it.icon+'</div>'+
-      '<div><h2 class="mp-modal-title">'+name+'</h2><div class="mp-modal-meta">'+mpCatName(it.cat)+' · '+mpRarityLabel(it.rarity)+' · sold by '+it.shop+'</div></div>'+
-      '<button class="mp-x" onclick="mpCloseModal()">&times;</button></div>'+
+    '<div class="mp-modal-head"><div class="mp-modal-icon">'+it.icon+'</div><div><h2 class="mp-modal-title">'+name+'</h2><div class="mp-modal-meta">'+mpCatName(it.cat)+' · '+mpRarityLabel(it.rarity)+' · sold by '+it.shop+'</div></div><button class="mp-x" onclick="mpCloseModal()">&times;</button></div>'+
     '<div class="mp-modal-body">'+
-      '<div class="mp-buybox">'+
-        '<div class="row"><span>Price</span><b>'+mpFmtFull(it.price)+' CP</b></div>'+
-        '<div class="row total"><span>You pay</span><b>'+mpFmtFull(it.price)+' CP</b></div>'+
+      '<div class="mp-buybox"><div class="row"><span>Price</span><b>'+mpFmtFull(it.price)+' Balance</b></div>'+
+        '<div class="row total"><span>You pay</span><b>'+mpFmtFull(it.price)+'</b></div>'+
         '<div class="mp-rodex-note"><i class="ti ti-mail"></i> Delivered to the <b>RODEX</b> mailbox of <b>'+w.user+'</b> right after purchase — open your in-game mail to claim it.</div>'+
-        (afford
-          ? '<button class="mp-btn full" onclick="mpBuy('+it.id+')"><i class="ti ti-shopping-cart"></i> Buy for '+mpFmtFull(it.price)+' CP</button>'
-          : '<button class="mp-btn full" onclick="mpOpenTopup()"><i class="ti ti-plus"></i> Top up to buy (need '+mpFmtFull(it.price-w.balance)+' more CP)</button>')+
-        (afford?'':'<div class="mp-inline-warn"><i class="ti ti-alert-triangle"></i> Balance '+mpFmtFull(w.balance)+' CP is not enough for this item.</div>')+
+        (afford?'<button class="mp-btn full" onclick="mpBuy('+it.id+')"><i class="ti ti-shopping-cart"></i> Buy for '+mpFmtFull(it.price)+'</button>'
+               :'<button class="mp-btn full" onclick="mpOpenTopup()"><i class="ti ti-plus"></i> Top up to buy (need '+mpFmtFull(it.price-w.balance)+' more)</button>')+
+        (afford?'':'<div class="mp-inline-warn"><i class="ti ti-alert-triangle"></i> Balance '+mpFmtFull(w.balance)+' is not enough for this item.</div>')+
       '</div>'+
       '<p class="mp-secttl" style="margin-top:24px">Price history (7 days)</p>'+mpChart(it.history)+
       '<div class="mp-chart-legend"><span>7d ago</span><span style="color:'+(up?'#46d17f':'#f2705a')+'">'+(up?'▲':'▼')+' '+Math.abs(p).toFixed(1)+'% this week</span><span>today</span></div>'+
       '<div class="mp-listings"><p class="mp-secttl">All shops selling this</p>'+
-        listings.map(function(l){return '<div class="mp-listing"><span class="lz">'+mpFmtFull(l.price)+' CP</span><span class="lshop"><b>'+l.shop+'</b><small>'+l.char+' · '+l.map+' '+l.x+','+l.y+'</small></span><span class="lqty">×'+mpFmtFull(l.qty)+'</span></div>';}).join('')+
+        listings.map(function(l){return '<div class="mp-listing"><span class="lz">'+mpFmtFull(l.price)+'</span><span class="lshop"><b>'+l.shop+'</b><small>'+l.char+' · '+l.map+' '+l.x+','+l.y+'</small></span><span class="lqty">×'+mpFmtFull(l.qty)+'</span></div>';}).join('')+
       '</div></div>';
   document.getElementById('mp-modal-bg').classList.add('show');
 }
-function mpCloseModal(){ document.getElementById('mp-modal-bg').classList.remove('show'); }
+function mpCloseModal(){document.getElementById('mp-modal-bg').classList.remove('show');}
 function mpBuy(id){
-  var it=MP_DATA.find(function(x){return x.id===id;}); if(!it) return;
-  var w=mpWallet();
+  var it=MP_DATA.find(function(x){return x.id===id;});if(!it)return;var w=mpWallet();
   document.getElementById('mp-modal').innerHTML=
-    '<div class="mp-modal-head"><div class="mp-modal-icon">'+it.icon+'</div>'+
-      '<div><h2 class="mp-modal-title">Confirm purchase</h2><div class="mp-modal-meta">'+it.name+'</div></div>'+
-      '<button class="mp-x" onclick="mpCloseModal()">&times;</button></div>'+
+    '<div class="mp-modal-head"><div class="mp-modal-icon">'+it.icon+'</div><div><h2 class="mp-modal-title">Confirm purchase</h2><div class="mp-modal-meta">'+it.name+'</div></div><button class="mp-x" onclick="mpCloseModal()">&times;</button></div>'+
     '<div class="mp-modal-body"><div class="mp-buybox">'+
       '<div class="row"><span>Item</span><b>'+(it.refine>0?'+'+it.refine+' ':'')+it.name+(it.slots>0?' ['+it.slots+']':'')+'</b></div>'+
-      '<div class="row"><span>Balance now</span><b>'+mpFmtFull(w.balance)+' CP</b></div>'+
-      '<div class="row"><span>Price</span><b>−'+mpFmtFull(it.price)+' CP</b></div>'+
-      '<div class="row total"><span>Balance after</span><b>'+mpFmtFull(w.balance-it.price)+' CP</b></div>'+
+      '<div class="row"><span>Balance now</span><b>'+mpFmtFull(w.balance)+'</b></div>'+
+      '<div class="row"><span>Price</span><b>−'+mpFmtFull(it.price)+'</b></div>'+
+      '<div class="row total"><span>Balance after</span><b>'+mpFmtFull(w.balance-it.price)+'</b></div>'+
       '<div class="mp-rodex-note"><i class="ti ti-mail"></i> Sent to <b>'+w.user+'</b>\'s RODEX immediately.</div>'+
       '<button class="mp-btn full" onclick="mpConfirmBuy('+it.id+')"><i class="ti ti-check"></i> Confirm &amp; buy</button>'+
       '<button class="mp-btn ghost full" style="margin-top:8px" onclick="mpOpen('+it.id+')">Back</button>'+
     '</div></div>';
 }
 function mpConfirmBuy(id){
-  var it=MP_DATA.find(function(x){return x.id===id;}); if(!it) return;
-  var w=mpWallet();
-  if(w.balance<it.price){ mpOpen(id); return; }
+  var it=MP_DATA.find(function(x){return x.id===id;});if(!it)return;var w=mpWallet();
+  if(w.balance<it.price){mpOpen(id);return;}
   w.balance-=it.price;
-  w.purchases.unshift({name:(it.refine>0?'+'+it.refine+' ':'')+it.name+(it.slots>0?' ['+it.slots+']':''), price:it.price, when:Date.now()});
-  mpSave(w); mpRefreshBar();
+  w.purchases.unshift({name:(it.refine>0?'+'+it.refine+' ':'')+it.name+(it.slots>0?' ['+it.slots+']':''),price:it.price,when:Date.now()});
+  mpSave(w);mpRefreshBar();
   document.getElementById('mp-modal').innerHTML=
-    '<div class="mp-modal-body"><div class="mp-success">'+
-      '<div class="ok"><i class="ti ti-check"></i></div>'+
-      '<h3>Sent to your RODEX!</h3>'+
-      '<p>'+it.name+' has been mailed to <b>'+w.user+'</b>. Open your <b>RODEX</b> mailbox in-game to claim it. New balance: <b>'+mpFmtFull(w.balance)+' CP</b>.</p>'+
+    '<div class="mp-modal-body"><div class="mp-success"><div class="ok"><i class="ti ti-check"></i></div><h3>Sent to your RODEX!</h3>'+
+      '<p>'+it.name+' has been mailed to <b>'+w.user+'</b>. Open your <b>RODEX</b> mailbox in-game to claim it. New balance: <b>'+mpFmtFull(w.balance)+'</b>.</p>'+
       '<div class="rodex"><i class="ti ti-mail-opened"></i> RODEX › Mailbox › Attached item</div>'+
-      '<div style="margin-top:22px"><button class="mp-btn" onclick="mpCloseModal()">Keep shopping</button></div>'+
-    '</div></div>';
+      '<div style="margin-top:22px"><button class="mp-btn" onclick="mpCloseModal()">Keep shopping</button></div></div></div>';
 }
 
-/* ---------------- top up ---------------- */
+/* ---------------- top up (no referral) ---------------- */
 var mpTier=null;
 function mpOpenTopup(){
-  mpCloseModal(); mpClose('mp-profile-bg'); mpTier=null;
+  mpCloseModal();mpClose('mp-shop-bg');mpClose('mp-cash-bg');mpTier=null;
   var tiers=MP_TIERS.map(function(a,i){return '<button class="mp-amt" id="mp-amt'+i+'" onclick="mpPickTier('+i+')">'+mpFmtFull(a)+'</button>';}).join('');
-  var opts='<option value="">None</option>'+MP_STREAMERS.map(function(s){return '<option value="'+s.code+'" data-name="'+s.name+'">'+s.name+' — Code '+s.code+'</option>';}).join('');
   document.getElementById('mp-topup').innerHTML=
-    '<div class="mp-modal-head"><div class="mp-modal-icon"><i class="ti ti-coins"></i></div>'+
-      '<div><h2 class="mp-modal-title">Top up Cash Points</h2><div class="mp-modal-meta">1 CP = Rp 1</div></div>'+
-      '<button class="mp-x" onclick="mpClose(\'mp-topup-bg\')">&times;</button></div>'+
+    '<div class="mp-modal-head"><div class="mp-modal-icon"><i class="ti ti-wallet"></i></div><div><h2 class="mp-modal-title">Top up Balance</h2><div class="mp-modal-meta">1 Balance = Rp 1</div></div><button class="mp-x" onclick="mpClose(\'mp-topup-bg\')">&times;</button></div>'+
     '<div class="mp-modal-body">'+
       '<label class="mp-fld">1 · Amount</label><div class="mp-amtgrid">'+tiers+'</div>'+
-      '<label class="mp-fld">2 · Referral code <span style="text-transform:none;letter-spacing:0;color:var(--muted);font-weight:400">(optional, +20% bonus CP)</span></label>'+
-      '<select class="mp-inp" id="mp-ref" onchange="mpTopupSummary()">'+opts+'</select>'+
       '<div class="mp-summary" id="mp-topsum">Choose an amount to continue.</div>'+
       '<div id="mp-paybox" style="display:none">'+
-        '<label class="mp-fld">3 · Pay via QRIS</label>'+
-        '<div class="mp-qris"><img src="../assets/qris-newera.png" alt="QRIS"></div>'+
-        '<div class="mp-demo-credit"><p><b>DEMO:</b> in production, CP is credited after your payment is verified. For this preview, credit it instantly so you can test buying &amp; cash-out:</p>'+
-          '<button class="mp-btn full" onclick="mpCreditDemo()"><i class="ti ti-bolt"></i> Simulate successful payment</button></div>'+
-      '</div>'+
+        '<label class="mp-fld">2 · Pay via QRIS</label><div class="mp-qris"><img src="../assets/qris-newera.png" alt="QRIS"></div>'+
+        '<div class="mp-demo-credit"><p><b>DEMO:</b> in production, Balance is credited after your payment is verified. For this preview, credit it instantly so you can test:</p>'+
+          '<button class="mp-btn full" onclick="mpCreditDemo()"><i class="ti ti-bolt"></i> Simulate successful payment</button></div></div>'+
     '</div>';
   document.getElementById('mp-topup-bg').classList.add('show');
 }
-function mpPickTier(i){ mpTier=i; MP_TIERS.forEach(function(_,j){document.getElementById('mp-amt'+j).classList.toggle('sel',j===i);}); mpTopupSummary(); }
+function mpPickTier(i){mpTier=i;MP_TIERS.forEach(function(_,j){document.getElementById('mp-amt'+j).classList.toggle('sel',j===i);});mpTopupSummary();}
 function mpTopupSummary(){
-  var box=document.getElementById('mp-topsum'), pay=document.getElementById('mp-paybox');
-  if(mpTier===null){ box.innerHTML='Choose an amount to continue.'; pay.style.display='none'; return; }
-  var base=MP_TIERS[mpTier], sel=document.getElementById('mp-ref'), code=sel.value;
-  var name=code?sel.options[sel.selectedIndex].getAttribute('data-name'):'';
-  var bonus=code?Math.round(base*0.20):0, payTotal=base+(code?Number(code):0);
-  box.innerHTML='Base: <b>'+mpFmtFull(base)+' CP</b><br>'+
-    (code?'Referral bonus (+20%): <b>+'+mpFmtFull(bonus)+' CP</b> → '+name+' (code '+code+')<br>':'')+
-    '<hr class="mp-hr">You receive: <b class="tot">'+mpFmtFull(base+bonus)+' CP</b><br>You pay: <b>'+mpRp(payTotal)+'</b>'+(code?' <span style="color:var(--gold);font-size:12px">· last 3 digits = code '+code+'</span>':'');
+  var box=document.getElementById('mp-topsum'),pay=document.getElementById('mp-paybox');
+  if(mpTier===null){box.innerHTML='Choose an amount to continue.';pay.style.display='none';return;}
+  var base=MP_TIERS[mpTier];
+  box.innerHTML='You receive: <b class="tot">'+mpFmtFull(base)+' Balance</b><br>You pay: <b>'+mpRp(base)+'</b>';
   pay.style.display='';
 }
 function mpCreditDemo(){
-  if(mpTier===null) return;
-  var base=MP_TIERS[mpTier], code=document.getElementById('mp-ref').value;
-  var bonus=code?Math.round(base*0.20):0;
-  var w=mpWallet();
-  w.paidIn+=base; w.bonus+=bonus; w.balance+=base+bonus;
-  mpSave(w); mpRefreshBar();
+  if(mpTier===null)return;var base=MP_TIERS[mpTier];var w=mpWallet();w.balance+=base;mpSave(w);mpRefreshBar();
   document.getElementById('mp-topup').innerHTML=
-    '<div class="mp-modal-body"><div class="mp-success">'+
-      '<div class="ok"><i class="ti ti-check"></i></div><h3>'+mpFmtFull(base+bonus)+' CP added</h3>'+
-      '<p>Your balance is now <b>'+mpFmtFull(w.balance)+' CP</b>. (Demo — no real payment was taken.)</p>'+
-      '<div style="margin-top:22px"><button class="mp-btn" onclick="mpClose(\'mp-topup-bg\')">Start shopping</button></div>'+
-    '</div></div>';
+    '<div class="mp-modal-body"><div class="mp-success"><div class="ok"><i class="ti ti-check"></i></div><h3>'+mpFmtFull(base)+' Balance added</h3>'+
+      '<p>Your balance is now <b>'+mpFmtFull(w.balance)+'</b>. (Demo — no real payment was taken.)</p>'+
+      '<div style="margin-top:22px"><button class="mp-btn" onclick="mpClose(\'mp-topup-bg\')">Start shopping</button></div></div></div>';
 }
 
-/* ---------------- profile + cash out ---------------- */
-function mpOpenProfile(){
-  mpCloseModal(); mpClose('mp-topup-bg');
-  var w=mpWallet(), wd=mpWithdrawable(w);
-  var purch=w.purchases.length?w.purchases.slice(0,5).map(function(p){
-    return '<div class="mp-hist-row"><div><div class="h-main">'+p.name+'</div><div class="h-sub">'+new Date(p.when).toLocaleString()+' · mailed to RODEX</div></div><div class="h-amt" style="color:#f2705a">−'+mpFmtFull(p.price)+' CP</div></div>';
-  }).join(''):'<p style="color:var(--muted);font-size:12.5px">No purchases yet.</p>';
-  var cash=w.cashouts.length?w.cashouts.slice(0,5).map(function(c){
-    return '<div class="mp-hist-row"><div><div class="h-main">'+mpFmtFull(c.amount)+' CP → '+c.dest+'</div><div class="h-sub">'+new Date(c.when).toLocaleString()+' · net '+mpRp(c.net)+'</div></div><div class="h-amt '+(c.status==='Pending review'?'mp-pending':'mp-done')+'">'+c.status+'</div></div>';
-  }).join(''):'<p style="color:var(--muted);font-size:12.5px">No cash-out requests yet.</p>';
-  document.getElementById('mp-profile').innerHTML=
-    '<div class="mp-modal-head"><div class="mp-modal-icon"><i class="ti ti-user-circle"></i></div>'+
-      '<div><h2 class="mp-modal-title">'+w.user+'</h2><div class="mp-modal-meta">Wallet &amp; cash-out</div></div>'+
-      '<button class="mp-x" onclick="mpClose(\'mp-profile-bg\')">&times;</button></div>'+
+/* ---------------- cash out (10% platform fee) ---------------- */
+function mpOpenCashout(){
+  mpCloseModal();mpClose('mp-shop-bg');mpClose('mp-topup-bg');
+  var w=mpWallet();
+  document.getElementById('mp-cash').innerHTML=
+    '<div class="mp-modal-head"><div class="mp-modal-icon"><i class="ti ti-cash-banknote"></i></div><div><h2 class="mp-modal-title">Request a cash-out</h2><div class="mp-modal-meta">Withdraw your Balance to real money</div></div><button class="mp-x" onclick="mpClose(\'mp-cash-bg\')">&times;</button></div>'+
     '<div class="mp-modal-body">'+
-      '<div class="mp-bal-cards">'+
-        '<div class="mp-bal-card hi"><div class="lbl">Balance</div><div class="val">'+mpFmtFull(w.balance)+'</div></div>'+
-        '<div class="mp-bal-card"><div class="lbl">Bonus (locked)</div><div class="val">'+mpFmtFull(w.bonus)+'</div></div>'+
-        '<div class="mp-bal-card"><div class="lbl">Withdrawable</div><div class="val">'+mpFmtFull(wd)+'</div></div>'+
-      '</div>'+
-      '<p class="mp-secttl">Request a cash-out</p>'+
-      '<div class="mp-rodex-note" style="margin-top:0"><i class="ti ti-info-circle"></i> You can only withdraw Cash Points you paid for — referral <b>bonus CP is not withdrawable</b>. Requests are reviewed manually before payout.</div>'+
-      '<label class="mp-fld">Amount to withdraw (max '+mpFmtFull(wd)+' CP)</label>'+
-      '<input class="mp-inp" id="mp-cashamt" type="number" min="0" max="'+wd+'" placeholder="e.g. '+wd+'" oninput="mpCashSummary()">'+
+      '<div class="mp-stat-row"><span>Available Balance</span><b>'+mpFmtFull(w.balance)+'</b></div>'+
+      '<div class="mp-fee-note"><i class="ti ti-info-circle"></i> A <b>10% platform fee</b> is deducted from every cash-out. Requests are reviewed manually before payout.</div>'+
+      '<label class="mp-fld">Amount to cash out <span class="opt">(max '+mpFmtFull(w.balance)+')</span></label>'+
+      '<input class="mp-inp" id="mp-cashamt" type="number" min="0" max="'+w.balance+'" placeholder="e.g. '+w.balance+'" oninput="mpCashSummary()">'+
       '<div class="mp-two" style="margin-top:10px">'+
-        '<div><label class="mp-fld" style="margin-top:0">Payout method</label>'+
-          '<select class="mp-inp" id="mp-cashdest"><option>DANA</option><option>OVO</option><option>GoPay</option><option>ShopeePay</option><option>Bank Transfer (BCA)</option><option>Bank Transfer (Mandiri)</option></select></div>'+
-        '<div><label class="mp-fld" style="margin-top:0">Account number / phone</label>'+
-          '<input class="mp-inp" id="mp-cashacct" placeholder="0812xxxxxxx"></div>'+
+        '<div><label class="mp-fld" style="margin-top:0">Payout method</label><select class="mp-inp" id="mp-cashdest"><option>DANA</option><option>OVO</option><option>GoPay</option><option>ShopeePay</option><option>Bank Transfer (BCA)</option><option>Bank Transfer (Mandiri)</option></select></div>'+
+        '<div><label class="mp-fld" style="margin-top:0">Account no. / phone</label><input class="mp-inp" id="mp-cashacct" placeholder="0812xxxxxxxx"></div>'+
       '</div>'+
       '<div class="mp-summary" id="mp-cashsum">Enter an amount to see your payout.</div>'+
-      '<button class="mp-btn full" style="margin-top:14px" id="mp-cashbtn" onclick="mpSubmitCashout()"><i class="ti ti-cash-banknote"></i> Submit cash-out request</button>'+
-      '<p class="mp-secttl" style="margin-top:26px">Recent purchases</p><div class="mp-hist">'+purch+'</div>'+
-      '<p class="mp-secttl" style="margin-top:22px">Cash-out requests</p><div class="mp-hist">'+cash+'</div>'+
-      '<div style="margin-top:24px;text-align:center"><button class="mp-btn ghost" onclick="mpResetDemo()"><i class="ti ti-refresh"></i> Reset demo wallet</button></div>'+
+      '<button class="mp-btn full" style="margin-top:14px" id="mp-cashbtn" onclick="mpSubmitCashout()"><i class="ti ti-send"></i> Submit cash-out request</button>'+
     '</div>';
-  document.getElementById('mp-profile-bg').classList.add('show');
+  document.getElementById('mp-cash-bg').classList.add('show');
   mpCashSummary();
 }
 function mpCashSummary(){
-  var w=mpWallet(), wd=mpWithdrawable(w);
-  var amt=parseInt(document.getElementById('mp-cashamt').value,10)||0;
-  var box=document.getElementById('mp-cashsum'), btn=document.getElementById('mp-cashbtn');
-  if(amt<=0){ box.innerHTML='Enter an amount to see your payout.'; btn.disabled=true; return; }
-  if(amt>wd){ box.innerHTML='<span style="color:#f2705a">Amount exceeds your withdrawable balance ('+mpFmtFull(wd)+' CP).</span>'; btn.disabled=true; return; }
-  var fee=Math.round(amt*MP_FEE), net=amt-fee;
-  box.innerHTML='Withdraw: <b>'+mpFmtFull(amt)+' CP</b><br>Fee ('+(MP_FEE*100)+'%): <b>−'+mpFmtFull(fee)+' CP</b><hr class="mp-hr">You receive: <b class="tot">'+mpRp(net)+'</b>';
+  var w=mpWallet(),amt=parseInt(document.getElementById('mp-cashamt').value,10)||0;
+  var box=document.getElementById('mp-cashsum'),btn=document.getElementById('mp-cashbtn');
+  if(amt<=0){box.innerHTML='Enter an amount to see your payout.';btn.disabled=true;return;}
+  if(amt>w.balance){box.innerHTML='<span style="color:#f2705a">Amount exceeds your balance ('+mpFmtFull(w.balance)+').</span>';btn.disabled=true;return;}
+  var fee=Math.round(amt*MP_FEE),net=amt-fee;
+  box.innerHTML='Cash out: <b>'+mpFmtFull(amt)+' Balance</b><br>Platform fee (10%): <b>−'+mpFmtFull(fee)+'</b><hr class="mp-hr">You receive: <b class="tot">'+mpRp(net)+'</b>';
   btn.disabled=false;
 }
 function mpSubmitCashout(){
-  var w=mpWallet(), wd=mpWithdrawable(w);
-  var amt=parseInt(document.getElementById('mp-cashamt').value,10)||0;
-  var dest=document.getElementById('mp-cashdest').value;
-  var acct=(document.getElementById('mp-cashacct').value||'').trim();
-  if(amt<=0||amt>wd) return;
-  if(!acct){ document.getElementById('mp-cashacct').style.borderColor='#f2705a'; return; }
-  var fee=Math.round(amt*MP_FEE), net=amt-fee;
-  w.balance-=amt; w.withdrawn+=amt;
-  w.cashouts.unshift({amount:amt, net:net, dest:dest+' ('+acct+')', when:Date.now(), status:'Pending review'});
-  mpSave(w); mpRefreshBar();
-  document.getElementById('mp-profile').innerHTML=
-    '<div class="mp-modal-body"><div class="mp-success">'+
-      '<div class="ok"><i class="ti ti-check"></i></div><h3>Cash-out requested</h3>'+
-      '<p>Your request to withdraw <b>'+mpFmtFull(amt)+' CP</b> to <b>'+dest+'</b> is <b>pending review</b>. You\'ll receive <b>'+mpRp(net)+'</b> after approval. (Demo — no real payout.)</p>'+
-      '<div style="margin-top:22px"><button class="mp-btn" onclick="mpOpenProfile()">Back to profile</button></div>'+
-    '</div></div>';
+  var w=mpWallet(),amt=parseInt(document.getElementById('mp-cashamt').value,10)||0;
+  var dest=document.getElementById('mp-cashdest').value,acct=(document.getElementById('mp-cashacct').value||'').trim();
+  if(amt<=0||amt>w.balance)return;
+  if(!acct){document.getElementById('mp-cashacct').style.borderColor='#f2705a';return;}
+  var fee=Math.round(amt*MP_FEE),net=amt-fee;
+  w.balance-=amt;w.cashouts.unshift({amount:amt,net:net,fee:fee,dest:dest+' ('+acct+')',when:Date.now(),status:'Pending review'});
+  mpSave(w);mpRefreshBar();
+  document.getElementById('mp-cash').innerHTML=
+    '<div class="mp-modal-body"><div class="mp-success"><div class="ok"><i class="ti ti-check"></i></div><h3>Cash-out requested</h3>'+
+      '<p>Your request to withdraw <b>'+mpFmtFull(amt)+' Balance</b> to <b>'+dest+'</b> is <b>pending review</b>. After the 10% platform fee you\'ll receive <b>'+mpRp(net)+'</b>. (Demo — no real payout.)</p>'+
+      '<div style="margin-top:22px"><button class="mp-btn" onclick="mpClose(\'mp-cash-bg\')">Done</button></div></div></div>';
 }
 
-function mpClose(id){ document.getElementById(id).classList.remove('show'); }
-document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ mpCloseModal(); mpClose('mp-topup-bg'); mpClose('mp-profile-bg'); } });
+/* ---------------- seller / My Shop ---------------- */
+function mpOpenShop(){
+  mpCloseModal();mpClose('mp-topup-bg');mpClose('mp-cash-bg');
+  var w=mpWallet();
+  var revenue=MP_SELLER.sales.reduce(function(s,x){return s+x.price;},0);
+  var listings=MP_SELLER.listings.map(function(l){
+    return '<div class="mp-listing"><span style="font-size:22px">'+l.icon+'</span><span class="lshop"><b>'+l.name+'</b><small>×'+mpFmtFull(l.qty)+' in stock</small></span><span class="lz" style="min-width:auto">'+mpFmtFull(l.price)+'</span></div>';
+  }).join('')||'<p style="color:var(--muted);font-size:12.5px">No active listings.</p>';
+  var sales=MP_SELLER.sales.map(function(s){
+    return '<div class="mp-hist-row"><div><div class="h-main">'+s.icon+' '+s.name+'</div><div class="h-sub">Bought by '+s.buyer+' · '+mpAgo(s.when)+'</div></div><div class="h-amt mp-pos">+'+mpFmtFull(s.price)+'</div></div>';
+  }).join('')||'<p style="color:var(--muted);font-size:12.5px">No sales yet.</p>';
+  var purch=w.purchases.length?w.purchases.slice(0,5).map(function(p){
+    return '<div class="mp-hist-row"><div><div class="h-main">'+p.name+'</div><div class="h-sub">'+mpAgo(p.when)+' · mailed to RODEX</div></div><div class="h-amt mp-neg">−'+mpFmtFull(p.price)+'</div></div>';
+  }).join(''):'<p style="color:var(--muted);font-size:12.5px">No purchases yet.</p>';
+  var cash=w.cashouts.length?w.cashouts.slice(0,5).map(function(c){
+    return '<div class="mp-hist-row"><div><div class="h-main">'+mpFmtFull(c.amount)+' → '+c.dest+'</div><div class="h-sub">'+mpAgo(c.when)+' · fee '+mpFmtFull(c.fee)+' · net '+mpRp(c.net)+'</div></div><div class="h-amt '+(c.status==='Pending review'?'mp-pending':'mp-done')+'">'+c.status+'</div></div>';
+  }).join(''):'<p style="color:var(--muted);font-size:12.5px">No cash-out requests yet.</p>';
+  document.getElementById('mp-shop').innerHTML=
+    '<div class="mp-modal-head"><div class="mp-modal-icon"><i class="ti ti-building-store"></i></div><div><h2 class="mp-modal-title">'+MP_SELLER.shop+'</h2><div class="mp-modal-meta">Signed in as '+w.user+' · seller dashboard</div></div><button class="mp-x" onclick="mpClose(\'mp-shop-bg\')">&times;</button></div>'+
+    '<div class="mp-modal-body">'+
+      '<div class="mp-bal-cards">'+
+        '<div class="mp-bal-card hi"><div class="lbl">Balance</div><div class="val">'+mpFmtFull(w.balance)+'</div></div>'+
+        '<div class="mp-bal-card"><div class="lbl">Revenue from sales</div><div class="val">'+mpFmtFull(revenue)+'</div></div>'+
+        '<div class="mp-bal-card"><div class="lbl">Items sold</div><div class="val">'+MP_SELLER.sales.length+'</div></div>'+
+      '</div>'+
+      '<button class="mp-btn full" onclick="mpOpenCashout()"><i class="ti ti-cash-banknote"></i> Cash out my Balance</button>'+
+      '<p class="mp-secttl" style="margin-top:24px">My active listings</p><div class="mp-listings" style="margin-top:0">'+listings+'</div>'+
+      '<p class="mp-secttl" style="margin-top:22px">Items sold</p>'+sales+
+      '<p class="mp-secttl" style="margin-top:22px">My purchases</p>'+purch+
+      '<p class="mp-secttl" style="margin-top:22px">Cash-out history</p>'+cash+
+      '<div style="margin-top:24px;text-align:center"><button class="mp-btn ghost" onclick="mpResetDemo()"><i class="ti ti-refresh"></i> Reset demo wallet</button></div>'+
+    '</div>';
+  document.getElementById('mp-shop-bg').classList.add('show');
+}
 
-mpRefreshBar();
-mpBuildCats();
-mpRender();
+function mpClose(id){document.getElementById(id).classList.remove('show');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){mpCloseModal();mpClose('mp-topup-bg');mpClose('mp-cash-bg');mpClose('mp-shop-bg');}});
+
+mpRefreshBar();mpBuildCats();mpRender();
 </script>
 </body></html>
