@@ -3,6 +3,75 @@
 <title>New Era Ragnarok Online — NeRO</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+/* ===== On-Going Event badge + modal ===== */
+.oge-badge{position:fixed;left:18px;top:84px;z-index:40;width:104px;cursor:pointer;border:none;background:none;padding:0;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));transition:transform .18s}
+.oge-badge:hover{transform:translateY(-3px) scale(1.03)}
+.oge-badge img{width:100%;display:block;animation:oge-bob 3.4s ease-in-out infinite}
+.oge-badge .oge-ping{position:absolute;top:6px;right:10px;width:13px;height:13px;border-radius:50%;background:#ff5252;
+  border:2px solid #1a1206;box-shadow:0 0 0 0 rgba(255,82,82,.6);animation:oge-pulse 1.8s infinite}
+@keyframes oge-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes oge-pulse{0%{box-shadow:0 0 0 0 rgba(255,82,82,.6)}70%{box-shadow:0 0 0 9px rgba(255,82,82,0)}100%{box-shadow:0 0 0 0 rgba(255,82,82,0)}}
+@media(max-width:640px){.oge-badge{width:74px;left:10px;top:70px}}
+
+.oge-bg{position:fixed;inset:0;z-index:120;background:rgba(3,6,12,.82);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;padding:24px}
+.oge-bg.show{display:flex}
+.oge-modal{position:relative;width:min(1000px,96vw);height:min(88vh,900px);background:#0b1220;border:1px solid var(--line);
+  border-radius:18px;box-shadow:0 40px 100px rgba(0,0,0,.7);display:flex;flex-direction:column;overflow:hidden}
+.oge-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--tline);flex-shrink:0}
+.oge-top h2{margin:0;font-size:17px;font-weight:800;display:flex;align-items:center;gap:9px}
+.oge-top h2 i{color:var(--gold);font-size:20px}
+.oge-close{background:rgba(255,255,255,.06);border:1px solid var(--tline);color:var(--muted);width:38px;height:38px;
+  border-radius:10px;font-size:24px;line-height:1;cursor:pointer;flex-shrink:0;transition:.15s}
+.oge-close:hover{background:#ff5252;color:#fff;border-color:#ff5252}
+
+.oge-viewport{position:relative;flex:1;overflow:hidden}
+.oge-track{display:flex;height:100%;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.oge-slide{min-width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.oge-banner{width:100%;display:block;background:#0b1220}
+.oge-body{padding:20px 26px 30px}
+.oge-etitle{font-size:22px;font-weight:800;margin:0 0 4px;letter-spacing:.2px}
+.oge-period{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--gold-soft);
+  background:rgba(228,184,75,.12);border:1px solid rgba(228,184,75,.35);border-radius:8px;padding:5px 11px;margin-bottom:14px}
+.oge-body p{font-size:14px;line-height:1.65;color:var(--text);margin:0 0 12px}
+.oge-body .lead{color:var(--muted)}
+.oge-body h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--gold);font-weight:700;margin:20px 0 9px}
+.oge-body ul{margin:0 0 12px;padding:0;list-style:none}
+.oge-body ul li{position:relative;padding:5px 0 5px 22px;font-size:13.5px;line-height:1.5;color:var(--text);border-bottom:1px solid rgba(255,255,255,.06)}
+.oge-body ul li:before{content:'';position:absolute;left:4px;top:12px;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.oge-body ul.plain li{padding-left:0}.oge-body ul.plain li:before{display:none}
+.oge-body a{color:var(--gold);text-decoration:underline;text-underline-offset:2px;word-break:break-word}
+.oge-links{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+.oge-lbtn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);border:1px solid var(--tline);
+  color:var(--text);border-radius:9px;padding:9px 13px;font-size:12.5px;font-weight:600;text-decoration:none;transition:.15s}
+.oge-lbtn:hover{border-color:var(--line);background:rgba(255,255,255,.1)}
+.oge-lbtn.fb:hover{background:#1877f2;border-color:#1877f2;color:#fff}
+.oge-lbtn.ig:hover{background:#d6249f;border-color:#d6249f;color:#fff}
+.oge-lbtn.dc:hover{background:#5865f2;border-color:#5865f2;color:#fff}
+.oge-note{font-size:12px;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--tline);
+  border-radius:10px;padding:11px 13px;line-height:1.55;margin-top:8px}
+.oge-prize{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 0 12px}
+.oge-prize .pz{background:rgba(228,184,75,.07);border:1px solid rgba(228,184,75,.25);border-radius:8px;padding:8px 11px;font-size:13px;color:var(--text)}
+@media(max-width:640px){.oge-prize{grid-template-columns:1fr}.oge-body{padding:16px 16px 26px}.oge-etitle{font-size:18px}}
+
+/* nav arrows */
+.oge-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:44px;height:44px;border-radius:50%;
+  background:rgba(11,18,32,.85);border:1px solid var(--line);color:var(--gold);font-size:22px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:.15s}
+.oge-nav:hover{background:var(--gold);color:#1a1206}
+.oge-prev{left:12px}.oge-next{right:12px}
+@media(max-width:640px){.oge-nav{width:36px;height:36px;font-size:18px}}
+
+/* dots + autoplay bar */
+.oge-foot{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px;border-top:1px solid var(--tline);flex-shrink:0}
+.oge-dots{display:flex;gap:8px}
+.oge-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;padding:0;transition:.15s}
+.oge-dot.on{background:var(--gold);width:26px;border-radius:5px}
+.oge-play{background:none;border:1px solid var(--tline);color:var(--muted);border-radius:8px;padding:6px 11px;font-size:11.5px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.oge-play:hover{color:var(--text);border-color:var(--line)}
+</style>
 </head><body class="landing">
 <div class="pagebg"><video autoplay muted loop playsinline><source src="assets/nero_landingpage.mp4" type="video/mp4"></video><div class="pagebg-veil"></div></div>
 <div id="app">
@@ -40,6 +109,26 @@
     <div class="panel-body" id="pnl-body"></div>
   </aside>
 </div>
+<button class="oge-badge" id="oge-badge" onclick="ogeOpen()" title="On-Going Events" aria-label="On-Going Events">
+  <img src="assets/event-icon.png" alt="On-Going Event"><span class="oge-ping"></span>
+</button>
+<div class="oge-bg" id="oge-bg" onclick="if(event.target===this)ogeClose()">
+  <div class="oge-modal">
+    <div class="oge-top">
+      <h2><i class="ti ti-calendar-star"></i> On-Going Events</h2>
+      <button class="oge-close" onclick="ogeClose()" aria-label="Close">&times;</button>
+    </div>
+    <div class="oge-viewport">
+      <button class="oge-nav oge-prev" onclick="ogeGo(-1)" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
+      <div class="oge-track" id="oge-track"></div>
+      <button class="oge-nav oge-next" onclick="ogeGo(1)" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
+    </div>
+    <div class="oge-foot">
+      <button class="oge-play" id="oge-play" onclick="ogeToggle()"><i class="ti ti-player-pause"></i> <span>Auto</span></button>
+      <div class="oge-dots" id="oge-dots"></div>
+    </div>
+  </div>
+</div>
 <div class="music" id="music">
   <button class="mus-toggle" id="mus-toggle" title="Play / pause"><i class="ti ti-player-play"></i></button>
   <div class="mus-mid">
@@ -50,5 +139,159 @@
   <div class="mus-panel" id="mus-panel"></div>
 </div>
 <audio id="bgm" preload="auto"></audio>
+<script>
+/* ===== On-Going Events carousel (self-contained) ===== */
+var OGE_EVENTS=[
+{
+ img:'assets/event-likeshare.jpg',
+ title:'Like &amp; Share Event',
+ period:'Total Prize: 20,000 IDR',
+ html:
+   '<p class="lead">Don\'t miss the opportunity to earn Rupiah in the Like &amp; Share event at New Era Ragnarok. The steps are very easy: share the post image below, tag 5 friends, and tag New Era on whatever platform you use.</p>'+
+   '<div class="oge-links">'+
+     '<a class="oge-lbtn fb" target="_blank" rel="noopener" href="https://www.facebook.com/profile.php?id=61592822981622"><i class="ti ti-brand-facebook"></i> Facebook</a>'+
+     '<a class="oge-lbtn ig" target="_blank" rel="noopener" href="https://www.instagram.com/newera_ro/"><i class="ti ti-brand-instagram"></i> Instagram</a>'+
+     '<a class="oge-lbtn dc" target="_blank" rel="noopener" href="https://discord.com/invite/sXRqykzN3G"><i class="ti ti-brand-discord"></i> Discord</a>'+
+   '</div>'+
+   '<h4>Rewards</h4><ul>'+
+     '<li>Facebook Like &amp; Share — 5,000 IDR</li>'+
+     '<li>Instagram Like &amp; Share — 5,000 IDR</li>'+
+     '<li>Discord Like &amp; Share — 10,000 IDR</li>'+
+     '<li><b>Total prize — 20,000 IDR</b></li>'+
+   '</ul>'+
+   '<p class="lead">More likes, more shares, more rewards!</p>'+
+   '<a target="_blank" rel="noopener" href="https://discord.com/channels/1528372919229485076/1543824150358007889/1543824150358007889">Full details on Discord →</a>'
+},
+{
+ img:'assets/event-stayonline.jpg',
+ title:'Stay Online, Get Lucky with NERO!',
+ period:'02 September – 12 October 2026',
+ html:
+   '<p class="lead">📢 Calling all adventurers! Are you always online and enjoying your journey in NERO? Now your playtime can turn into lucky rewards — the longer you stay active, the more Hourly Points you collect, and the more chances you have to win!</p>'+
+   '<h4>🎟️ How to get raffle tickets</h4>'+
+   '<ul><li>Stay online and play NERO to earn Hourly Points.</li>'+
+   '<li>Every <b>100 Hourly Points</b> can be exchanged for <b>1 Play-For-Win Raffle Ticket</b> in the Hourly Shop.</li>'+
+   '<li>Collect tickets and use them for your chance to win!</li></ul>'+
+   '<h4>🎁 Raffle prize pool</h4>'+
+   '<div class="oge-prize">'+
+     '<div class="pz">🚲 Mountain Bike MTB 27.5" Evergreen Ranger</div>'+
+     '<div class="pz">⌚ Xiaomi Mi Smart Band 9</div>'+
+     '<div class="pz">🎧 Rexus Thundervox Gaming Headset</div>'+
+     '<div class="pz">💰 300,000 Cash Coin × 2</div>'+
+     '<div class="pz">👑 VIP 30 Days × 5</div>'+
+   '</div>'+
+   '<h4>⚠️ Live draw</h4>'+
+   '<p>The raffle drawing will be conducted via LIVE STREAM after the event ends.</p>'+
+   '<h4>Event rules</h4>'+
+   '<ul><li>This event is for <b>characters, not ID</b>.</li>'+
+   '<li>Keep your tickets in your inventory — <b>do not</b> place them in Kafra/Cart.</li>'+
+   '<li>Tickets left in Kafra/Cart after the event ends will not be counted.</li>'+
+   '<li>The list of participants will be announced before the draw.</li>'+
+   '<li>Draw date &amp; time announced on social media &amp; NERO Discord.</li>'+
+   '<li>Winners must share on social media with <b>#STAYONLINEGETLUCKYWITHNERO</b>.</li></ul>'+
+   '<a target="_blank" rel="noopener" href="https://discord.com/channels/1528372919229485076/1543825977572987020/1543825977572987020">Full details on Discord →</a>'
+},
+{
+ img:'assets/event-blessing.jpg',
+ title:'Nero Blessing Aura Event',
+ period:'02 September – 12 October 2026',
+ html:
+   '<p class="lead">Lucky Aura Reward — <b>Total Prize: 10M</b> in HP, gaming gear, smart watch, microphone &amp; more!</p>'+
+   '<h4>🎁 Prize pool</h4>'+
+   '<div class="oge-prize">'+
+     '<div class="pz">📱 Samsung Galaxy A07</div>'+
+     '<div class="pz">⌚ Samsung Galaxy Watch 7</div>'+
+     '<div class="pz">🪑 Kucadi Gaming Chair</div>'+
+     '<div class="pz">⌨️ Gaming Keyboard</div>'+
+     '<div class="pz">🖱️ Logitech G203 Gaming Mouse</div>'+
+     '<div class="pz">🎙️ TNWK18 Microphone</div>'+
+     '<div class="pz">🎧 Rexus Gaming Headset</div>'+
+     '<div class="pz">🖱️ RGB Gaming Mouse Pad × 3</div>'+
+     '<div class="pz">💵 100K IDR × 5</div>'+
+     '<div class="pz">🪙 100K Cash Coin × 5</div>'+
+     '<div class="pz">🪙 50K Cash Coin × 5</div>'+
+     '<div class="pz">✨ Exclusive Costume LHZ</div>'+
+     '<div class="pz">✨ Exclusive Costume Garment</div>'+
+   '</div>'+
+   '<h4>Requirements</h4>'+
+   '<ul><li>Your character must be <b>Lv 99/70</b>.</li>'+
+   '<li>Post on your social media, then screenshot and share it in the Discord channel to get your ticket number.</li>'+
+   '<li>Use caption: <b>EVENT BLESSING AURA NEW ERA RAGNAROK</b></li></ul>'+
+   '<div class="oge-note">Tickets are unlimited — the more tickets you collect, the higher your chance to win. Winners are drawn via live stream.</div>'+
+   '<p style="margin-top:12px"><a target="_blank" rel="noopener" href="https://discord.com/channels/1528372919229485076/1543826503123345438/1543826503123345438">Full details on Discord →</a></p>'
+},
+{
+ img:'assets/event-mvp.jpg',
+ title:'MVP Collector — Hunt MVP, Get the Glory!',
+ period:'Starts 02 September 2026',
+ html:
+   '<p class="lead">Calling all MVP hunters who roam the Rune Midgard — quickly conquer MVPs in New Era Ragnarok! The first player to obtain an MVP Card in each category is rewarded <b>IDR 500K + CP 500K</b>. Be the first to own an MVP card!</p>'+
+   '<div class="oge-note">Event ends when the first MVP card in each category has been obtained.</div>'+
+   '<h4>🌟 Prize pool</h4>'+
+   '<ul><li><b>Total Prize:</b> 25,000,000 IDR / 85,000 PHP</li>'+
+   '<li>IDR = Rp 12,500,000 / 42,000 PHP</li>'+
+   '<li>Cash Points = 12,500,000</li></ul>'+
+   '<h4>💫 Event rules</h4>'+
+   '<ul><li>The first to obtain an MVP card of a monster is entitled to IDR 500K + CP 500K. <b>Only MVP cards, and only the first card dropped directly from the monster</b> — not from a Mystical Card Album. (Example: first Golden Thief Bug Card.)</li>'+
+   '<li>Multi-claims allowed — obtaining the first MVP card of different monsters lets you claim 2× or more.</li>'+
+   '<li>Prizes are based on the first MVP card in the inventory. If you kill an MVP and someone else takes the first card, the person who gets the card is eligible to claim.</li>'+
+   '<li>Any form of cheating will result in sanctions.</li>'+
+   '<li>The first upload of the MVP Card screenshot will be counted as the winner.</li></ul>'+
+   '<a target="_blank" rel="noopener" href="https://discord.com/channels/1528372919229485076/1543827139424686140/1543827139424686140">Full details on Discord →</a>'
+}
+];
+
+var ogeIdx=0, ogeTimer=null, ogePlaying=true;
+function ogeBuild(){
+  var track=document.getElementById('oge-track'), dots=document.getElementById('oge-dots');
+  track.innerHTML=OGE_EVENTS.map(function(e){
+    return '<div class="oge-slide"><img class="oge-banner" src="'+e.img+'" alt="'+e.title+'" loading="lazy">'+
+      '<div class="oge-body"><h3 class="oge-etitle">'+e.title+'</h3>'+
+      '<div class="oge-period"><i class="ti ti-calendar-event"></i> '+e.period+'</div>'+e.html+'</div></div>';
+  }).join('');
+  dots.innerHTML=OGE_EVENTS.map(function(_,i){return '<button class="oge-dot'+(i===0?' on':'')+'" onclick="ogeSet('+i+')" aria-label="Event '+(i+1)+'"></button>';}).join('');
+}
+function ogeApply(){
+  document.getElementById('oge-track').style.transform='translateX(-'+(ogeIdx*100)+'%)';
+  Array.prototype.forEach.call(document.querySelectorAll('.oge-dot'),function(d,i){d.classList.toggle('on',i===ogeIdx);});
+  // reset each slide scroll to top on change
+  var s=document.querySelectorAll('.oge-slide')[ogeIdx]; if(s) s.scrollTop=0;
+}
+function ogeSet(i){ ogeIdx=(i+OGE_EVENTS.length)%OGE_EVENTS.length; ogeApply(); ogeRestart(); }
+function ogeGo(d){ ogeSet(ogeIdx+d); }
+function ogeRestart(){ if(ogeTimer){clearInterval(ogeTimer);ogeTimer=null;} if(ogePlaying){ ogeTimer=setInterval(function(){ogeIdx=(ogeIdx+1)%OGE_EVENTS.length;ogeApply();},5000); } }
+function ogeToggle(){
+  ogePlaying=!ogePlaying;
+  document.getElementById('oge-play').innerHTML=ogePlaying?'<i class="ti ti-player-pause"></i> <span>Auto</span>':'<i class="ti ti-player-play"></i> <span>Paused</span>';
+  ogeRestart();
+}
+function ogeOpen(){
+  document.getElementById('oge-bg').classList.add('show');
+  document.body.style.overflow='hidden';
+  ogeIdx=0; ogeApply(); ogePlaying=true;
+  document.getElementById('oge-play').innerHTML='<i class="ti ti-player-pause"></i> <span>Auto</span>';
+  ogeRestart();
+}
+function ogeClose(){
+  document.getElementById('oge-bg').classList.remove('show');
+  document.body.style.overflow='';
+  if(ogeTimer){clearInterval(ogeTimer);ogeTimer=null;}
+}
+document.addEventListener('keydown',function(e){
+  if(!document.getElementById('oge-bg').classList.contains('show')) return;
+  if(e.key==='Escape') ogeClose();
+  else if(e.key==='ArrowRight') ogeGo(1);
+  else if(e.key==='ArrowLeft') ogeGo(-1);
+});
+/* pause auto-advance while the pointer is over the modal so long text is readable */
+(function(){
+  var bg=document.getElementById('oge-bg');
+  var modal=bg.querySelector('.oge-modal');
+  modal.addEventListener('mouseenter',function(){ if(ogeTimer){clearInterval(ogeTimer);ogeTimer=null;} });
+  modal.addEventListener('mouseleave',function(){ ogeRestart(); });
+})();
+ogeBuild();
+</script>
+
 <script src="js/data.js"></script><script src="js/wiki-index.js"></script><script src="js/app.js"></script>
 </body></html>
