@@ -5,15 +5,15 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <style>
 /* ===== On-Going Event badge + modal ===== */
-.oge-badge{position:fixed;left:18px;top:84px;z-index:40;width:104px;cursor:pointer;border:none;background:none;padding:0;
+.oge-badge{position:fixed;left:50%;transform:translateX(-50%);top:96px;z-index:40;width:104px;cursor:pointer;border:none;background:none;padding:0;
   filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));transition:transform .18s}
-.oge-badge:hover{transform:translateY(-3px) scale(1.03)}
+.oge-badge:hover{transform:translateX(-50%) translateY(-3px) scale(1.03)}
 .oge-badge img{width:100%;display:block;animation:oge-bob 3.4s ease-in-out infinite}
 .oge-badge .oge-ping{position:absolute;top:6px;right:10px;width:13px;height:13px;border-radius:50%;background:#ff5252;
   border:2px solid #1a1206;box-shadow:0 0 0 0 rgba(255,82,82,.6);animation:oge-pulse 1.8s infinite}
 @keyframes oge-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes oge-pulse{0%{box-shadow:0 0 0 0 rgba(255,82,82,.6)}70%{box-shadow:0 0 0 9px rgba(255,82,82,0)}100%{box-shadow:0 0 0 0 rgba(255,82,82,0)}}
-@media(max-width:640px){.oge-badge{width:74px;left:10px;top:70px}}
+@media(max-width:640px){.oge-badge{width:74px;top:78px}}
 
 .oge-bg{position:fixed;inset:0;z-index:120;background:rgba(3,6,12,.82);backdrop-filter:blur(4px);
   display:none;align-items:center;justify-content:center;padding:24px}
@@ -69,8 +69,6 @@
 .oge-dots{display:flex;gap:8px}
 .oge-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;padding:0;transition:.15s}
 .oge-dot.on{background:var(--gold);width:26px;border-radius:5px}
-.oge-play{background:none;border:1px solid var(--tline);color:var(--muted);border-radius:8px;padding:6px 11px;font-size:11.5px;cursor:pointer;display:flex;align-items:center;gap:5px}
-.oge-play:hover{color:var(--text);border-color:var(--line)}
 </style>
 </head><body class="landing">
 <div class="pagebg"><video autoplay muted loop playsinline><source src="assets/nero_landingpage.mp4" type="video/mp4"></video><div class="pagebg-veil"></div></div>
@@ -124,7 +122,6 @@
       <button class="oge-nav oge-next" onclick="ogeGo(1)" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
     </div>
     <div class="oge-foot">
-      <button class="oge-play" id="oge-play" onclick="ogeToggle()"><i class="ti ti-player-pause"></i> <span>Auto</span></button>
       <div class="oge-dots" id="oge-dots"></div>
     </div>
   </div>
@@ -238,10 +235,64 @@ var OGE_EVENTS=[
    '<li>Any form of cheating will result in sanctions.</li>'+
    '<li>The first upload of the MVP Card screenshot will be counted as the winner.</li></ul>'+
    '<a target="_blank" rel="noopener" href="https://discord.com/channels/1528372919229485076/1543827139424686140/1543827139424686140">Full details on Discord →</a>'
+},
+{
+ img:'assets/event-refinemaster.jpg',
+ title:'Nero Refine Master S1',
+ period:'From Open Beta (OBT) until all rewards are claimed',
+ html:
+   '<p class="lead">Refine to <b>+10</b> and claim the glory! Will you be the first to master refinement in New Era Ragnarok?</p>'+
+   '<h4>Rules</h4>'+
+   '<ul><li>Only <b>1 winner per armor category</b> (e.g. 1 for +10 Boots/Shoes, 1 for +10 Muffler/Manteau, etc.).</li>'+
+   '<li>First to reach <b>+10</b> on a specific armor type automatically wins its designated prize.</li></ul>'+
+   '<h4>🏆 Exclusive rewards</h4>'+
+   '<div class="oge-prize">'+
+     '<div class="pz">🛡️ Armor +10 Winner</div>'+
+     '<div class="pz">🛡️ Shield +10 Winner</div>'+
+     '<div class="pz">👢 Shoes +10 Winner</div>'+
+     '<div class="pz">🧥 Garment +10 Winner</div>'+
+     '<div class="pz">👑 Cash Shop Upper Headgear +10 Winner</div>'+
+     '<div class="pz">✨ …and more amazing prizes!</div>'+
+   '</div>'+
+   '<div class="oge-note">Refine » Enhance to +10 » Be the first to win! #NEWERARO #RefineToGlory</div>'
+},
+{
+ img:'assets/event-shadowrefine.jpg',
+ title:'Nero Shadow Refine Event',
+ period:'02 September – 31 October 2026',
+ html:
+   '<p class="lead">Hello adventurers! New Era Ragnarok has begun, and it\'s time to prove your refining skills in the <b>Shadow Refine Challenge</b>. Sharpen your determination, push your limits, and let your Shadow Equipment shine brighter than ever!</p>'+
+   '<h4>🏆 Special reward — fastest refiners</h4>'+
+   '<p>Prize pool total: <b>10,000,000 IDR / 35,000 PHP</b>. The <b>3 fastest</b> players to reach a total refine score of <b>+55</b> will win:</p>'+
+   '<ul><li><b>Rank 1</b> — 5,000,000 IDR / 17,500 PHP</li>'+
+   '<li><b>Rank 2</b> — 3,000,000 IDR / 10,500 PHP</li>'+
+   '<li><b>Rank 3</b> — 2,000,000 IDR / 7,000 PHP</li></ul>'+
+   '<h4>How to join</h4>'+
+   '<p>Complete a full set of Shadow Equipment — Weapon, Armor, Shield, Shoes, Accessory 1 and Accessory 2 — reaching a <b>total refine score of +55</b>.</p>'
+},
+{
+ img:'assets/event-luckydraw.jpg',
+ title:'OBT Lucky Draw — Top-Up',
+ period:'02 September – 12 October 2026',
+ html:
+   '<p class="lead"><b>100K CP = 1 Raffle Ticket.</b> Applies multiply — the more you top up, the more tickets you get. Top up more, win bigger!</p>'+
+   '<p>Total grand prize: <b>20,000,000 IDR / 70,000 PHP</b></p>'+
+   '<h4>🎁 Amazing prizes</h4>'+
+   '<div class="oge-prize">'+
+     '<div class="pz">🛹 E-Buy 10" HoverBoard (Smart Balance Scooter)</div>'+
+     '<div class="pz">🖥️ Xiaomi Gaming Monitor G24i</div>'+
+     '<div class="pz">🎮 Game Retro R356 128GB</div>'+
+     '<div class="pz">🔊 Sony SRS-XB13 Bluetooth Speaker</div>'+
+     '<div class="pz">⌨️ Fantech ATOM Mizu Gaming Keyboard</div>'+
+     '<div class="pz">🔊 JBL Speaker Go 2 Portable</div>'+
+     '<div class="pz">🖱️ Rexus RX-KM8 Wireless Keyboard + Mouse</div>'+
+     '<div class="pz">📷 Webcam EYD UHD 2K</div>'+
+   '</div>'+
+   '<div class="oge-note">Top up now &amp; get your tickets — your luck, your reward!</div>'
 }
 ];
 
-var ogeIdx=0, ogeTimer=null, ogePlaying=true;
+var ogeIdx=0, ogeTimer=null;
 function ogeBuild(){
   var track=document.getElementById('oge-track'), dots=document.getElementById('oge-dots');
   track.innerHTML=OGE_EVENTS.map(function(e){
@@ -259,17 +310,11 @@ function ogeApply(){
 }
 function ogeSet(i){ ogeIdx=(i+OGE_EVENTS.length)%OGE_EVENTS.length; ogeApply(); ogeRestart(); }
 function ogeGo(d){ ogeSet(ogeIdx+d); }
-function ogeRestart(){ if(ogeTimer){clearInterval(ogeTimer);ogeTimer=null;} if(ogePlaying){ ogeTimer=setInterval(function(){ogeIdx=(ogeIdx+1)%OGE_EVENTS.length;ogeApply();},5000); } }
-function ogeToggle(){
-  ogePlaying=!ogePlaying;
-  document.getElementById('oge-play').innerHTML=ogePlaying?'<i class="ti ti-player-pause"></i> <span>Auto</span>':'<i class="ti ti-player-play"></i> <span>Paused</span>';
-  ogeRestart();
-}
+function ogeRestart(){ if(ogeTimer){clearInterval(ogeTimer);ogeTimer=null;} ogeTimer=setInterval(function(){ogeIdx=(ogeIdx+1)%OGE_EVENTS.length;ogeApply();},5000); }
 function ogeOpen(){
   document.getElementById('oge-bg').classList.add('show');
   document.body.style.overflow='hidden';
-  ogeIdx=0; ogeApply(); ogePlaying=true;
-  document.getElementById('oge-play').innerHTML='<i class="ti ti-player-pause"></i> <span>Auto</span>';
+  ogeIdx=0; ogeApply();
   ogeRestart();
 }
 function ogeClose(){
