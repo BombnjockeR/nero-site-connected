@@ -5,15 +5,19 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <style>
 /* ===== On-Going Event badge + modal ===== */
-.oge-badge{position:fixed;left:50%;transform:translateX(-50%);top:96px;z-index:40;width:104px;cursor:pointer;border:none;background:none;padding:0;
+.oge-badge{position:fixed;left:49px;top:182px;z-index:40;width:104px;cursor:pointer;border:none;background:none;padding:0;
   filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));transition:transform .18s}
-.oge-badge:hover{transform:translateX(-50%) translateY(-3px) scale(1.03)}
+.oge-badge:hover{transform:translateY(-3px) scale(1.03)}
 .oge-badge img{width:100%;display:block;animation:oge-bob 3.4s ease-in-out infinite}
 .oge-badge .oge-ping{position:absolute;top:6px;right:10px;width:13px;height:13px;border-radius:50%;background:#ff5252;
   border:2px solid #1a1206;box-shadow:0 0 0 0 rgba(255,82,82,.6);animation:oge-pulse 1.8s infinite}
 @keyframes oge-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes oge-pulse{0%{box-shadow:0 0 0 0 rgba(255,82,82,.6)}70%{box-shadow:0 0 0 9px rgba(255,82,82,0)}100%{box-shadow:0 0 0 0 rgba(255,82,82,0)}}
-@media(max-width:640px){.oge-badge{width:74px;top:78px}}
+/* tablet: logo 96px tall, centered at 26+48=74px */
+@media(max-width:900px){.oge-badge{width:84px;left:32px;top:128px}}
+/* phone: homebar becomes relative/centered; drop the badge to top-center so it stays under the logo */
+@media(max-width:640px){.oge-badge{width:70px;left:50%;transform:translateX(-50%);top:96px}
+  .oge-badge:hover{transform:translateX(-50%) translateY(-3px) scale(1.03)}}
 
 .oge-bg{position:fixed;inset:0;z-index:120;background:rgba(3,6,12,.82);backdrop-filter:blur(4px);
   display:none;align-items:center;justify-content:center;padding:24px}
@@ -31,6 +35,14 @@
 .oge-track{display:flex;height:100%;transition:transform .45s cubic-bezier(.4,0,.2,1)}
 .oge-slide{min-width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .oge-banner{width:100%;display:block;background:#0b1220}
+.oge-banner-link{position:relative;display:block;cursor:pointer}
+.oge-banner-link .oge-banner{transition:filter .2s}
+.oge-banner-link:hover .oge-banner{filter:brightness(1.06)}
+.oge-banner-cta{position:absolute;right:12px;bottom:12px;display:inline-flex;align-items:center;gap:6px;
+  background:rgba(88,101,242,.92);color:#fff;font-size:12px;font-weight:700;padding:8px 13px;border-radius:9px;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);opacity:0;transform:translateY(6px);transition:.2s;pointer-events:none}
+.oge-banner-link:hover .oge-banner-cta{opacity:1;transform:translateY(0)}
+@media(max-width:640px){.oge-banner-cta{opacity:1;transform:none;font-size:11px;padding:6px 10px}}
 .oge-body{padding:20px 26px 30px}
 .oge-etitle{font-size:22px;font-weight:800;margin:0 0 4px;letter-spacing:.2px}
 .oge-period{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--gold-soft);
@@ -138,6 +150,7 @@
 <audio id="bgm" preload="auto"></audio>
 <script>
 /* ===== On-Going Events carousel (self-contained) ===== */
+var OGE_LINK='https://discord.com/channels/1528372919229485076/1543820458795864144';
 var OGE_EVENTS=[
 {
  img:'assets/event-likeshare.jpg',
@@ -296,7 +309,7 @@ var ogeIdx=0, ogeTimer=null;
 function ogeBuild(){
   var track=document.getElementById('oge-track'), dots=document.getElementById('oge-dots');
   track.innerHTML=OGE_EVENTS.map(function(e){
-    return '<div class="oge-slide"><img class="oge-banner" src="'+e.img+'" alt="'+e.title+'" loading="lazy">'+
+    return '<div class="oge-slide"><a class="oge-banner-link" href="'+OGE_LINK+'" target="_blank" rel="noopener" title="Open event details on Discord"><img class="oge-banner" src="'+e.img+'" alt="'+e.title+'" loading="lazy"><span class="oge-banner-cta"><i class="ti ti-brand-discord"></i> View on Discord</span></a>'+
       '<div class="oge-body"><h3 class="oge-etitle">'+e.title+'</h3>'+
       '<div class="oge-period"><i class="ti ti-calendar-event"></i> '+e.period+'</div>'+e.html+'</div></div>';
   }).join('');
