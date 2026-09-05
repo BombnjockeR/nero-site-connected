@@ -389,6 +389,10 @@ function serverHTML(){ var s=SERVER_INFO; return `
 
 /* ---- Donation (1 CP : 1 Rp) ---- */
 var selAmt=null;
+var qrisPollHandle=null;
+var qrisCountdownHandle=null;
+var qrisCreatedAt=null;
+
 function donationHTML(){
   var amts=DONATE_AMOUNTS.map(function(a,i){
     return '<button class="amt" data-i="'+i+'" onclick="pickAmt('+i+')">'+fmtRp(a.cp)+'</button>';
@@ -414,18 +418,32 @@ function donationHTML(){
   <div class="don-summary" id="don-summary">Select an amount to see your total.</div>
 
   <div class="don-pay" id="don-pay" style="display:none">
-    <label class="fld">3 · Scan &amp; pay with QRIS</label>
-    <p class="don-hint">Open any QRIS-supported app (GoPay, OVO, DANA, ShopeePay, bank apps…), scan the code, and enter <b id="don-payamt">the exact amount</b>.</p>
-    <p class="don-kode-note" id="don-kode-note" style="display:none"></p>
-    <div class="qris-card"><img src="`+ROOT+`assets/qris-newera.png" alt="NewEraRO QRIS payment code" loading="lazy"></div>
-    <div class="don-steps">
-      <p><b>After paying:</b></p>
-      <ol>
-        <li>Screenshot your payment receipt.</li>
-        <li>Note your account name: <b>`+ (Auth.user()||'your account') +`</b></li>
-        <li>Open a ticket in our <a href="`+DISCORD_URL+`" target="_blank" rel="noopener">Discord</a> and submit your transaction receipt to get your CP credited.</li>
-      </ol>
-      <p class="don-note"><i class="ti ti-info-circle"></i> Cash Points are credited manually after we verify your payment (usually within a few hours). This keeps top-ups secure.</p>
+    <button class="btn-gold" id="don-generate" onclick="qrisGenerate()">
+      <i class="ti ti-qrcode"></i> Generate QRIS
+    </button>
+    <div id="don-qris-box" style="display:none">
+      <label class="fld">3 · Scan &amp; pay with QRIS</label>
+      <p class="don-hint">Scan with any QRIS app (GoPay, OVO, DANA, ShopeePay, bank apps…). Pay <b id="don-payamt">the exact amount</b> within <b id="don-payexp">5 minutes</b>.</p>
+      <div class="qris-card">
+        <div id="don-qris-loading" class="don-qris-loading">Generating QR…</div>
+        <img id="don-qris-img" alt="QRIS payment code" style="display:none">
+        <a id="don-qris-fallback" style="display:none" target="_blank" rel="noopener">Open QR in new tab</a>
+      </div>
+      <div class="don-qris-status" id="don-qris-status">Waiting for payment…</div>
+      <button class="btn-ghost" onclick="qrisCancel()" style="margin-top:8px">
+        <i class="ti ti-x"></i> Cancel this QR
+      </button>
+    </div>
+    <div class="don-fallback" id="don-fallback" style="display:none">
+      <p class="don-note" style="margin-top:14px"><i class="ti ti-info-circle"></i> QRIS gateway is offline. Use the static QR below and submit a Discord ticket — we'll credit your CP manually.</p>
+      <div class="qris-card"><img src="`+ROOT+`assets/qris-newera.png" alt="NewEraRO QRIS payment code" loading="lazy"></div>
+      <div class="don-steps">
+        <ol>
+          <li>Screenshot your payment receipt.</li>
+          <li>Note your account name: <b>`+ (Auth.user()||'your account') +`</b></li>
+          <li>Open a ticket in our <a href="`+DISCORD_URL+`" target="_blank" rel="noopener">Discord</a> and submit your transaction receipt to get your CP credited.</li>
+        </ol>
+      </div>
     </div>
   </div>`;
 }
@@ -434,6 +452,7 @@ function pickAmt(i){ selAmt=i;
   document.querySelectorAll('.amt').forEach(function(e){e.classList.toggle('sel',+e.dataset.i===i);});
   updateSummary();
 }
+
 function updateSummary(){
   var box=document.getElementById('don-summary'); if(!box) return;
   var pay=document.getElementById('don-pay');
@@ -443,10 +462,8 @@ function updateSummary(){
   var code=sel.value;
   var name=code ? sel.options[sel.selectedIndex].getAttribute('data-name') : '';
   var bonus=code?Math.round(cp*0.20):0;
-  /* When a referral is used, append its code as the last 3 digits of the amount
-     paid (Indonesian "kode unik" style) so an incoming payment can be traced
-     back to the streamer. CP received is still based on the base tier — the
-     extra rupiah are only a tracking tag. */
+  /* Same as before: base tier determines CP received. Streamer code only
+     acts as a tracking tag (last 3 digits of the rupiah total). */
   var payTotal=cp+(code?Number(code):0);
   box.innerHTML='Base: <b>'+fmtNum(cp)+' CP</b><br>'+
     (code?'Streamer bonus (+20%): <b>+'+fmtNum(bonus)+' CP</b> → '+name+' (code '+code+')<br>':'')+
@@ -458,17 +475,118 @@ function updateSummary(){
     pay.style.display='';
     var pa=document.getElementById('don-payamt');
     if(pa) pa.textContent=fmtRp(payTotal);
-    var kn=document.getElementById('don-kode-note');
-    if(kn){
-      if(code){
-        kn.style.display='';
-        kn.innerHTML='<i class="ti ti-alert-triangle"></i> Please pay <b>exactly '+fmtRp(payTotal)+'</b>. The last 3 digits (<b>'+code+'</b>) tag this top-up to <b>'+name+'</b> — rounding the amount means we can\'t credit the referral bonus.';
-      }else{
-        kn.style.display='none';
-      }
-    }
+    qrisReset();
   }
 }
+
+function qrisReset(){
+  qrisStopPolling();
+  var box=document.getElementById('don-qris-box'); if(box) box.style.display='none';
+  var img=document.getElementById('don-qris-img'); if(img){ img.src=''; img.style.display='none'; }
+  var fb=document.getElementById('don-qris-fallback'); if(fb) fb.style.display='none';
+  var st=document.getElementById('don-qris-status'); if(st) st.textContent='';
+  qrisCreatedAt=null;
+}
+
+async function qrisGenerate(){
+  if(selAmt===null) return panelMsg('don-msg','Select an amount first.',false);
+  if(!Auth.loggedIn)   return panelMsg('don-msg','Sign in first.',false);
+  var cp=DONATE_AMOUNTS[selAmt].cp;
+  var code=(document.getElementById('don-streamer')||{}).value||'';
+
+  var btn=document.getElementById('don-generate'); if(btn){ btn.disabled=true; btn.textContent='Generating…'; }
+  panelMsg('don-msg','',true);
+  var res=await NeroAPI.post('/qris.php',{action:'create',amount:cp,streamer:code});
+  if(btn){ btn.disabled=false; btn.innerHTML='<i class="ti ti-qrcode"></i> Generate QRIS'; }
+  if(!res||!res.ok){
+    /* QRIS backend not live / failed: fall back to manual Discord flow. */
+    var fb=document.getElementById('don-fallback'); if(fb) fb.style.display='';
+    panelMsg('don-msg','QRIS gateway unavailable: '+(res&&res.error||'unknown'),false);
+    return;
+  }
+  var d=res.data||{};
+  var box=document.getElementById('don-qris-box'); if(box) box.style.display='';
+  var img=document.getElementById('don-qris-img');
+  var loading=document.getElementById('don-qris-loading');
+  var fbLink=document.getElementById('don-qris-fallback');
+  if(d.qr_url){
+    if(img){ img.src=d.qr_url; img.style.display=''; }
+    if(loading) loading.style.display='none';
+  } else if(d.qr_payload){
+    /* Render as data-URL via a tiny QR generator if NusaPay gave us the raw payload. */
+    if(loading) loading.textContent='Loading QR…';
+    if(img){ img.alt='QRIS payload: '+d.qr_payload; }
+    if(fbLink){ fbLink.href='data:text/plain;charset=utf-8,'+encodeURIComponent(d.qr_payload); fbLink.style.display=''; }
+    if(loading) loading.style.display='none';
+  } else {
+    if(loading) loading.textContent='No QR returned.';
+  }
+  qrisStartPolling(d.reference, d.amount_rp);
+  window.__qrisLastRef=d.reference;
+}
+
+function qrisStartPolling(ref, amountRp){
+  qrisStopPolling();
+  qrisCreatedAt=Date.now();
+  var st=document.getElementById('don-qris-status');
+  if(st) st.innerHTML='Waiting for payment of <b>'+fmtRp(amountRp)+'</b>…';
+  qrisTickCountdown();
+  qrisCountdownHandle=setInterval(qrisTickCountdown,1000);
+  qrisPollHandle=setInterval(function(){ qrisCheckStatus(ref, amountRp); }, QRIS_POLL_MS);
+  qrisCheckStatus(ref, amountRp);
+}
+
+function qrisStopPolling(){
+  if(qrisPollHandle){ clearInterval(qrisPollHandle); qrisPollHandle=null; }
+  if(qrisCountdownHandle){ clearInterval(qrisCountdownHandle); qrisCountdownHandle=null; }
+}
+
+function qrisTickCountdown(){
+  if(!qrisCreatedAt) return;
+  var left=Math.max(0, QRIS_EXPIRE_S - Math.floor((Date.now()-qrisCreatedAt)/1000));
+  var el=document.getElementById('don-payexp');
+  if(el) el.textContent=Math.ceil(left/60)+' minute'+(left>=120?'s':'');
+  if(left<=0){
+    qrisStopPolling();
+    var st=document.getElementById('don-qris-status');
+    if(st) st.innerHTML='<i class="ti ti-clock"></i> QR expired — generate a new one to pay.';
+  }
+}
+
+async function qrisCheckStatus(ref, amountRp){
+  var st=document.getElementById('don-qris-status'); if(!st) return;
+  var res=await NeroAPI.post('/qris.php?action=status&ref='+encodeURIComponent(ref), {});
+  if(res&&res.ok&&res.data){
+    var s=(res.data.status||'').toLowerCase();
+    if(s==='paid'||s==='success'||s==='completed'||s==='settlement'){
+      qrisStopPolling();
+      st.innerHTML='<i class="ti ti-circle-check" style="color:#7ee787"></i> Payment received! <b>'+fmtNum(res.data.credit_cp+(res.data.bonus_cp||0))+' CP</b> credited to <b>'+(Auth.user()||'')+'</b>.';
+      if(typeof loadAccountPanel==='function') loadAccountPanel();
+      return;
+    }
+    if(s==='failed'||s==='expired'||s==='cancelled'||s==='canceled'||s==='voided'||s==='declined'){
+      qrisStopPolling();
+      st.innerHTML='<i class="ti ti-alert-circle"></i> Transaction '+s+'.';
+      return;
+    }
+  }
+  /* still pending; UI stays as "Waiting for payment…" */
+  st.innerHTML='Waiting for payment of <b>'+fmtRp(amountRp)+'</b>…';
+}
+
+async function qrisCancel(){
+  if(!qrisCreatedAt) return;
+  var ref=(document.getElementById('don-qris-img')||{}).dataset&&document.getElementById('don-qris-img').dataset.ref;
+  /* ref isn't on the img; fall back to last reference via in-memory state */
+  ref=ref||(window.__qrisLastRef||'');
+  if(!ref) return;
+  await NeroAPI.post('/qris.php',{action:'cancel',ref:ref});
+  qrisReset();
+}
+
+/* Hook the reset hook so closing/reopening the panel cleans up polling. */
+var _origClosePanel=window.closePanel;
+window.closePanel=function(){ qrisStopPolling(); return _origClosePanel.apply(this,arguments); };
 
 /* ================= TABLE / GRID SEARCH ================= */
 function filterTable(){

@@ -52,10 +52,16 @@ const STREAMERS = [
 ];
 const GUILDS    = [];   /* guild royalty referral — not enabled yet */
 
-/* Donation: CP and Rupiah are 1 : 1 */
+/* Donation: CP and Rupiah are 1 : 1. Tiers must mirror bridge/_config.php [QRIS][TiersRp]. */
 const DONATE_AMOUNTS = [
   {cp:100000},{cp:250000},{cp:500000},{cp:1000000},{cp:5000000}
 ];
+/* Whether the QRIS endpoint should be used (set false to fall back to the
+   old "static QR + Discord ticket" flow). Wire to true on the VPS once the
+   NusaPay dev environment is provisioned. */
+const QRIS_LIVE = false;
+const QRIS_POLL_MS = 4000;       /* how often the donation page asks /status */
+const QRIS_EXPIRE_S = 300;        /* NusaPay unpaid QR validity (5 min) */
 
 const SERVER_INFO = {base:"x30", job:"x30", drop:"x30", maxbase:"99", maxjob:"70", episode:"10.3 (Abyss Lake)"};
 
