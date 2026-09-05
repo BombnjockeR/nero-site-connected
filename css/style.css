@@ -28,6 +28,9 @@ body.page .sitehead{position:sticky;top:0;z-index:9;background:rgba(7,11,18,.86)
 .hd-logo:hover{transform:scale(1.07)}
 .hd-status{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .hd-time{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8);font-size:13px;white-space:nowrap}
+/* Server time is only shown on the landing page; on sub-pages it crowds the
+   header and pushed the player pill onto the nav tabs. */
+body.page .hd-time{display:none}
 .hd-peaklbl{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8);font-size:13px;white-space:nowrap}
 .hd-peaklbl b{color:#fff;font-weight:600}
 .hd-pill{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.8);color:#fff;
@@ -37,7 +40,10 @@ body.page .sitehead{position:sticky;top:0;z-index:9;background:rgba(7,11,18,.86)
 .hd-pill .hd-sep{color:#445468;margin:0 2px}
 .hd-tabs{display:flex;gap:8px;align-items:center}
 @media(min-width:901px){
-  .hd-tabs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1}
+  /* Keep tabs centered WITHOUT taking them out of flow, so the right-hand
+     status/account cluster can never overlap them. */
+  .hd-tabs{margin-left:auto;margin-right:auto}
+  .sitehead .hd-right{margin-left:0}
 }
 .hd-tabs .tab{font-size:13px;letter-spacing:.4px;color:#fff;text-decoration:none;background:rgba(8,13,24,.55);
  border:1px solid var(--line);padding:8px 16px;border-radius:20px;backdrop-filter:blur(6px);transition:.2s;white-space:nowrap}
