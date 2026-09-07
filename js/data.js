@@ -56,9 +56,11 @@ const GUILDS    = [];   /* guild royalty referral — not enabled yet */
 const DONATE_AMOUNTS = [
   {cp:100000},{cp:250000},{cp:500000},{cp:1000000},{cp:5000000}
 ];
-/* Whether the QRIS endpoint should be used (set false to fall back to the
-   old "static QR + Discord ticket" flow). Wire to true on the VPS once the
-   NusaPay dev environment is provisioned. */
+/* Whether the QRIS endpoint should be used. false falls back to the "static QR
+   + Discord ticket" flow, and the donation panel then skips the API call
+   entirely instead of showing a Generate button that can only fail.
+   Set to true once NusaPay's dev gateway answers — as of 2026-09-07 it returns
+   403 to everyone, which NusaPay is tracing on their side. */
 const QRIS_LIVE = false;
 const QRIS_POLL_MS = 4000;       /* how often the donation page asks /status */
 const QRIS_EXPIRE_S = 300;        /* NusaPay unpaid QR validity (5 min) */

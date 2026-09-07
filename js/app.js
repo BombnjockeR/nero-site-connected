@@ -457,6 +457,9 @@ function updateSummary(){
   var box=document.getElementById('don-summary'); if(!box) return;
   var pay=document.getElementById('don-pay');
   if(selAmt===null){ box.innerHTML='Select an amount to see your total.'; if(pay)pay.style.display='none'; return; }
+  /* Gateway off: show the manual QR straight away rather than offering a
+     "Generate QRIS" button that can only fail. */
+  if(!QRIS_LIVE) qrisShowFallback('Automatic QRIS is temporarily unavailable. Use the QR below.');
   var cp=DONATE_AMOUNTS[selAmt].cp;
   var sel=document.getElementById('don-streamer');
   var code=sel.value;
@@ -488,9 +491,32 @@ function qrisReset(){
   qrisCreatedAt=null;
 }
 
+/* Turn whatever the bridge reported into one short line safe to put in the DOM.
+   res.error can carry a gateway's raw HTML error page (nginx serves one for a
+   403), and dropping that into innerHTML both breaks the layout and leaks
+   infrastructure detail at the user. Keep the detail in the console instead. */
+function qrisErrorText(res){
+  var raw=(res&&res.error)||'';
+  if(raw) try{ console.warn('[qris] '+raw); }catch(e){}
+  if(/<\s*html|<\s*head|<\s*body|403 Forbidden|502 Bad Gateway/i.test(raw))
+    return 'The payment gateway is not responding right now.';
+  if(/not signed in|unauthor/i.test(raw)) return 'Your session expired — sign in again.';
+  if(!raw) return 'The payment gateway is unavailable right now.';
+  return raw.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,120);
+}
+
+/* Reveal the manual "static QR + Discord ticket" path and explain why. */
+function qrisShowFallback(msg){
+  var fb=document.getElementById('don-fallback'); if(fb) fb.style.display='';
+  var btn=document.getElementById('don-generate'); if(btn) btn.style.display='none';
+  panelMsg('don-msg',msg,false);
+}
+
 async function qrisGenerate(){
   if(selAmt===null) return panelMsg('don-msg','Select an amount first.',false);
   if(!Auth.loggedIn)   return panelMsg('don-msg','Sign in first.',false);
+  /* Gateway switched off in data.js — skip the round-trip entirely. */
+  if(!QRIS_LIVE) return qrisShowFallback('Automatic QRIS is temporarily unavailable. Use the QR below.');
   var cp=DONATE_AMOUNTS[selAmt].cp;
   var code=(document.getElementById('don-streamer')||{}).value||'';
 
@@ -500,8 +526,7 @@ async function qrisGenerate(){
   if(btn){ btn.disabled=false; btn.innerHTML='<i class="ti ti-qrcode"></i> Generate QRIS'; }
   if(!res||!res.ok){
     /* QRIS backend not live / failed: fall back to manual Discord flow. */
-    var fb=document.getElementById('don-fallback'); if(fb) fb.style.display='';
-    panelMsg('don-msg','QRIS gateway unavailable: '+(res&&res.error||'unknown'),false);
+    qrisShowFallback(qrisErrorText(res)+' Use the QR below — we will credit your CP manually.');
     return;
   }
   var d=res.data||{};
