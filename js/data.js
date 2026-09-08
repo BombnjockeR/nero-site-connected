@@ -27,6 +27,26 @@ const NeroAPI = {
       return j;
     }catch(e){ return {ok:false, error:"Could not reach the server"}; }
   },
+  /* Fetch a binary response (the QR image) with the auth header attached.
+     An <img src> cannot carry an Authorization header, and putting the token
+     in the query string would write a credential into logs and history — so
+     the bytes are fetched here and handed to the <img> as an object URL.
+     Returns null on anything unexpected; the caller falls back. */
+  async blob(path){
+    if(!this.enabled()) return null;
+    try{
+      const ctl=new AbortController();
+      const t=setTimeout(()=>ctl.abort(), 15000);
+      const r=await fetch(API_BASE+path,
+                          {signal:ctl.signal, credentials:"omit", headers:this.authHeaders()});
+      clearTimeout(t);
+      if(!r.ok) return null;
+      const b=await r.blob();
+      /* On failure the bridge answers JSON, not an image. Rendering that would
+         give a broken <img> with no explanation. */
+      return (b && b.type && b.type.indexOf("image/")===0) ? b : null;
+    }catch(e){ return null; }
+  },
   async get(type, extra){
     if(!this.enabled()) return null;
     try{

@@ -393,6 +393,9 @@ var selAmt=null;
    may use the automatic flow while the gateway is NusaPay's sandbox — a sandbox
    QR is not payable from a real banking app. See qris_is_test_account(). */
 var qrisAvailable=null;
+/* The QR arrives as a blob, so its object URL has to be revoked by hand or the
+   image stays in memory for the life of the page. */
+var qrisObjectUrl=null;
 var qrisPollHandle=null;
 var qrisCountdownHandle=null;
 var qrisCreatedAt=null;
@@ -543,8 +546,15 @@ function updateSummary(){
   }
 }
 
+function qrisRevokeObjectUrl(){
+  if(!qrisObjectUrl) return;
+  try{ URL.revokeObjectURL(qrisObjectUrl); }catch(e){}
+  qrisObjectUrl=null;
+}
+
 function qrisReset(){
   qrisStopPolling();
+  qrisRevokeObjectUrl();
   var box=document.getElementById('don-qris-box'); if(box) box.style.display='none';
   var img=document.getElementById('don-qris-img'); if(img){ img.src=''; img.style.display='none'; }
   var fb=document.getElementById('don-qris-fallback'); if(fb) fb.style.display='none';
@@ -595,18 +605,34 @@ async function qrisGenerate(){
   var img=document.getElementById('don-qris-img');
   var loading=document.getElementById('don-qris-loading');
   var fbLink=document.getElementById('don-qris-fallback');
-  if(d.qr_url){
-    if(img){ img.src=d.qr_url; img.style.display=''; }
-    if(loading) loading.style.display='none';
-  } else if(d.qr_payload){
-    /* Render as data-URL via a tiny QR generator if NusaPay gave us the raw payload. */
-    if(loading) loading.textContent='Loading QR…';
-    if(img){ img.alt='QRIS payload: '+d.qr_payload; }
-    if(fbLink){ fbLink.href='data:text/plain;charset=utf-8,'+encodeURIComponent(d.qr_payload); fbLink.style.display=''; }
-    if(loading) loading.style.display='none';
-  } else {
-    if(loading) loading.textContent='No QR returned.';
+  if(!d.reference){
+    qrisShowFallback('The gateway did not return a QR. Use the QR below — we will credit your CP manually.');
+    return;
   }
+
+  /* Do NOT point the <img> at d.qr_url. That URL is on NusaPay's host, which is
+     IP-allowlisted to our server: a donor's browser gets 403 text/html and the
+     QR renders as a broken image. Verified 2026-09-08 — the same URL is
+     200 image/png from the VPS and 403 from anywhere else. The bridge fetches
+     it for us instead. */
+  if(loading){ loading.textContent='Loading QR…'; loading.style.display=''; }
+  if(img) img.style.display='none';
+
+  var blob=await NeroAPI.blob('/qris.php?action=qr&ref='+encodeURIComponent(d.reference));
+  if(!blob){
+    /* The QR exists but we cannot show it, so do not leave the donor staring at
+       a spinner — send them down the path that works. */
+    qrisReset();
+    qrisShowFallback('Could not load the QR image. Use the QR below — we will credit your CP manually.');
+    return;
+  }
+
+  qrisRevokeObjectUrl();
+  qrisObjectUrl=URL.createObjectURL(blob);
+  if(img){ img.src=qrisObjectUrl; img.alt='QRIS payment code for '+fmtRp(d.amount_rp); img.style.display=''; }
+  if(loading) loading.style.display='none';
+  if(fbLink) fbLink.style.display='none';
+
   qrisStartPolling(d.reference, d.amount_rp);
   window.__qrisLastRef=d.reference;
 }
