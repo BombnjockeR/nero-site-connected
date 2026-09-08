@@ -64,16 +64,23 @@ const NeroAPI = {
   }
 };
 
-/* ================= MOCK DATA — used until API_BASE is set ================= */
-const STREAMERS = [
+/* ================= SITE DATA =================
+   These three are DEFAULTS only. NeroConfig.load() overwrites them at boot
+   from stats.php?type=config, whose source of truth is bridge/_config.php.
+   They stay declared with `var` for exactly that reason — and they keep
+   working unchanged if the bridge is unreachable.
+   ============================================================== */
+var STREAMERS = [
   {name:"Hatred",     code:"311"},
   {name:"JuneGaming", code:"108"},
   {name:"PEA",        code:"449"}
 ];
 const GUILDS    = [];   /* guild royalty referral — not enabled yet */
 
-/* Donation: CP and Rupiah are 1 : 1. Tiers must mirror bridge/_config.php [QRIS][TiersRp]. */
-const DONATE_AMOUNTS = [
+/* Donation: CP and Rupiah are 1 : 1. Default only — NeroConfig.load() replaces
+   this with bridge/_config.php [QRIS][TiersRp], which is what the bridge
+   actually enforces on a donation. */
+var DONATE_AMOUNTS = [
   {cp:100000},{cp:250000},{cp:500000},{cp:1000000},{cp:5000000}
 ];
 /* Master switch for the automatic QRIS flow. false falls back to the "static QR
@@ -94,7 +101,51 @@ const QRIS_LIVE = true;
 const QRIS_POLL_MS = 4000;       /* how often the donation page asks /status */
 const QRIS_EXPIRE_S = 300;        /* NusaPay unpaid QR validity (5 min) */
 
-const SERVER_INFO = {base:"x30", job:"x30", drop:"x30", maxbase:"99", maxjob:"70", episode:"10.3 (Abyss Lake)"};
+var SERVER_INFO = {base:"x30", job:"x30", drop:"x30", maxbase:"99", maxjob:"70", episode:"10.3 (Abyss Lake)"};
+
+/* Pull STREAMERS / DONATE_AMOUNTS / SERVER_INFO from the bridge so the site
+   and bridge/_config.php cannot disagree — the donation tiers especially,
+   since the bridge REJECTS an amount that is not in its own TiersRp and a
+   stale preset here would just produce a failing donation.
+
+   Everything is optional and validated: a missing, empty or malformed field
+   leaves the default above in place. Returns true when something changed, so
+   the caller can repaint a panel that is already on screen. */
+const NeroConfig = {
+  loaded: false,
+  async load(){
+    var d = await NeroAPI.get('config');
+    if(!d) return false;                       /* offline / older bridge: keep defaults */
+    var changed = false;
+
+    if(Array.isArray(d.tiers)){
+      var tiers = d.tiers
+        .map(function(t){ return {cp: Number(t && t.cp)}; })
+        .filter(function(t){ return isFinite(t.cp) && t.cp > 0; });
+      if(tiers.length){ DONATE_AMOUNTS = tiers; changed = true; }
+    }
+
+    if(Array.isArray(d.streamers)){
+      var st = d.streamers
+        .filter(function(s){ return s && s.name && s.code; })
+        .map(function(s){ return {name: String(s.name), code: String(s.code)}; });
+      /* an empty list is a legitimate answer here — "no streamers right now" */
+      STREAMERS = st; changed = true;
+    }
+
+    if(d.server && typeof d.server === 'object'){
+      var keys = ['base','job','drop','maxbase','maxjob','episode'], si = {};
+      for(var k in SERVER_INFO) si[k] = SERVER_INFO[k];
+      keys.forEach(function(k){
+        if(typeof d.server[k] === 'string' && d.server[k]) si[k] = d.server[k];
+      });
+      SERVER_INFO = si; changed = true;
+    }
+
+    this.loaded = true;
+    return changed;
+  }
+};
 
 /* Music playlist — add more tracks here as you upload them */
 const TRACKS = [

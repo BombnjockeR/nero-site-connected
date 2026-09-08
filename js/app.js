@@ -73,6 +73,8 @@ var ICONS={server:'ti-scroll',download:'ti-download',marketplace:'ti-scale',dona
            login:'ti-login',register:'ti-user-plus',account:'ti-user-circle',forgot:'ti-lock-question'};
 var TITLES={server:'Server Detail',download:'Download',donation:'Donation',
             login:'Login',register:'Create Account',account:'My Account',forgot:'Forgot Password'};
+/* which panel is on screen, so a late config load can repaint it */
+var currentPanel=null;
 
 function openPanel(type){
   if(type==='marketplace'){ location.href=ROOT+'pages/marketplace.html'; return; }
@@ -82,6 +84,7 @@ function openPanel(type){
   if(!panel){ location.href=ROOT; return; }
   document.getElementById('pnl-icon').className='ti '+ICONS[type];
   document.getElementById('pnl-title').textContent=TITLES[type];
+  currentPanel=type;
   document.getElementById('pnl-body').innerHTML=render(type);
   if(type==='donation') selAmt=null;
   if(type==='account') loadAccountPanel();
@@ -92,6 +95,7 @@ function closePanel(){
   var p=$panel(), b=$backdrop();
   if(p) p.classList.remove('show');
   if(b) b.classList.remove('show');
+  currentPanel=null;
 }
 function render(t){
   if(t==='login')    return loginHTML();
@@ -796,6 +800,23 @@ async function refreshOnline(){
 }
 setInterval(refreshOnline, NeroAPI.enabled()? 30000 : 5000);
 refreshOnline();
+
+/* Donation tiers, streamer codes and the server rates come from the bridge
+   (stats.php?type=config) rather than from constants in data.js. Fired once at
+   boot; until it lands the defaults in data.js are used, so nothing blocks on
+   it. If a panel built from those values is already open when it returns,
+   repaint it — except a donation panel the user has already started, where a
+   repaint would throw away a QR or a picked amount. */
+(function loadSiteConfig(){
+  NeroConfig.load().then(function(changed){
+    if(!changed || !currentPanel) return;
+    var p=$panel();
+    if(!p || !p.classList.contains('show')) return;
+    if(currentPanel==='donation' && (selAmt!==null || qrisPollHandle)) return;
+    if(currentPanel!=='server' && currentPanel!=='donation') return;
+    document.getElementById('pnl-body').innerHTML=render(currentPanel);
+  });
+})();
 
 function tickServerTime(){
   var d=new Date();
