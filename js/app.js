@@ -99,7 +99,7 @@ function render(t){
   if(t==='account')  return accountHTML();
   if(t==='download') return downloadHTML();
   if(t==='server')   return serverHTML();
-  if(t==='donation') return donationHTML();
+  if(t==='donation'){ qrisRefreshAvailability(); return donationHTML(); }
   if(t==='forgot')   return forgotHTML();
   return '';
 }
@@ -389,6 +389,10 @@ function serverHTML(){ var s=SERVER_INFO; return `
 
 /* ---- Donation (1 CP : 1 Rp) ---- */
 var selAmt=null;
+/* null until the bridge has answered. Only accounts on the bridge's test list
+   may use the automatic flow while the gateway is NusaPay's sandbox — a sandbox
+   QR is not payable from a real banking app. See qris_is_test_account(). */
+var qrisAvailable=null;
 var qrisPollHandle=null;
 var qrisCountdownHandle=null;
 var qrisCreatedAt=null;
@@ -441,11 +445,68 @@ function donationHTML(){
         <ol>
           <li>Screenshot your payment receipt.</li>
           <li>Note your account name: <b>`+ (Auth.user()||'your account') +`</b></li>
-          <li>Open a ticket in our <a href="`+DISCORD_URL+`" target="_blank" rel="noopener">Discord</a> and submit your transaction receipt to get your CP credited.</li>
+          <li>Press <b>I have paid</b> below to get a reference number.</li>
+          <li>Open a ticket in our <a href="`+DISCORD_URL+`" target="_blank" rel="noopener">Discord</a>, quote that reference and attach your receipt.</li>
         </ol>
       </div>
+      <button class="btn-ghost" id="don-claim" onclick="donClaim()">
+        <i class="ti ti-receipt"></i> I have paid — get my reference
+      </button>
+      <div id="don-claim-out"></div>
     </div>
   </div>`;
+}
+
+/* HTML-escape for anything going into innerHTML. Note esc() further down is a
+   REGEX escaper used by the wiki search - it leaves < and & untouched, so it
+   must never be used for this. */
+function escHtml(t){
+  return String(t==null?'':t)
+    .split('&').join('&amp;')
+    .split('<').join('&lt;')
+    .split('>').join('&gt;')
+    .split('"').join('&quot;');
+}
+
+/* Book a manual donation so the Discord ticket has a reference behind it.
+   Without this the manual path is entirely off the books: an admin credits CP
+   from a screenshot with nothing recording who claimed what, and the same
+   receipt can be credited twice on two tickets. The bridge allows one open
+   claim per account, so pressing this twice returns the existing reference
+   rather than queueing another. */
+async function donClaim(){
+  if(selAmt===null) return panelMsg('don-msg','Select an amount first.',false);
+  if(!Auth.loggedIn) return panelMsg('don-msg','Sign in first.',false);
+
+  var btn=document.getElementById('don-claim');
+  if(btn){ btn.disabled=true; btn.textContent='Submitting…'; }
+  var res=await NeroAPI.post('/qris.php',{
+    action:'claim',
+    amount:DONATE_AMOUNTS[selAmt].cp,
+    streamer:(document.getElementById('don-streamer')||{}).value||''
+  });
+  if(btn){ btn.disabled=false; btn.innerHTML='<i class="ti ti-receipt"></i> I have paid — get my reference'; }
+
+  var out=document.getElementById('don-claim-out');
+  if(!out) return;
+  /* An existing open claim comes back as ok:false WITH a reference — that is
+     not an error to the donor, it is the same answer as success. */
+  var ref=(res&&res.data&&res.data.reference)||'';
+  if(!ref){ out.innerHTML='<p class="don-note">'+escHtml(qrisErrorText(res))+'</p>'; return; }
+  out.innerHTML='<p class="don-note"><i class="ti ti-check"></i> Your reference: <b>'+escHtml(ref)+'</b><br>'+
+    'Quote it in your Discord ticket. CP is credited once an admin confirms your receipt.</p>';
+}
+
+/* Ask the bridge whether THIS account may use the automatic QRIS flow.
+   Unknown, offline and "no" all resolve to false, so anything unexpected leaves
+   the donor on the manual QR + Discord path rather than on a QR that cannot be
+   paid. Re-renders the summary because the answer usually lands after it. */
+async function qrisRefreshAvailability(){
+  qrisAvailable=false;
+  if(!QRIS_LIVE || !Auth.loggedIn || !NeroAPI.enabled()) return;
+  var res=await NeroAPI.post('/qris.php?action=availability',{});
+  qrisAvailable=!!(res && res.ok && res.data && res.data.live);
+  if(selAmt!==null) updateSummary();
 }
 
 function pickAmt(i){ selAmt=i;
@@ -457,9 +518,9 @@ function updateSummary(){
   var box=document.getElementById('don-summary'); if(!box) return;
   var pay=document.getElementById('don-pay');
   if(selAmt===null){ box.innerHTML='Select an amount to see your total.'; if(pay)pay.style.display='none'; return; }
-  /* Gateway off: show the manual QR straight away rather than offering a
-     "Generate QRIS" button that can only fail. */
-  if(!QRIS_LIVE) qrisShowFallback('Automatic QRIS is temporarily unavailable. Use the QR below.');
+  /* Gateway off, or not enabled for this account: show the manual QR straight
+     away rather than offering a "Generate QRIS" button that can only fail. */
+  if(!qrisAvailable) qrisShowFallback('Automatic QRIS is temporarily unavailable. Use the QR below.');
   var cp=DONATE_AMOUNTS[selAmt].cp;
   var sel=document.getElementById('don-streamer');
   var code=sel.value;
@@ -515,8 +576,8 @@ function qrisShowFallback(msg){
 async function qrisGenerate(){
   if(selAmt===null) return panelMsg('don-msg','Select an amount first.',false);
   if(!Auth.loggedIn)   return panelMsg('don-msg','Sign in first.',false);
-  /* Gateway switched off in data.js — skip the round-trip entirely. */
-  if(!QRIS_LIVE) return qrisShowFallback('Automatic QRIS is temporarily unavailable. Use the QR below.');
+  /* Off in data.js, or not enabled for this account — skip the round-trip. */
+  if(!qrisAvailable) return qrisShowFallback('Automatic QRIS is temporarily unavailable. Use the QR below.');
   var cp=DONATE_AMOUNTS[selAmt].cp;
   var code=(document.getElementById('don-streamer')||{}).value||'';
 

@@ -56,12 +56,21 @@ const GUILDS    = [];   /* guild royalty referral — not enabled yet */
 const DONATE_AMOUNTS = [
   {cp:100000},{cp:250000},{cp:500000},{cp:1000000},{cp:5000000}
 ];
-/* Whether the QRIS endpoint should be used. false falls back to the "static QR
-   + Discord ticket" flow, and the donation panel then skips the API call
+/* Master switch for the automatic QRIS flow. false falls back to the "static QR
+   + Discord ticket" path, and the donation panel then skips the API call
    entirely instead of showing a Generate button that can only fail.
-   Set to true once NusaPay's dev gateway answers — as of 2026-09-07 it returns
-   403 to everyone, which NusaPay is tracing on their side. */
-const QRIS_LIVE = false;
+
+   true does NOT mean every donor gets it. The bridge decides per account, and
+   the panel asks it (qrisRefreshAvailability -> qris.php?action=availability)
+   before offering the button. That gate exists because the gateway is still
+   NusaPay's SANDBOX: a QR it mints cannot be paid from a real banking app, so
+   only the accounts in bridge/_config.php QRIS.TestAccountIds may reach it.
+   Everyone else keeps the manual path and is credited by an admin.
+
+   Verified end to end against the sandbox on 2026-09-08: generate, query and
+   cancel all return 2xx. Set this back to false to kill the flow for everyone
+   without touching the server. */
+const QRIS_LIVE = true;
 const QRIS_POLL_MS = 4000;       /* how often the donation page asks /status */
 const QRIS_EXPIRE_S = 300;        /* NusaPay unpaid QR validity (5 min) */
 
