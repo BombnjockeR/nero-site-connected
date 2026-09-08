@@ -207,10 +207,32 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
 .pg-gap{color:var(--muted);padding:0 2px;font-size:13px;user-select:none}
 /* narrow: one centred column, buttons first — the count reads as a caption
    under them and the music player has the bottom-right corner to itself */
+/* rows-per-page picker, third column of the pager grid. It stays put when the
+   page buttons are gone (one page of results) because it is the only way back
+   to a paged view after choosing All. */
+.pg-per{grid-column:3;justify-self:end;font-size:13px;color:var(--muted)}
+.pg-per label{display:inline-flex;align-items:center;gap:8px}
+.pg-sel,.statbar-sel{height:36px;padding:0 30px 0 10px;border-radius:9px;cursor:pointer;
+ background:rgba(255,255,255,.07) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dfe6f2' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 8px center/14px;
+ border:1px solid var(--tline);color:#dfe6f2;font-size:13px;font-weight:600;
+ font-family:inherit;appearance:none;-webkit-appearance:none;transition:.15s}
+.pg-sel:hover,.statbar-sel:hover{border-color:var(--gold);color:#fff}
+.pg-sel:disabled,.statbar-sel:disabled{opacity:.5;cursor:default}
+.pg-sel option,.statbar-sel option{background:#12203a;color:#dfe6f2}
+
+/* WoE date filter bar, above the tabs */
+.statbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.statbar-lbl{font-size:13px;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.statbar-lbl i{font-size:16px;color:var(--gold)}
+.statbar-sel{min-width:250px;max-width:100%}
+.statbar-note{font-size:12.5px;color:var(--muted)}
+
 @media(max-width:760px){
   .pager{grid-template-columns:1fr;justify-items:center}
   .pg-btns{grid-column:1;order:1}
   .pg-count{grid-column:1;order:2;text-align:center}
+  .pg-per{grid-column:1;order:3;justify-self:center}
+  .statbar-sel{min-width:0;flex:1 1 180px}
 }
 
 /* marketplace */

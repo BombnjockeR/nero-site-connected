@@ -17,6 +17,14 @@
 <div class="wrap full">
   <h1 class="pg-title">WoE Statistics</h1>
 
+  <div class="statbar">
+    <label class="statbar-lbl" for="woe-datefilter"><i class="ti ti-calendar-event"></i> WoE date</label>
+    <select class="statbar-sel" id="woe-datefilter" onchange="goWoeDate(this.value)">
+      <option>Loading…</option>
+    </select>
+    <span class="statbar-note" id="woe-datenote"></span>
+  </div>
+
   <div class="acct-tabs">
     <button class="atab on" onclick="woeTab('castles',this)"><i class="ti ti-castle"></i> Castle Standings</button>
     <button class="atab" onclick="woeTab('players',this)"><i class="ti ti-swords"></i> Top Players</button>
@@ -34,19 +42,19 @@
   </section>
 
   <section class="atab-panel" id="woe-players">
-    <p class="subtitle">Every character who scored in WoE this month, ranked by score — damage dealt/taken, objective damage, kills, assists and support all count. Role is each player's best-scoring day this month. 20 per page.</p>
+    <p class="subtitle">Everyone who turned up to the selected WoE, <b>ranked by kills</b>. Score breaks ties and still counts damage dealt/taken, objective damage, assists and support. Role is that day's role. Pick the date above and how many rows a page below.</p>
     <p class="subtitle woe-est" id="woeplayers-est" style="display:none"><i class="ti ti-alert-triangle"></i> The game server hasn't written its own WoE scores yet, so these scores and roles are the website's own estimate from the raw stats.</p>
     <div class="tbl-wrap"><table class="stat" data-api="woe_players"><thead><tr><th>#</th><th>Player</th><th>Guild</th><th>Job</th><th>Kills</th><th>Deaths</th><th>Assist</th><th>Damage Dealt</th><th>Damage Taken</th><th>Emperium Dmg</th><th>Barricade Dmg</th><th>Skill Used</th><th>Support Casts</th><th>Acid Demo</th><th>Healing Done</th><th>SP Used</th><th>Heal Items</th><th>Role</th><th>Score</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="19">Loading…</td></tr></tbody></table></div>
     <div class="pager" id="woeplayers-pager" style="display:none"></div>
   </section>
 
   <section class="atab-panel narrow" id="woe-guildkills">
-    <p class="subtitle">Total player kills/deaths by guild this month.</p>
+    <p class="subtitle">Player kills and deaths by guild, for the selected WoE date.</p>
     <div class="tbl-wrap"><table class="stat" data-api="woe_guild_kills"><thead><tr><th>#</th><th>Guild</th><th>Kills</th><th>Deaths</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="4">Loading…</td></tr></tbody></table></div>
   </section>
 
   <section class="atab-panel narrow" id="woe-kills">
-    <p class="subtitle">Live combat feed from the last WoE.</p>
+    <p class="subtitle">Kill log for the selected WoE date.</p>
     <div class="tbl-wrap"><table class="stat" data-api="woe_kills"><thead><tr><th>Time</th><th>Killer</th><th>Killed</th><th>Map</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="4">Loading…</td></tr></tbody></table></div>
   </section>
 
@@ -55,7 +63,7 @@
       <i class="ti ti-lock"></i>
       <div>
         <h3>You are not signed in</h3>
-        <p>Log in to see every character on your account and how they did in WoE this month.</p>
+        <p>Log in to see every character on your account and how they did in the selected WoE.</p>
       </div>
       <button class="btn-gold" style="max-width:180px" onclick="openPanel('login')">Log in</button>
     </div>

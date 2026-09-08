@@ -1190,16 +1190,33 @@ function woeEstNote(id,on){
   var el=document.getElementById(id);
   if(el) el.style.display = on ? '' : 'none';
 }
-/* ---- Top Players paging ----
-   The board lists every character who scored this month, so it's paged
-   (20 rows a page) rather than cut off at a top-N. Page state lives here
-   and is reset on every SPA navigation, same as the marketplace filter. */
+/* ---- Stat board paging ----
+   Every ranking board is paged rather than cut off at a top-N, and the reader
+   picks how many rows a page. State lives here and is reset on every SPA
+   navigation, same as the marketplace filter. */
 var WOE_PLAYERS_PER_PAGE=20;
 var woePlayersPage=1;
+var woePlayersPerPage=20;            /* 20 | 50 | 100 | 'all' */
+
+/* Which WoE day the board is showing. 'all' aggregates every day on record.
+   null means "not resolved yet" — loadWoeDates() fills it from the newest day
+   that actually has data before the first fetch goes out. */
+var woeDate=null;
+
+/* The flat boards. Page and rows-per-page are per board so switching tabs or
+   pages on one doesn't disturb another. */
+var STAT_KEYS=['pvp','mvp','zeny'];
+var statPage={pvp:1, mvp:1, zeny:1};
+var statPerPage={pvp:30, mvp:30, zeny:30};
+
+function isStatKey(key){ return STAT_KEYS.indexOf(key)!==-1; }
 
 /* Per-table query string for the paged endpoints. */
 function tableParams(key){
-  if(key==='woe_players') return {page:woePlayersPage, per_page:WOE_PLAYERS_PER_PAGE};
+  if(key==='woe_players') return {page:woePlayersPage, per_page:woePlayersPerPage, date:woeDate||'all'};
+  /* the guild board and the kill feed follow the same day as the player board */
+  if(key==='woe_guild_kills' || key==='woe_kills') return woeDate ? {date:woeDate} : null;
+  if(isStatKey(key)) return {page:statPage[key], per_page:statPerPage[key]};
   return null;
 }
 
@@ -1212,12 +1229,19 @@ function pagerNumbers(cur,last){
   }
   return out;
 }
-function renderPager(id,meta,goFn,noun){
+/* opts.perFn   - JS call that changes rows-per-page, given the new value
+   opts.perOpts - the choices to offer, 'all' meaning no paging
+   opts.current - the value currently in force, so the picker shows it
+   The page buttons disappear when there is only one page; the rows-per-page
+   picker does not. It is how a reader who chose All gets back to paged view,
+   so hiding it there would strand them. */
+function renderPager(id,meta,goFn,noun,opts){
   var el=document.getElementById(id);
   if(!el) return;
+  opts=opts||{};
   var total=Number(meta.total)||0, per=Number(meta.per_page)||WOE_PLAYERS_PER_PAGE;
   var last=Math.max(1,Number(meta.pages)||1), cur=Math.min(Math.max(1,Number(meta.page)||1),last);
-  if(total<=per){ el.innerHTML=''; el.style.display='none'; return; }
+  if(!total){ el.innerHTML=''; el.style.display='none'; return; }
   el.style.display='';
 
   var from=(cur-1)*per+1, to=Math.min(cur*per,total);
@@ -1231,12 +1255,98 @@ function renderPager(id,meta,goFn,noun){
     return p==='…' ? btn('…',null) : btn(p,p);
   }).join('');
 
+  var btns = last>1 ?
+    btn('<i class="ti ti-chevron-left"></i>',cur-1,'pg-nav')+mid+
+    btn('<i class="ti ti-chevron-right"></i>',cur+1,'pg-nav') : '';
+
+  var picker='';
+  if(opts.perFn && opts.perOpts){
+    var sel=opts.perOpts.map(function(v){
+      var on=String(opts.current)===String(v);
+      return '<option value="'+v+'"'+(on?' selected':'')+'>'+(v==='all'?'All':v)+'</option>';
+    }).join('');
+    picker='<div class="pg-per"><label>Rows <select class="pg-sel" onchange="'+opts.perFn+'(this.value)">'+
+           sel+'</select></label></div>';
+  }
+
   el.innerHTML='<div class="pg-count">Showing <b>'+fmtNum(from)+'</b>–<b>'+fmtNum(to)+
       '</b> of <b>'+fmtNum(total)+'</b> '+noun+'</div>'+
-    '<div class="pg-btns">'+
-      btn('<i class="ti ti-chevron-left"></i>',cur-1,'pg-nav')+mid+
-      btn('<i class="ti ti-chevron-right"></i>',cur+1,'pg-nav')+
-    '</div>';
+    '<div class="pg-btns">'+btns+'</div>'+picker;
+}
+
+/* ---- WoE date filter ----
+   Built from the days woe_stats actually holds. The default is the NEWEST day
+   with data, not today: WoE runs on set days, so on most days today is empty
+   and an empty board reads as a broken page. With nothing recorded at all we
+   fall back to today, which is at least honest about being empty. */
+async function loadWoeDates(){
+  var sel=document.getElementById('woe-datefilter');
+  if(!sel) return;                                  /* not the WoE page */
+  var d=await NeroAPI.get('woe_dates');
+  var dates=(d && Array.isArray(d.dates)) ? d.dates : [];
+  var today=(d && d.today) || new Date().toISOString().slice(0,10);
+  if(!woeDate) woeDate=(d && d.latest) || today;
+
+  var note=document.getElementById('woe-datenote');
+  if(!dates.length){
+    sel.innerHTML='<option value="'+today+'">'+fmtWoeDate(today)+'</option>';
+    sel.disabled=true;
+    if(note) note.textContent='No WoE recorded yet.';
+    return;
+  }
+  sel.disabled=false;
+  var opts=dates.map(function(x,i){
+    var label=fmtWoeDate(x.date)+' — '+fmtNum(x.players)+' player'+(x.players===1?'':'s');
+    if(i===0) label+=' (latest)';
+    return '<option value="'+x.date+'"'+(x.date===woeDate?' selected':'')+'>'+label+'</option>';
+  }).join('');
+  sel.innerHTML=opts+'<option value="all"'+(woeDate==='all'?' selected':'')+'>All dates combined</option>';
+  if(note) note.textContent=(dates.length===1?'1 WoE day':fmtNum(dates.length)+' WoE days')+' on record.';
+}
+function fmtWoeDate(iso){
+  var d=new Date(iso+'T00:00:00');
+  if(isNaN(d)) return iso;
+  var mons=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return days[d.getDay()]+' '+d.getDate()+' '+mons[d.getMonth()]+' '+d.getFullYear();
+}
+/* Changing the day resets the page: page 4 of one siege means nothing in another. */
+async function goWoeDate(v){
+  woeDate=v||null;
+  woePlayersPage=1;
+  await hydrateTable();
+  await loadWoeMePage();
+}
+async function setWoePlayersPerPage(v){
+  woePlayersPerPage=(v==='all') ? 'all' : (parseInt(v,10)||20);
+  woePlayersPage=1;
+  await goWoePlayersPage(1);
+}
+
+/* ---- flat board paging (PvP / MVP / Zeny) ---- */
+async function goStatPage(key,n){
+  if(!isStatKey(key)) return;
+  statPage[key]=Math.max(1,parseInt(n,10)||1);
+  await rehydrateStatTable(key);
+}
+async function setStatPerPage(key,v){
+  if(!isStatKey(key)) return;
+  statPerPage[key]=(v==='all') ? 'all' : (parseInt(v,10)||30);
+  statPage[key]=1;
+  await rehydrateStatTable(key);
+}
+async function rehydrateStatTable(key){
+  var tbl=document.querySelector('table.stat[data-api="'+key+'"]');
+  if(!tbl) return;
+  /* a fresh page arrives in the server's order, so drop any click-to-sort
+     arrow still lit - it would claim a sort these rows are not in */
+  if(tbl.tHead && tbl.tHead.rows.length){
+    var hc=tbl.tHead.rows[0].cells;
+    for(var c=0;c<hc.length;c++){ hc[c].classList.remove('sort-asc','sort-desc'); }
+  }
+  tbl.tBodies[0].innerHTML=noDataRow(tbl.rows[0].cells.length,'Loading…');
+  await hydrateOneTable(tbl);
+  if(tbl.scrollIntoView) tbl.scrollIntoView({behavior:'smooth',block:'start'});
 }
 async function goWoePlayersPage(n){
   var tbl=document.querySelector('table.stat[data-api="woe_players"]');
@@ -1299,10 +1409,14 @@ async function hydrateOneTable(tbl){
   var rows=[], i=(Number(d.offset)||0)+1;
   tbl.dataset.rankStart=i;          /* remember the page's first # so a later client-side sort keeps 21,22,23… */
 
-  if(key==='zeny' && Array.isArray(d)){
-    d.forEach(function(r){
+  if(key==='zeny' && (Array.isArray(d) || d.rows)){
+    /* the bare array is the old bridge answer; keep reading it so a cached
+       page against an older server still fills in rather than going blank */
+    var zrows = Array.isArray(d) ? d : d.rows;
+    zrows.forEach(function(r){
       rows.push(tdRow([i++, r.name, fmtNum(r.zeny), r.base_level, r.guild||'—']));
     });
+    if(!Array.isArray(d)) renderStatPager('zeny', d, 'accounts');
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
       : noDataRow(cols,'No characters tracked yet — check back once players have started playing.');
   } else if(key==='woe' && d.guilds){
@@ -1316,7 +1430,8 @@ async function hydrateOneTable(tbl){
     /* the bridge clamps a page number past the end back to the last real
        page — follow it, so the next click counts from what's on screen */
     if(d.page) woePlayersPage=Number(d.page);
-    renderPager('woeplayers-pager', d, 'goWoePlayersPage', 'players');
+    renderPager('woeplayers-pager', d, 'goWoePlayersPage', 'players',
+                {perFn:'setWoePlayersPerPage', perOpts:[20,50,100,'all'], current:woePlayersPerPage});
     /* Hide non-participants: a player with every combat counter at zero never
        actually showed up to WoE, so they'd just be noise in the rankings. This
        is a display filter only — the data itself is untouched. (With the paged
@@ -1350,15 +1465,32 @@ async function hydrateOneTable(tbl){
     d.rows.forEach(function(r){
       rows.push(tdRow([i++, r.name, fmtNum(r.kills), r.favorite||'—', fmtNum(r.kills*2)]));
     });
+    renderStatPager('mvp', d, 'players');
     if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
   } else if(key==='pvp'){
     if(!d.available) return;                      /* keep the honest "no tracking" row already in the HTML */
     d.rows.forEach(function(r){
       rows.push(tdRow([i++, r.name, fmtNum(r.kills), fmtNum(r.deaths), r.kd, fmtNum(r.points)]));
     });
+    renderStatPager('pvp', d, 'players');
     if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
   }
 }
+/* The three flat boards all page the same way, so they share one call. The
+   pager element is <key>-pager next to the table. */
+function renderStatPager(key, d, noun){
+  var Cap=key.charAt(0).toUpperCase()+key.slice(1);
+  renderPager(key+'-pager', d, 'go'+Cap+'Page', noun,
+              {perFn:'set'+Cap+'PerPage', perOpts:[30,50,100,'all'], current:statPerPage[key]});
+}
+/* Named wrappers because a pager button is an inline onclick attribute, and a
+   single generic call would have to smuggle the board name through it. */
+function goPvpPage(n){ return goStatPage('pvp',n); }
+function goMvpPage(n){ return goStatPage('mvp',n); }
+function goZenyPage(n){ return goStatPage('zeny',n); }
+function setPvpPerPage(v){ return setStatPerPage('pvp',v); }
+function setMvpPerPage(v){ return setStatPerPage('mvp',v); }
+function setZenyPerPage(v){ return setStatPerPage('zeny',v); }
 async function hydrateTable(){
   var tables=document.querySelectorAll('table.stat[data-api]');
   for(var t=0;t<tables.length;t++){ await hydrateOneTable(tables[t]); }
@@ -1471,7 +1603,8 @@ async function openWoePlayerDetail(charId){
   document.getElementById('pnl-body').innerHTML='<p class="lead">Loading player stats…</p>';
   panel.classList.add('show'); backdrop.classList.add('show');
 
-  var d=await NeroAPI.get('woe_player',{char_id:charId});
+  /* same day the board is showing, so the detail matches the row clicked */
+  var d=await NeroAPI.get('woe_player',{char_id:charId, date:woeDate||'all'});
   if(!d){
     document.getElementById('pnl-body').innerHTML='<p class="lead">Could not load this player’s WoE stats.</p>';
     return;
@@ -1491,7 +1624,7 @@ async function loadWoeMePage(){
   var tbl=document.getElementById('woeme-tbl');
   if(!tbl) return;
   var cols=tbl.rows[0].cells.length;
-  var d=await NeroAPI.get('woe_me');
+  var d=await NeroAPI.get('woe_me',{date:woeDate||'all'});
   if(!d){ tbl.tBodies[0].innerHTML=noDataRow(cols,'Could not load your characters — try again shortly.'); return; }
   woeEstNote('woeme-est', !!d.estimated);
   var rows=d.rows.map(function(r){
@@ -1520,8 +1653,12 @@ function afterPageLoad(){
   wikiNav(false);
   curF='all';                       /* reset marketplace filter state */
   woePlayersPage=1;                 /* ...and the WoE Top Players page */
+  woeDate=null;                     /* ...and re-resolve which WoE day to show */
+  STAT_KEYS.forEach(function(k){ statPage[k]=1; });
   selAmt=null;
-  hydrateTable();                   /* pull live rows if the API is on */
+  /* loadWoeDates() must settle first: it decides which day the WoE tables ask
+     for. It returns immediately on any page that has no date filter. */
+  loadWoeDates().then(hydrateTable);
   loadAccountPage();                /* account page, if we're on it */
   loadWoeMePage();                  /* WoE "My Status" tab, if we're on it */
   enableSortableTables();           /* click-to-sort headers on any stat table present */
