@@ -23,9 +23,16 @@
   <h1 class="pg-title">Donations</h1>
   <p class="subtitle">Every donation that has come in, and the claims waiting on you.</p>
 
-  <div id="adm-gate" class="don-note" style="display:none">
-    <i class="ti ti-lock"></i><span id="adm-gate-msg">Checking your access…</span>
+  <!-- Starts VISIBLE on purpose. Both blocks used to start hidden, so if
+       admin-donations.js failed to load the page rendered as nothing at all —
+       no error, no clue, just a title. A stuck "Loading…" is a far better
+       failure than a blank page. admInit() hides or replaces this. -->
+  <div id="adm-gate" class="don-note">
+    <i class="ti ti-lock"></i><span id="adm-gate-msg">Loading…</span>
   </div>
+  <noscript>
+    <p class="don-note">This page needs JavaScript.</p>
+  </noscript>
 
   <div id="adm-main" style="display:none">
     <div class="adm-tiles" id="adm-tiles"></div>

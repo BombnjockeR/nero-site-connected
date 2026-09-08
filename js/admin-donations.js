@@ -93,7 +93,7 @@ function admMsg(text, kind){
 function admRender(d){
   ADM = d || {};
   admTiles(d.totals || {});
-  admTable(d.rows || []);
+  admTable(d.rows || [], Number(d.ever_any || 0) === 0);
   admStreamers(d.streamers || []);
   if(d.truncated) admMsg('Showing the newest ' + (d.filters && d.filters.limit) +
                          ' only — narrow the period to see the rest.');
@@ -117,10 +117,15 @@ function admTiles(t){
   }).join('');
 }
 
-function admTable(rows){
+function admTable(rows, neverAny){
   var tb = document.querySelector('#adm-tbl tbody');
   if(!rows.length){
-    tb.innerHTML = '<tr class="norow-row"><td class="norow" colspan="8">No donations match these filters.</td></tr>';
+    /* "No match" on a server that has never had a donation reads like a bug.
+       Say which of the two it actually is. */
+    var why = neverAny
+      ? 'No donations yet. The first one will appear here as soon as a player donates.'
+      : 'No donations match these filters.';
+    tb.innerHTML = '<tr class="norow-row"><td class="norow" colspan="8">' + escHtml(why) + '</td></tr>';
     return;
   }
   tb.innerHTML = rows.map(function(r){
@@ -198,7 +203,7 @@ function admAsk(ref, mode){
       '<div class="adm-ask-q">' + question + '</div>' +
       '<input class="adm-note" id="note-' + ref + '" maxlength="255" placeholder="' + hint + '">' +
       go +
-      '<button class="adm-btn" onclick="admTable(ADM.rows)">Cancel</button>' +
+      '<button class="adm-btn" onclick="admTable(ADM.rows, Number(ADM.ever_any||0)===0)">Cancel</button>' +
     '</div>';
 
   var input = document.getElementById('note-' + ref);
@@ -236,4 +241,12 @@ function admFind(ref){
   return null;
 }
 
-document.addEventListener('DOMContentLoaded', admInit);
+document.addEventListener('DOMContentLoaded', function(){
+  /* Any unexpected throw must still leave a readable page rather than the
+     stuck "Loading…" the markup starts with. */
+  admInit().catch(function(e){
+    try{ console.error('[admin-donations]', e); }catch(_){}
+    var msg = document.getElementById('adm-gate-msg');
+    if(msg) msg.textContent = 'Could not load the dashboard. Reload the page, or check the browser console.';
+  });
+});
