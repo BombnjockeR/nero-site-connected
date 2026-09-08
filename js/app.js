@@ -329,6 +329,8 @@ function accountHTML(){
   <div class="kv"><span>Guild</span><span id="pnl-guild">—</span></div>
   <div class="kv"><span>Status</span><span id="pnl-status">—</span></div>
   <button class="btn-gold" onclick="openPanel('donation')">Donate / Top Up</button>
+  <a class="btn-ghost" id="pnl-admin" href="${ROOT}pages/admin-donations.html" style="display:none">
+    <i class="ti ti-receipt-2"></i> Donation Dashboard</a>
   <a class="btn-ghost" href="${ROOT}pages/account.html">Manage Account</a>
   <a class="btn-ghost" href="${ROOT}pages/marketplace.html">My Marketplace Listings</a>
   <button class="btn-ghost" onclick="doLogout()">Log Out</button>`;
@@ -352,6 +354,11 @@ async function loadAccountPanel(){
   set('pnl-guild', withGuild.length ? withGuild[0].guild : '—');
   set('pnl-status', anyOnline?'Online':'Offline', anyOnline?'#46d17f':'');
   set('pnl-since', d.account.registered ? ('Member since '+d.account.registered) : 'Member');
+
+  /* Staff-only shortcut. Hiding it is a convenience, not the access control —
+     qris.php refuses ?action=donations to anyone below GM regardless. */
+  var admLink=document.getElementById('pnl-admin');
+  if(admLink && Number(d.account.group_id||0) >= 99) admLink.style.display='';
 }
 async function doLogout(){
   if(NeroAPI.enabled()){ await NeroAPI.post('/account.php',{action:'logout'}); }

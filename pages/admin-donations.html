@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Donations — NeRO Admin</title>
+<!-- Staff-only view. The page is public HTML like every other page here, but it
+     holds no data of its own: everything comes from qris.php, which refuses
+     ?action=donations to anyone who is not group_id 99. Opening this URL as a
+     player shows the "staff only" notice and nothing else. -->
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</head><body class="page">
+<div class="pagebg"><video autoplay muted loop playsinline><source src="../assets/nero_landingpage.mp4" type="video/mp4"></video><div class="pagebg-veil"></div></div>
+<div id="app">
+<header class="sitehead">
+  <img class="hd-logo" src="../assets/logo.png" alt="Home" title="Home" onclick="location.href='../'">
+  <nav class="hd-tabs"><a class="tab" href="../wiki/index.html">Wiki</a><a class="tab" href="../pages/stat-woe.html">WoE</a><a class="tab" href="../pages/stat-pvp.html">PvP</a><a class="tab" href="../pages/stat-mvp.html">MVP</a><a class="tab" href="../pages/stat-zeny.html">Zeny</a><a class="tab" href="../pages/marketplace.html">Market</a></nav>
+  <div class="hd-right">
+    <div class="hd-status"><span class="hd-time" id="hd-time">Server time: —</span><div class="hd-pill" id="hd-pill"><b id="online-num">—</b><span>Players</span><span class="hd-sep">|</span><b id="merchant-num">—</b><span>Merchants</span></div><span class="hd-peaklbl">peak player <b id="peak-num">—</b></span></div>
+    <div class="hd-acct" id="hd-acct"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1 class="pg-title">Donations</h1>
+  <p class="subtitle">Every donation that has come in, and the claims waiting on you.</p>
+
+  <div id="adm-gate" class="don-note" style="display:none">
+    <i class="ti ti-lock"></i><span id="adm-gate-msg">Checking your access…</span>
+  </div>
+
+  <div id="adm-main" style="display:none">
+    <div class="adm-tiles" id="adm-tiles"></div>
+
+    <div class="adm-filters">
+      <label class="adm-fld">Status
+        <select id="f-status" onchange="admLoad()">
+          <option value="all">All</option>
+          <option value="unconfirmed">Waiting on me</option>
+          <option value="paid">Paid</option>
+          <option value="pending">Pending (QR unpaid)</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="failed">Failed / rejected</option>
+          <option value="expired">Expired</option>
+          <option value="refunded">Refunded</option>
+        </select>
+      </label>
+      <label class="adm-fld">Source
+        <select id="f-source" onchange="admLoad()">
+          <option value="all">All</option>
+          <option value="manual">Manual (Discord)</option>
+          <option value="qris">Automatic QRIS</option>
+        </select>
+      </label>
+      <label class="adm-fld">Period
+        <select id="f-days" onchange="admLoad()">
+          <option value="1">Last 24 hours</option>
+          <option value="7">Last 7 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="all">All time</option>
+        </select>
+      </label>
+      <button class="btn-ghost adm-refresh" onclick="admLoad()"><i class="ti ti-refresh"></i> Refresh</button>
+    </div>
+
+    <div id="adm-msg"></div>
+
+    <div class="tbl-wrap">
+      <table class="stat" id="adm-tbl">
+        <thead><tr>
+          <th>When</th><th>Player</th><th>Source</th><th>Amount</th>
+          <th>CP</th><th>Code</th><th>Status</th><th>Action</th>
+        </tr></thead>
+        <tbody><tr class="norow-row"><td class="norow" colspan="8">Loading…</td></tr></tbody>
+      </table>
+    </div>
+
+    <div id="adm-streamers"></div>
+  </div>
+</div>
+
+<div class="backdrop" id="backdrop" onclick="closePanel()"></div>
+<aside class="panel" id="panel">
+  <div class="panel-head"><i id="pnl-icon" class="ti"></i><h2 id="pnl-title"></h2>
+    <button class="panel-close" onclick="closePanel()">&times;</button></div>
+  <div class="panel-body" id="pnl-body"></div>
+</aside>
+</div>
+
+<script src="../js/data.js"></script><script src="../js/wiki-index.js"></script><script src="../js/app.js"></script>
+<script src="../js/admin-donations.js"></script>
+</body></html>
