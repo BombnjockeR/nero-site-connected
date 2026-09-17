@@ -723,7 +723,7 @@ async function qrisCheckStatus(ref, amountRp){
     var s=(res.data.status||'').toLowerCase();
     if(s==='paid'||s==='success'||s==='completed'||s==='settlement'){
       qrisStopPolling();
-      st.innerHTML='<i class="ti ti-circle-check" style="color:#7ee787"></i> Payment received! <b>'+fmtNum(res.data.credit_cp+(res.data.bonus_cp||0))+' CP</b> for <b>'+escHtml(Auth.user()||'')+'</b> — delivered in game on your next login, or right away via <b>Collect Donations</b> at the Donator Ranking NPC (close the Cash Shop first).';
+      st.innerHTML='<i class="ti ti-circle-check" style="color:#7ee787"></i> Payment received! <b>'+fmtNum(res.data.credit_cp+(res.data.bonus_cp||0))+' CP</b> added to <b>'+escHtml(Auth.user()||'')+'</b>\'s Cash Points. Relog in game to see your new balance.';
       if(typeof loadAccountPanel==='function') loadAccountPanel();
       return;
     }
