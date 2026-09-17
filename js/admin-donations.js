@@ -248,11 +248,30 @@ function admFind(ref){
   return null;
 }
 
-/* Direct load: app.js ran before this file was parsed, so start on DOM ready.
-   SPA arrival: app.js loads this file and then calls runAdminPage() itself. */
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', runAdminPage);
+/* Start the dashboard. Guarded so the several things that may ask for it (DOM
+   ready, the SPA router, sign-in, the watchdog below) never run two at once.
+   It does not depend on anything new in app.js, so a browser still holding an
+   older cached app.js starts it too. */
+var admBusy = false;
+function admStart(){
+  if(admBusy || !document.getElementById('adm-gate')) return;
+  admBusy = true;
+  admInit().catch(function(e){
+    try{ console.error('[admin-donations]', e); }catch(_){}
+    var msg = document.getElementById('adm-gate-msg');
+    if(msg) msg.textContent = 'Could not load the dashboard. Check your connection and try again.';
+  }).then(function(){ admBusy = false; });
 }
+
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', admStart);
+else admStart();
+
+/* Watchdog: if the page is ever showing the untouched "Loading…" gate with
+   nothing in flight — however it got there — start it. */
+setInterval(function(){
+  var msg = document.getElementById('adm-gate-msg');
+  if(msg && msg.textContent === 'Loading…' && !admBusy) admStart();
+}, 1500);
 
 
 /* --- GM: manage streamers (qris.php streamers / streamer_save) ---------- */

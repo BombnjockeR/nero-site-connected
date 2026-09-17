@@ -1749,12 +1749,7 @@ async function loadWoeMePage(){
 /* Donation Admin lives in js/admin-donations.js; run it whenever its page is
    on screen (first load, SPA arrival, sign-in, sign-out). */
 function runAdminPage(){
-  if(typeof admInit!=='function' || !document.getElementById('adm-gate')) return;
-  admInit().catch(function(e){
-    try{ console.error('[admin-donations]', e); }catch(_){}
-    var msg=document.getElementById('adm-gate-msg');
-    if(msg) msg.textContent='Could not load the dashboard. Check your connection and try again.';
-  });
+  if(typeof admStart==='function') admStart();
 }
 
 /* ================= SPA ROUTER ================= */
@@ -1796,12 +1791,14 @@ function afterPageLoad(){
   function samePage(a,b){ return a.split('#')[0]===b.split('#')[0]; }
 
   function loadPageScripts(doc){
+    /* compared by path, ignoring ?v=..., so a versioned tag never loads a
+       second copy of app.js / data.js */
     var have={};
-    document.querySelectorAll('script[src]').forEach(function(s){ have[s.src]=1; });
+    document.querySelectorAll('script[src]').forEach(function(s){ have[new URL(s.src).pathname]=1; });
     var want=[];
     doc.querySelectorAll('script[src]').forEach(function(s){
-      var abs=new URL(s.getAttribute('src'), location.href).href;
-      if(!have[abs]) want.push(abs);
+      var u=new URL(s.getAttribute('src'), location.href);
+      if(!have[u.pathname]) want.push(u.href);
     });
     return want.reduce(function(p, src){
       return p.then(function(){
