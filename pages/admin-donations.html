@@ -107,7 +107,8 @@
           <input class="inp" id="sm-name" maxlength="64" placeholder="e.g. JuneGaming">
         </label>
         <label class="adm-fld">Referral code
-          <input class="inp" id="sm-code" maxlength="16" placeholder="e.g. 108">
+          <input class="inp sm-code" id="sm-code" maxlength="16" placeholder="e.g. JUNE10"
+                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
         </label>
         <label class="adm-fld sm-active">Active
           <select class="inp" id="sm-active"><option value="1">Yes</option><option value="0">No</option></select>
@@ -115,6 +116,7 @@
       </div>
       <div class="sm-actions">
         <button class="btn-gold" id="sm-save" onclick="smSave()"><i class="ti ti-user-plus"></i> Register streamer</button>
+        <span class="adm-ref sm-hint">Code: 2–16 letters or numbers, e.g. JUNE10 or HATRED. Renaming a code keeps its donation history.</span>
         <button class="btn-ghost" id="sm-cancel" style="display:none" onclick="smReset()">Cancel edit</button>
       </div>
       <div id="sm-msg"></div>

@@ -321,7 +321,8 @@ async function smSend(payload, btn){
   var d = res.data;
   smMsg(d.name + ' (code ' + d.code + ') saved' +
         (d.account_id ? ' — linked to account ' + d.account_id + (d.userid ? ' (' + d.userid + ')' : '') : '') +
-        (d.active ? '.' : ', inactive.'), true);
+        (d.active ? '.' : ', inactive.') +
+        (d.history_moved ? ' ' + d.history_moved + ' past donation(s) moved to the new code.' : ''), true);
   await smLoad();
   return true;
 }

@@ -690,6 +690,8 @@ table.stat.big td{padding:15px 18px}
 .sm-grid .inp{text-transform:none;letter-spacing:0}
 .sm-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .sm-actions .btn-gold,.sm-actions .btn-ghost{width:auto;margin:0;padding:10px 18px;display:flex;align-items:center;gap:8px}
+.sm-grid .inp.sm-code{text-transform:uppercase;font-weight:600;letter-spacing:.5px}
+.sm-hint{align-self:center}
 .sm-row-btn{width:auto;margin:0 4px 0 0;padding:5px 11px;font-size:12px;display:inline-flex}
 .adm-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:18px 0 22px}
 .adm-tile{background:rgba(10,16,28,.55);border:1px solid var(--tline);border-radius:12px;padding:14px 16px}
