@@ -82,6 +82,39 @@
     </div>
 
     <div id="adm-streamers"></div>
+
+    <!-- GM: register an account as a streamer with a referral code -->
+    <h2 class="adm-h2"><i class="ti ti-speakerphone"></i> Manage streamers</h2>
+    <p class="subtitle" style="margin:0 0 12px">Link a game account to a referral code. Donors who pick the code get
+      bonus CP, and the linked account sees who donated in its <b>Referral</b> tab on My Account.</p>
+    <div class="form-card sm-card">
+      <input type="hidden" id="sm-id" value="">
+      <div class="sm-grid">
+        <label class="adm-fld">Account ID
+          <input class="inp" id="sm-aid" inputmode="numeric" placeholder="e.g. 2000007">
+        </label>
+        <label class="adm-fld">Streamer name
+          <input class="inp" id="sm-name" maxlength="64" placeholder="e.g. JuneGaming">
+        </label>
+        <label class="adm-fld">Referral code
+          <input class="inp" id="sm-code" maxlength="16" placeholder="e.g. 108">
+        </label>
+        <label class="adm-fld sm-active">Active
+          <select class="inp" id="sm-active"><option value="1">Yes</option><option value="0">No</option></select>
+        </label>
+      </div>
+      <div class="sm-actions">
+        <button class="btn-gold" id="sm-save" onclick="smSave()"><i class="ti ti-user-plus"></i> Register streamer</button>
+        <button class="btn-ghost" id="sm-cancel" style="display:none" onclick="smReset()">Cancel edit</button>
+      </div>
+      <div id="sm-msg"></div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="stat" id="sm-tbl">
+        <thead><tr><th>Code</th><th>Streamer</th><th>Account</th><th>Status</th><th></th></tr></thead>
+        <tbody><tr><td class="norow" colspan="5">Loading…</td></tr></tbody>
+      </table>
+    </div>
   </div>
 </div>
 

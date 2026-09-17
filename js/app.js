@@ -1071,6 +1071,7 @@ async function loadAccountPage(){
 
   var d = await NeroAPI.get('me');
   var demo = !d;
+  loadReferral();
 
   var name = (d && d.account && d.account.userid) || Auth.user() || 'Adventurer';
   var mail = (d && d.account && d.account.email) || (demo ? 'not connected' : '—');
@@ -1153,6 +1154,63 @@ async function loadAccountPage(){
         (demo ? 'Connect the backend to see your donation history.' : 'No donations yet.')+
         '</td></tr>';
     }
+  }
+}
+
+/* ---- Referral tab: shown only to accounts linked to a streamer code in
+   bridge/_config.php Streamers[account_id] ---- */
+async function loadReferral(){
+  var tabBtn=document.getElementById('atab-referral');
+  if(!tabBtn) return;
+  var sel=document.getElementById('rf-period');
+  var period=sel ? sel.value : 'all';
+  var r=await NeroAPI.get('referral',{period:period});
+  if(!r || !r.is_streamer){
+    tabBtn.style.display='none';
+    /* the remembered tab may be one this account can no longer see */
+    var panel=document.getElementById('tab-referral');
+    if(panel && panel.classList.contains('show')){
+      var first=document.querySelector('.atab[data-t="details"]'); acctTab('details',first);
+    }
+    return;
+  }
+  tabBtn.style.display='';
+  var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+  set('rf-name', r.streamer.name);
+  set('rf-code', r.streamer.code);
+  set('rf-pct', '+'+r.streamer.bonus_pct+'%');
+  set('rf-count', fmtNum(r.summary.paid_donations));
+  set('rf-donors', fmtNum(r.summary.unique_donors));
+  set('rf-rp', fmtRp(r.summary.total_rp));
+  set('rf-bonus', fmtNum(r.summary.total_bonus_cp)+' CP');
+  window.__referralCode=r.streamer.code;
+
+  var tb=document.querySelector('#rf-table tbody');
+  if(!tb) return;
+  var rows=r.rows||[];
+  tb.innerHTML = rows.length ? rows.map(function(x){
+    return '<tr>'+
+      '<td>'+escHtml(x.paid_at)+'</td>'+
+      '<td><b>'+escHtml(x.donor)+'</b></td>'+
+      '<td>'+fmtRp(x.amount_rp)+'</td>'+
+      '<td>+'+fmtNum(x.bonus_cp)+' CP'+(x.bonus_pct?' <span class="pill paid">'+x.bonus_pct+'%</span>':'')+'</td>'+
+    '</tr>';
+  }).join('') : '<tr><td colspan="4" class="norow">No donations with your code in this period yet.</td></tr>';
+}
+
+function copyReferralCode(btn){
+  var code=String(window.__referralCode||'');
+  if(!code) return;
+  var done=function(){
+    if(!btn) return;
+    var old=btn.innerHTML;
+    btn.innerHTML='<i class="ti ti-check"></i> Copied!';
+    setTimeout(function(){ btn.innerHTML=old; }, 1800);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(done, function(){ prompt('Your referral code:', code); });
+  }else{
+    prompt('Your referral code:', code);
   }
 }
 

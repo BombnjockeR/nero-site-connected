@@ -32,6 +32,7 @@
       <button class="atab on" data-t="details"  onclick="acctTab('details',this)"><i class="ti ti-user"></i> Account Details</button>
       <button class="atab"    data-t="security" onclick="acctTab('security',this)"><i class="ti ti-lock"></i> Security</button>
       <button class="atab"    data-t="donation" onclick="acctTab('donation',this)"><i class="ti ti-heart"></i> Donations &amp; CP</button>
+      <button class="atab"    data-t="referral" id="atab-referral" style="display:none" onclick="acctTab('referral',this)"><i class="ti ti-speakerphone"></i> Referral</button>
     </div>
 
     <!-- ============ TAB 1 : ACCOUNT DETAILS ============ -->
@@ -141,6 +142,46 @@
       <p class="subtitle" style="margin-top:14px">
         Cash Points are credited once payment is confirmed. Pending items usually
         clear within a few minutes.
+      </p>
+    </section>
+
+    <!-- ============ TAB 4 : REFERRAL (streamers only) ============ -->
+    <section class="atab-panel" id="tab-referral">
+      <div class="cp-banner">
+        <div>
+          <span class="cp-label">Your referral code · <span id="rf-name">—</span></span>
+          <span class="cp-value" id="rf-code">—</span>
+          <span class="pstat-sub">Donors who pick your code get <b id="rf-pct">+10%</b> extra CP.</span>
+        </div>
+        <button class="btn-gold" style="max-width:220px;margin:0" onclick="copyReferralCode(this)">
+          <i class="ti ti-copy"></i> Copy code
+        </button>
+      </div>
+
+      <div class="rf-head">
+        <h2 class="sec-title"><i class="ti ti-chart-bar"></i> Your supporters</h2>
+        <select class="inp rf-period" id="rf-period" onchange="loadReferral()">
+          <option value="this_month">This month</option>
+          <option value="last_month">Last month</option>
+          <option value="all" selected>All time</option>
+        </select>
+      </div>
+
+      <div class="info-row">
+        <div class="info-item"><span>Donations</span><b id="rf-count">—</b></div>
+        <div class="info-item"><span>Unique donors</span><b id="rf-donors">—</b></div>
+        <div class="info-item"><span>Total donated</span><b id="rf-rp">—</b></div>
+        <div class="info-item"><span>Bonus CP given</span><b id="rf-bonus">—</b></div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table class="stat big" id="rf-table">
+          <thead><tr><th>Date</th><th>Donor</th><th>Amount</th><th>Bonus</th></tr></thead>
+          <tbody><tr><td colspan="4" class="norow">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="subtitle" style="margin-top:14px">
+        Only paid donations are listed. Donors are shown by their highest-level character.
       </p>
     </section>
 

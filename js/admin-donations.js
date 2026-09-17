@@ -58,6 +58,7 @@ async function admInit(){
     gate.style.display = 'none';
     main.style.display = '';
     admRender(res.data);
+    smLoad();
     return;
   }
 
@@ -250,3 +251,87 @@ document.addEventListener('DOMContentLoaded', function(){
     if(msg) msg.textContent = 'Could not load the dashboard. Reload the page, or check the browser console.';
   });
 });
+
+
+/* --- GM: manage streamers (qris.php streamers / streamer_save) ---------- */
+
+var smRows = [];
+
+async function smLoad(){
+  var tb = document.querySelector('#sm-tbl tbody');
+  var res = await NeroAPI.post('/qris.php?action=streamers', {});
+  if(!res || !res.ok){
+    tb.innerHTML = '<tr><td class="norow" colspan="5">' + escHtml(qrisErrorText(res)) + '</td></tr>';
+    return;
+  }
+  smRows = res.data.streamers || [];
+  tb.innerHTML = smRows.length ? smRows.map(function(s){
+    return '<tr>' +
+      '<td><b>' + escHtml(s.code) + '</b></td>' +
+      '<td>' + escHtml(s.name) + '</td>' +
+      '<td>' + (s.account_id ? escHtml(String(s.account_id)) + (s.userid ? ' <span class="adm-ref">' + escHtml(s.userid) + '</span>' : '') : '<span class="adm-ref">not linked</span>') + '</td>' +
+      '<td>' + (s.active ? '<span class="adm-badge ok">Active</span>' : '<span class="adm-badge muted">Inactive</span>') + '</td>' +
+      '<td><button class="btn-ghost sm-row-btn" onclick="smEdit(' + s.id + ')"><i class="ti ti-pencil"></i> Edit</button>' +
+      '<button class="btn-ghost sm-row-btn" onclick="smToggle(' + s.id + ')">' + (s.active ? 'Deactivate' : 'Activate') + '</button></td>' +
+    '</tr>';
+  }).join('') : '<tr><td class="norow" colspan="5">No streamers yet. Register one above.</td></tr>';
+}
+
+function smMsg(text, ok){
+  var el = document.getElementById('sm-msg');
+  el.innerHTML = text ? '<p class="hintline" style="color:' + (ok ? '#8ce0b4' : '#f0a3a3') + '">' + escHtml(text) + '</p>' : '';
+}
+
+function smReset(){
+  ['sm-id', 'sm-aid', 'sm-name', 'sm-code'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('sm-active').value = '1';
+  document.getElementById('sm-save').innerHTML = '<i class="ti ti-user-plus"></i> Register streamer';
+  document.getElementById('sm-cancel').style.display = 'none';
+}
+
+function smFind(id){
+  for(var i = 0; i < smRows.length; i++) if(smRows[i].id === id) return smRows[i];
+  return null;
+}
+
+function smEdit(id){
+  var s = smFind(id); if(!s) return;
+  document.getElementById('sm-id').value = s.id;
+  document.getElementById('sm-aid').value = s.account_id || '';
+  document.getElementById('sm-name').value = s.name;
+  document.getElementById('sm-code').value = s.code;
+  document.getElementById('sm-active').value = s.active ? '1' : '0';
+  document.getElementById('sm-save').innerHTML = '<i class="ti ti-device-floppy"></i> Save changes';
+  document.getElementById('sm-cancel').style.display = '';
+  smMsg('', true);
+  document.getElementById('sm-aid').focus();
+}
+
+async function smSend(payload, btn){
+  if(btn) btn.disabled = true;
+  var res = await NeroAPI.post('/qris.php', Object.assign({action: 'streamer_save'}, payload));
+  if(btn) btn.disabled = false;
+  if(!res || !res.ok){ smMsg((res && res.error) || 'Could not save the streamer.', false); return false; }
+  var d = res.data;
+  smMsg(d.name + ' (code ' + d.code + ') saved' +
+        (d.account_id ? ' — linked to account ' + d.account_id + (d.userid ? ' (' + d.userid + ')' : '') : '') +
+        (d.active ? '.' : ', inactive.'), true);
+  await smLoad();
+  return true;
+}
+
+async function smSave(){
+  var payload = {
+    id:         Number(document.getElementById('sm-id').value) || 0,
+    account_id: document.getElementById('sm-aid').value.trim(),
+    name:       document.getElementById('sm-name').value.trim(),
+    code:       document.getElementById('sm-code').value.trim(),
+    active:     document.getElementById('sm-active').value === '1'
+  };
+  if(await smSend(payload, document.getElementById('sm-save'))) smReset();
+}
+
+async function smToggle(id){
+  var s = smFind(id); if(!s) return;
+  await smSend({id: s.id, account_id: s.account_id ? String(s.account_id) : '', name: s.name, code: s.code, active: !s.active});
+}
