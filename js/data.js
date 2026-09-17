@@ -81,6 +81,9 @@ var STREAMERS = [
   {name:"JuneGaming", code:"108"},
   {name:"PEA",        code:"449"}
 ];
+/* Referral bonus in percent; the bridge's _config.php ReferralBonusPct is the
+   real value (loaded below), this is only the offline default. */
+var REFERRAL_BONUS_PCT = 10;
 const GUILDS    = [];   /* guild royalty referral — not enabled yet */
 
 /* Donation: CP and Rupiah are 1 : 1. Default only — NeroConfig.load() replaces
@@ -129,6 +132,10 @@ const NeroConfig = {
         .map(function(t){ return {cp: Number(t && t.cp)}; })
         .filter(function(t){ return isFinite(t.cp) && t.cp > 0; });
       if(tiers.length){ DONATE_AMOUNTS = tiers; changed = true; }
+    }
+
+    if(isFinite(Number(d.referral_bonus_pct)) && d.referral_bonus_pct !== null && d.referral_bonus_pct !== undefined){
+      REFERRAL_BONUS_PCT = Number(d.referral_bonus_pct); changed = true;
     }
 
     if(Array.isArray(d.streamers)){

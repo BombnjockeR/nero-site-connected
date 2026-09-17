@@ -539,12 +539,12 @@ function updateSummary(){
   var sel=document.getElementById('don-streamer');
   var code=sel.value;
   var name=code ? sel.options[sel.selectedIndex].getAttribute('data-name') : '';
-  var bonus=code?Math.round(cp*0.10):0;
-  /* Same as before: base tier determines CP received. Streamer code only
-     acts as a tracking tag (last 3 digits of the rupiah total). */
-  var payTotal=cp+(code?Number(code):0);
+  var bonus=code?Math.round(cp*REFERRAL_BONUS_PCT/100):0;
+  /* The donor pays exactly the tier; the referral is recorded on the donation
+     row by the bridge, so the code is no longer added to the rupiah amount. */
+  var payTotal=cp;
   box.innerHTML='Base: <b>'+fmtNum(cp)+' CP</b><br>'+
-    (code?'Streamer bonus (+10%): <b>+'+fmtNum(bonus)+' CP</b> → '+name+' (code '+code+')<br>':'')+
+    (code?'Streamer bonus (+'+REFERRAL_BONUS_PCT+'%): <b>+'+fmtNum(bonus)+' CP</b> → '+escHtml(name)+' (code '+escHtml(code)+')<br>':'')+
     '<hr class="don-hr">'+
     'You receive: <b class="don-total">'+fmtNum(cp+bonus)+' CP</b><br>'+
     'You pay: <b>'+fmtRp(payTotal)+'</b>'+
