@@ -643,9 +643,16 @@ async function qrisGenerate(){
   }
   if(!src){
     /* The QR exists but we cannot show it, so do not leave the donor staring at
-       a spinner — send them down the path that works. */
+       a spinner — send them down the path that works. The detail line is what
+       tells an admin which half failed: the bridge's image proxy, or a gateway
+       response with no qrContent to draw from. */
+    var why='image: '+(NeroAPI.lastBlobError||'not an image')+
+            ' · qr_url: '+(d.qr_url?'yes':'none')+
+            ' · qr_payload: '+(d.qr_payload?'yes':'none')+
+            ' · ref: '+d.reference;
+    try{ console.warn('[qris] '+why, d); }catch(e){}
     qrisReset();
-    qrisShowFallback('Could not load the QR image. Use the QR below — we will credit your CP manually.');
+    qrisShowFallback('Could not load the QR image. Use the QR below — we will credit your CP manually. ('+escHtml(why)+')');
     return;
   }
 

@@ -31,21 +31,27 @@ const NeroAPI = {
      An <img src> cannot carry an Authorization header, and putting the token
      in the query string would write a credential into logs and history — so
      the bytes are fetched here and handed to the <img> as an object URL.
-     Returns null on anything unexpected; the caller falls back. */
+     Returns null on anything unexpected; the caller falls back. The reason is
+     left in lastBlobError so the caller can say why. */
+  lastBlobError: "",
   async blob(path){
-    if(!this.enabled()) return null;
+    this.lastBlobError="";
+    if(!this.enabled()){ this.lastBlobError="backend not connected"; return null; }
     try{
       const ctl=new AbortController();
       const t=setTimeout(()=>ctl.abort(), 15000);
       const r=await fetch(API_BASE+path,
                           {signal:ctl.signal, credentials:"omit", headers:this.authHeaders()});
       clearTimeout(t);
-      if(!r.ok) return null;
       const b=await r.blob();
       /* On failure the bridge answers JSON, not an image. Rendering that would
          give a broken <img> with no explanation. */
-      return (b && b.type && b.type.indexOf("image/")===0) ? b : null;
-    }catch(e){ return null; }
+      if(r.ok && b && b.type && b.type.indexOf("image/")===0) return b;
+      var msg="";
+      try{ var j=JSON.parse(await b.text()); msg=(j&&j.error)||""; }catch(e){}
+      this.lastBlobError="HTTP "+r.status+(msg?" — "+msg:"");
+      return null;
+    }catch(e){ this.lastBlobError=(e&&e.name==="AbortError")?"timed out":"could not reach the server"; return null; }
   },
   async get(type, extra){
     if(!this.enabled()) return null;
