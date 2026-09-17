@@ -141,7 +141,8 @@ const NeroConfig = {
     if(Array.isArray(d.streamers)){
       var st = d.streamers
         .filter(function(s){ return s && s.name && s.code; })
-        .map(function(s){ return {name: String(s.name), code: String(s.code)}; });
+        .map(function(s){ return {name: String(s.name), code: String(s.code),
+                                  old_codes: Array.isArray(s.old_codes) ? s.old_codes.map(String) : []}; });
       /* an empty list is a legitimate answer here — "no streamers right now" */
       STREAMERS = st; changed = true;
     }

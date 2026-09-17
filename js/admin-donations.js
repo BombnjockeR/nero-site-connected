@@ -273,7 +273,9 @@ async function smLoad(){
   smRows = res.data.streamers || [];
   tb.innerHTML = smRows.length ? smRows.map(function(s){
     return '<tr>' +
-      '<td><b>' + escHtml(s.code) + '</b></td>' +
+      '<td><b>' + escHtml(s.code) + '</b>' + (s.old_codes || []).map(function(o){
+        return '<br><span class="adm-ref">was ' + escHtml(o.code) + ' · works until ' + escHtml(String(o.expires_at).slice(0, 10)) + '</span>';
+      }).join('') + '</td>' +
       '<td>' + escHtml(s.name) + '</td>' +
       '<td>' + (s.account_id ? escHtml(String(s.account_id)) + (s.userid ? ' <span class="adm-ref">' + escHtml(s.userid) + '</span>' : '') : '<span class="adm-ref">not linked</span>') + '</td>' +
       '<td>' + (s.active ? '<span class="adm-badge ok">Active</span>' : '<span class="adm-badge muted">Inactive</span>') + '</td>' +
@@ -322,7 +324,10 @@ async function smSend(payload, btn){
   smMsg(d.name + ' (code ' + d.code + ') saved' +
         (d.account_id ? ' — linked to account ' + d.account_id + (d.userid ? ' (' + d.userid + ')' : '') : '') +
         (d.active ? '.' : ', inactive.') +
-        (d.history_moved ? ' ' + d.history_moved + ' past donation(s) moved to the new code.' : ''), true);
+        (d.history_moved ? ' ' + d.history_moved + ' past donation(s) moved to the new code.' : '') +
+        (d.old_code ? (d.old_code_days
+          ? ' Old code ' + d.old_code + ' keeps working for ' + d.old_code_days + ' days — tell the streamer to switch.'
+          : ' Old code ' + d.old_code + ' stopped working.') : ''), true);
   await smLoad();
   return true;
 }

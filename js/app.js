@@ -416,7 +416,8 @@ function donationHTML(){
     return '<button class="amt" data-i="'+i+'" onclick="pickAmt('+i+')">'+fmtRp(a.cp)+'</button>';
   }).join('');
   var streamerOpts='<option value="">None</option>'+STREAMERS.map(function(s){
-    return '<option value="'+escHtml(s.code)+'" data-name="'+escHtml(s.name)+'">'+escHtml(s.name)+' — Code '+escHtml(s.code)+' (+'+REFERRAL_BONUS_PCT+'% CP)</option>';
+    var was=(s.old_codes&&s.old_codes.length) ? ', was '+s.old_codes.map(escHtml).join(' / ') : '';
+    return '<option value="'+escHtml(s.code)+'" data-name="'+escHtml(s.name)+'">'+escHtml(s.name)+' — Code '+escHtml(s.code)+was+' (+'+REFERRAL_BONUS_PCT+'% CP)</option>';
   }).join('');
   return `
   <p class="lead">Support NeRO and get Cash Points to spend in the Item Mall. <b>1 CP = Rp 1.</b></p>
