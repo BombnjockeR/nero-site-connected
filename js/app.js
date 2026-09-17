@@ -630,7 +630,18 @@ async function qrisGenerate(){
   if(img) img.style.display='none';
 
   var blob=await NeroAPI.blob('/qris.php?action=qr&ref='+encodeURIComponent(d.reference));
-  if(!blob){
+  var src=null;
+  qrisRevokeObjectUrl();
+  if(blob){
+    qrisObjectUrl=URL.createObjectURL(blob);
+    src=qrisObjectUrl;
+  }else if(d.qr_payload){
+    /* The image proxy failed (production may send no qrUrl, or one on a host
+       the bridge does not fetch). qr_payload is the QRIS string itself, so any
+       QR encoder produces the same payable code. */
+    src=await qrisDrawPayload(d.qr_payload);
+  }
+  if(!src){
     /* The QR exists but we cannot show it, so do not leave the donor staring at
        a spinner — send them down the path that works. */
     qrisReset();
@@ -638,14 +649,36 @@ async function qrisGenerate(){
     return;
   }
 
-  qrisRevokeObjectUrl();
-  qrisObjectUrl=URL.createObjectURL(blob);
-  if(img){ img.src=qrisObjectUrl; img.alt='QRIS payment code for '+fmtRp(d.amount_rp); img.style.display=''; }
+  if(img){ img.src=src; img.alt='QRIS payment code for '+fmtRp(d.amount_rp); img.style.display=''; }
   if(loading) loading.style.display='none';
   if(fbLink) fbLink.style.display='none';
 
   qrisStartPolling(d.reference, d.amount_rp);
   window.__qrisLastRef=d.reference;
+}
+
+/* Encode a QRIS payload string as a data: URL image, loading the encoder on
+   first use only. Resolves null if the library cannot be loaded. */
+var qrisLibPromise=null;
+function qrisLoadLib(){
+  if(window.qrcode) return Promise.resolve(true);
+  if(!qrisLibPromise) qrisLibPromise=new Promise(function(resolve){
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js';
+    s.onload=function(){ resolve(!!window.qrcode); };
+    s.onerror=function(){ qrisLibPromise=null; resolve(false); };
+    document.head.appendChild(s);
+  });
+  return qrisLibPromise;
+}
+async function qrisDrawPayload(payload){
+  if(!(await qrisLoadLib())) return null;
+  try{
+    var qr=window.qrcode(0,'M');
+    qr.addData(String(payload));
+    qr.make();
+    return qr.createDataURL(8,2);
+  }catch(e){ return null; }
 }
 
 function qrisStartPolling(ref, amountRp){
