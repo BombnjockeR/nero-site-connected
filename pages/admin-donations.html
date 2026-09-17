@@ -20,8 +20,7 @@
 </header>
 
 <div class="wrap">
-  <h1 class="pg-title">Donations</h1>
-  <p class="subtitle">Every donation that has come in, and the claims waiting on you.</p>
+  <h1 class="pg-title">Donation Admin</h1>
 
   <!-- Starts VISIBLE on purpose. Both blocks used to start hidden, so if
        admin-donations.js failed to load the page rendered as nothing at all —
@@ -35,6 +34,16 @@
   </noscript>
 
   <div id="adm-main" style="display:none">
+    <!-- One tab per area, like the WoE page. To add a section: a button here
+         with admTab('<name>'), and a <section class="atab-panel" id="adm-tab-<name>">. -->
+    <div class="acct-tabs">
+      <button class="atab on" data-t="donations" onclick="admTab('donations',this)"><i class="ti ti-receipt"></i> Donations</button>
+      <button class="atab" data-t="streamers" onclick="admTab('streamers',this)"><i class="ti ti-speakerphone"></i> Streamers</button>
+    </div>
+
+    <!-- ============ TAB: DONATIONS ============ -->
+    <section class="atab-panel show" id="adm-tab-donations">
+    <p class="subtitle">Every donation that has come in, and the claims waiting on you.</p>
     <div class="adm-tiles" id="adm-tiles"></div>
 
     <div class="adm-filters">
@@ -80,13 +89,14 @@
         <tbody><tr class="norow-row"><td class="norow" colspan="8">Loading…</td></tr></tbody>
       </table>
     </div>
+    </section>
 
-    <div id="adm-streamers"></div>
-
-    <!-- GM: register an account as a streamer with a referral code -->
-    <h2 class="adm-h2"><i class="ti ti-speakerphone"></i> Manage streamers</h2>
-    <p class="subtitle" style="margin:0 0 12px">Link a game account to a referral code. Donors who pick the code get
+    <!-- ============ TAB: STREAMERS ============ -->
+    <section class="atab-panel" id="adm-tab-streamers">
+    <p class="subtitle">Link a game account to a referral code. Donors who pick the code get
       bonus CP, and the linked account sees who donated in its <b>Referral</b> tab on My Account.</p>
+
+    <h2 class="adm-h2"><i class="ti ti-user-plus"></i> Register streamer</h2>
     <div class="form-card sm-card">
       <input type="hidden" id="sm-id" value="">
       <div class="sm-grid">
@@ -109,12 +119,16 @@
       </div>
       <div id="sm-msg"></div>
     </div>
+    <h2 class="adm-h2"><i class="ti ti-list"></i> All streamers</h2>
     <div class="tbl-wrap">
       <table class="stat" id="sm-tbl">
         <thead><tr><th>Code</th><th>Streamer</th><th>Account</th><th>Status</th><th></th></tr></thead>
         <tbody><tr><td class="norow" colspan="5">Loading…</td></tr></tbody>
       </table>
     </div>
+
+    <div id="adm-streamers"></div>
+    </section>
   </div>
 </div>
 

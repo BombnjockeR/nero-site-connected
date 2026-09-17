@@ -59,6 +59,7 @@ async function admInit(){
     main.style.display = '';
     admRender(res.data);
     smLoad();
+    admRestoreTab();
     return;
   }
 
@@ -160,8 +161,13 @@ function admTable(rows, neverAny){
 
 function admStreamers(list){
   var el = document.getElementById('adm-streamers');
-  if(!list.length){ el.innerHTML = ''; return; }
-  el.innerHTML = '<h2 class="adm-h2">Referral codes</h2>' +
+  if(!list.length){
+    el.innerHTML = '<h2 class="adm-h2"><i class="ti ti-chart-bar"></i> Referral performance</h2>' +
+      '<p class="subtitle">No paid donations with a referral code in the period picked on the Donations tab.</p>';
+    return;
+  }
+  el.innerHTML = '<h2 class="adm-h2"><i class="ti ti-chart-bar"></i> Referral performance</h2>' +
+    '<p class="subtitle" style="margin:0 0 10px">Paid donations per code, for the period picked on the Donations tab.</p>' +
     '<div class="tbl-wrap"><table class="stat"><thead><tr>' +
     '<th>Code</th><th>Streamer</th><th>Paid donations</th><th>Total</th>' +
     '</tr></thead><tbody>' +
@@ -334,4 +340,22 @@ async function smSave(){
 async function smToggle(id){
   var s = smFind(id); if(!s) return;
   await smSend({id: s.id, account_id: s.account_id ? String(s.account_id) : '', name: s.name, code: s.code, active: !s.active});
+}
+
+
+/* --- tabs (same look as the WoE page) ----------------------------------- */
+
+function admTab(name, btn){
+  document.querySelectorAll('#adm-main .atab').forEach(function(b){ b.classList.toggle('on', b === btn); });
+  document.querySelectorAll('#adm-main .atab-panel').forEach(function(p){ p.classList.remove('show'); });
+  var el = document.getElementById('adm-tab-' + name);
+  if(el) el.classList.add('show');
+  try{ sessionStorage.setItem('nero_adm_tab', name); }catch(e){}
+}
+
+function admRestoreTab(){
+  var want = null;
+  try{ want = sessionStorage.getItem('nero_adm_tab'); }catch(e){}
+  var btn = want && document.querySelector('#adm-main .atab[data-t="' + want + '"]');
+  if(btn) admTab(want, btn);
 }
