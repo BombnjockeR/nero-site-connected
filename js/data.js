@@ -77,7 +77,6 @@ const NeroAPI = {
    working unchanged if the bridge is unreachable.
    ============================================================== */
 var STREAMERS = [
-  {name:"Hatred",     code:"311"},
   {name:"JuneGaming", code:"108"},
   {name:"PEA",        code:"449"}
 ];
