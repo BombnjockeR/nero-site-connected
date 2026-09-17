@@ -90,7 +90,7 @@ const GUILDS    = [];   /* guild royalty referral — not enabled yet */
    this with bridge/_config.php [QRIS][TiersRp], which is what the bridge
    actually enforces on a donation. */
 var DONATE_AMOUNTS = [
-  {cp:100000},{cp:250000},{cp:500000},{cp:1000000},{cp:5000000}
+  {cp:100000},{cp:250000},{cp:500000},{cp:1000000},{cp:5000000},{cp:10000000}
 ];
 /* Master switch for the automatic QRIS flow. false falls back to the "static QR
    + Discord ticket" path, and the donation panel then skips the API call
