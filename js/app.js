@@ -416,7 +416,7 @@ function donationHTML(){
     return '<button class="amt" data-i="'+i+'" onclick="pickAmt('+i+')">'+fmtRp(a.cp)+'</button>';
   }).join('');
   var streamerOpts='<option value="">None</option>'+STREAMERS.map(function(s){
-    return '<option value="'+s.code+'" data-name="'+s.name+'">'+s.name+' — Code '+s.code+'</option>';
+    return '<option value="'+escHtml(s.code)+'" data-name="'+escHtml(s.name)+'">'+escHtml(s.name)+' — Code '+escHtml(s.code)+' (+'+REFERRAL_BONUS_PCT+'% CP)</option>';
   }).join('');
   return `
   <p class="lead">Support NeRO and get Cash Points to spend in the Item Mall. <b>1 CP = Rp 1.</b></p>
@@ -425,8 +425,9 @@ function donationHTML(){
   <label class="fld">1 · Choose an amount</label>
   <div class="amt-grid">`+amts+`</div>
 
-  <label class="fld">2 · Referral code <span class="fld-opt">(optional — adds bonus CP)</span></label>
+  <label class="fld">2 · Referral code <span class="fld-opt">(optional — +`+REFERRAL_BONUS_PCT+`% bonus CP)</span></label>
   <select class="inp" id="don-streamer" onchange="updateSummary()">`+streamerOpts+`</select>
+  <p class="hintline"><i class="ti ti-gift"></i> Pick your favourite streamer and get <b>+`+REFERRAL_BONUS_PCT+`% extra CP</b> — e.g. Rp 100.000 gives `+fmtNum(100000+Math.round(100000*REFERRAL_BONUS_PCT/100))+` CP.</p>
   <div class="don-guildrow">
     <select class="inp" id="don-guild" disabled>
       <option>Guild royalty — coming soon</option>
