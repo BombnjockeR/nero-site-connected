@@ -108,7 +108,7 @@ select.inp option{background:#101a2c;color:#fff}
 .rowlinks a{color:var(--muted);text-decoration:none}
 .rowlinks a:hover{color:var(--gold)}
 .amt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
-.amt{background:rgba(255,255,255,.06);border:1px solid var(--tline);border-radius:10px;padding:14px 8px;text-align:center;cursor:pointer;transition:.2s}
+.amt{background:rgba(255,255,255,.06);border:1px solid var(--tline);border-radius:10px;padding:14px 8px;text-align:center;cursor:pointer;transition:.2s;color:#fff;font:inherit;font-size:14px;font-weight:600}
 .amt:hover{background:rgba(228,184,75,.14)}
 .amt.sel{background:var(--gold);color:#1a1206;border-color:var(--gold);font-weight:600}
 .amt .cp{font-size:15px;font-weight:600}
