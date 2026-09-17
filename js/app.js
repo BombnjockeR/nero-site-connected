@@ -131,6 +131,7 @@ async function doLogin(){
   if(res&&res.ok){
     Auth.loggedIn=true; Auth.setUser(res.data.userid); Auth.setToken(res.data.token||'');
     renderAcct(); openPanel('account');
+    runAdminPage();
   }
   else panelMsg('login-msg',(res&&res.error)||'Could not sign in.',false);
 }
@@ -369,6 +370,7 @@ async function doLogout(){
   Auth.logout(); Auth.setToken('');
   renderAcct(); closePanel();
   if(location.pathname.indexOf('account.html')>-1) location.href=ROOT;
+  runAdminPage();
 }
 
 /* ---- Download ---- */
@@ -1744,6 +1746,17 @@ async function loadWoeMePage(){
     : noDataRow(cols,'No characters found on this account.');
 }
 
+/* Donation Admin lives in js/admin-donations.js; run it whenever its page is
+   on screen (first load, SPA arrival, sign-in, sign-out). */
+function runAdminPage(){
+  if(typeof admInit!=='function' || !document.getElementById('adm-gate')) return;
+  admInit().catch(function(e){
+    try{ console.error('[admin-donations]', e); }catch(_){}
+    var msg=document.getElementById('adm-gate-msg');
+    if(msg) msg.textContent='Could not load the dashboard. Check your connection and try again.';
+  });
+}
+
 /* ================= SPA ROUTER ================= */
 function afterPageLoad(){
   renderAcct();
@@ -1761,6 +1774,7 @@ function afterPageLoad(){
   loadWoeDates().then(hydrateTable);
   loadAccountPage();                /* account page, if we're on it */
   loadWoeMePage();                  /* WoE "My Status" tab, if we're on it */
+  runAdminPage();                   /* Donation Admin, if we're on it */
   enableSortableTables();           /* click-to-sort headers on any stat table present */
 
   /* pages like pages/register.html carry data-open-panel so a direct link
@@ -1781,6 +1795,25 @@ function afterPageLoad(){
 
   function samePage(a,b){ return a.split('#')[0]===b.split('#')[0]; }
 
+  function loadPageScripts(doc){
+    var have={};
+    document.querySelectorAll('script[src]').forEach(function(s){ have[s.src]=1; });
+    var want=[];
+    doc.querySelectorAll('script[src]').forEach(function(s){
+      var abs=new URL(s.getAttribute('src'), location.href).href;
+      if(!have[abs]) want.push(abs);
+    });
+    return want.reduce(function(p, src){
+      return p.then(function(){
+        return new Promise(function(resolve, reject){
+          var el=document.createElement('script');
+          el.src=src; el.onload=resolve; el.onerror=reject;
+          document.body.appendChild(el);
+        });
+      });
+    }, Promise.resolve());
+  }
+
   function swap(url,push){
     start();
     fetch(url,{credentials:'same-origin'}).then(function(r){
@@ -1798,8 +1831,11 @@ function afterPageLoad(){
       var t=doc.querySelector('title');
       if(t) document.title=t.textContent;
       window.scrollTo(0,0);
-      afterPageLoad();
-      done();
+      /* Page-only scripts (e.g. js/admin-donations.js) live outside #app, so a
+         swap never ran them and the page sat on "Loading…" until a refresh.
+         Load any external script the new page has that this document does not,
+         THEN run the page hooks. */
+      return loadPageScripts(doc).then(function(){ afterPageLoad(); done(); });
     }).catch(function(){ location.href=url; });   /* any problem -> normal navigation */
   }
 

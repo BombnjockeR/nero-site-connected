@@ -248,15 +248,11 @@ function admFind(ref){
   return null;
 }
 
-document.addEventListener('DOMContentLoaded', function(){
-  /* Any unexpected throw must still leave a readable page rather than the
-     stuck "Loading…" the markup starts with. */
-  admInit().catch(function(e){
-    try{ console.error('[admin-donations]', e); }catch(_){}
-    var msg = document.getElementById('adm-gate-msg');
-    if(msg) msg.textContent = 'Could not load the dashboard. Reload the page, or check the browser console.';
-  });
-});
+/* Direct load: app.js ran before this file was parsed, so start on DOM ready.
+   SPA arrival: app.js loads this file and then calls runAdminPage() itself. */
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', runAdminPage);
+}
 
 
 /* --- GM: manage streamers (qris.php streamers / streamer_save) ---------- */
