@@ -1790,15 +1790,20 @@ function afterPageLoad(){
 
   function samePage(a,b){ return a.split('#')[0]===b.split('#')[0]; }
 
+  /* every script path this tab has run, recorded before any swap can remove a tag */
+  var loadedScripts={};
+  document.querySelectorAll('script[src]').forEach(function(s){ loadedScripts[new URL(s.src).pathname]=1; });
+
   function loadPageScripts(doc){
-    /* compared by path, ignoring ?v=..., so a versioned tag never loads a
-       second copy of app.js / data.js */
-    var have={};
-    document.querySelectorAll('script[src]').forEach(function(s){ have[new URL(s.src).pathname]=1; });
+    /* Compared by path, ignoring ?v=..., against every script this tab has
+       ever run — not just the <script> tags still in the DOM: on some pages
+       (index.html) the tags sit inside #app, which the swap has just removed,
+       so the DOM alone would say "nothing loaded" and app.js would run twice. */
+    document.querySelectorAll('script[src]').forEach(function(s){ loadedScripts[new URL(s.src).pathname]=1; });
     var want=[];
     doc.querySelectorAll('script[src]').forEach(function(s){
       var u=new URL(s.getAttribute('src'), location.href);
-      if(!have[u.pathname]) want.push(u.href);
+      if(!loadedScripts[u.pathname]){ loadedScripts[u.pathname]=1; want.push(u.href); }
     });
     return want.reduce(function(p, src){
       return p.then(function(){
