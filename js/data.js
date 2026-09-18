@@ -83,7 +83,11 @@ var STREAMERS = [
 /* Referral bonus in percent; the bridge's _config.php ReferralBonusPct is the
    real value (loaded below), this is only the offline default. */
 var REFERRAL_BONUS_PCT = 10;
-const GUILDS    = [];   /* guild royalty referral — not enabled yet */
+/* Guild royalty referral: [{id, name}], GM-managed in the bridge
+   (referral_guilds, admin page -> Guilds). Empty = the picker shows
+   "coming soon". GUILD_BONUS_PCT is the bridge's GuildReferralBonusPct. */
+var GUILDS = [];
+var GUILD_BONUS_PCT = 10;
 
 /* Donation: CP and Rupiah are 1 : 1. Default only — NeroConfig.load() replaces
    this with bridge/_config.php [QRIS][TiersRp], which is what the bridge
@@ -144,6 +148,16 @@ const NeroConfig = {
                                   old_codes: Array.isArray(s.old_codes) ? s.old_codes.map(String) : []}; });
       /* an empty list is a legitimate answer here — "no streamers right now" */
       STREAMERS = st; changed = true;
+    }
+
+    if(Array.isArray(d.guilds)){
+      GUILDS = d.guilds
+        .filter(function(g){ return g && Number(g.id) > 0 && g.name; })
+        .map(function(g){ return {id: Number(g.id), name: String(g.name)}; });
+      changed = true;
+    }
+    if(isFinite(Number(d.guild_bonus_pct)) && d.guild_bonus_pct !== null && d.guild_bonus_pct !== undefined){
+      GUILD_BONUS_PCT = Number(d.guild_bonus_pct); changed = true;
     }
 
     if(d.server && typeof d.server === 'object'){

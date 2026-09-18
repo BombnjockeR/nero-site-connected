@@ -59,6 +59,7 @@ async function admInit(){
     main.style.display = '';
     admRender(res.data);
     smLoad();
+    gmLoad();
     admRestoreTab();
     return;
   }
@@ -97,6 +98,7 @@ function admRender(d){
   admTiles(d.totals || {});
   admTable(d.rows || [], Number(d.ever_any || 0) === 0);
   admStreamers(d.streamers || []);
+  admGuildStats(d.guilds || []);
   if(d.truncated) admMsg('Showing the newest ' + (d.filters && d.filters.limit) +
                          ' only — narrow the period to see the rest.');
 }
@@ -131,7 +133,7 @@ function admTable(rows, neverAny){
     return;
   }
   tb.innerHTML = rows.map(function(r){
-    var cp    = (+r.credit_cp || 0) + (+r.bonus_cp || 0);
+    var cp    = (+r.credit_cp || 0) + (+r.bonus_cp || 0) + (+r.guild_bonus_cp || 0);
     var who   = r.userid ? escHtml(r.userid) : ('account ' + escHtml(String(r.account_id)));
     var ref   = escHtml(r.partner_reference_no);
     var proof = r.proof_url
@@ -152,7 +154,7 @@ function admTable(rows, neverAny){
       '<td>' + (r.source === 'manual' ? 'Manual' : 'QRIS') + proof + '</td>' +
       '<td>' + admRp(r.amount_rp) + '</td>' +
       '<td>' + admNum(cp) + '</td>' +
-      '<td>' + (r.streamer_code ? escHtml(r.streamer_code) : '—') + '</td>' +
+      '<td>' + ([r.streamer_code, r.guild_name ? 'Guild: ' + r.guild_name : ''].filter(Boolean).map(escHtml).join('<br>') || '—') + '</td>' +
       '<td>' + admBadge(r.status) + '</td>' +
       '<td class="adm-act" id="act-' + ref + '">' + action + '</td>' +
     '</tr>';
@@ -194,7 +196,7 @@ function admAsk(ref, mode){
   var cell = document.getElementById('act-' + ref);
   if(!row || !cell) return;
 
-  var cp  = (+row.credit_cp || 0) + (+row.bonus_cp || 0);
+  var cp  = (+row.credit_cp || 0) + (+row.bonus_cp || 0) + (+row.guild_bonus_cp || 0);
   var who = row.userid || ('account ' + row.account_id);
 
   var question = mode === 'confirm'
@@ -219,7 +221,7 @@ function admAsk(ref, mode){
 
 async function admDo(ref, mode){
   var row  = admFind(ref);
-  var cp   = row ? (+row.credit_cp || 0) + (+row.bonus_cp || 0) : 0;
+  var cp   = row ? (+row.credit_cp || 0) + (+row.bonus_cp || 0) + (+row.guild_bonus_cp || 0) : 0;
   var who  = (row && row.userid) || ('account ' + (row && row.account_id));
   var el   = document.getElementById('note-' + ref);
   var note = el ? el.value : '';
@@ -294,10 +296,46 @@ async function smLoad(){
       '<td>' + escHtml(s.name) + '</td>' +
       '<td>' + (s.account_id ? escHtml(String(s.account_id)) + (s.userid ? ' <span class="adm-ref">' + escHtml(s.userid) + '</span>' : '') : '<span class="adm-ref">not linked</span>') + '</td>' +
       '<td>' + (s.active ? '<span class="adm-badge ok">Active</span>' : '<span class="adm-badge muted">Inactive</span>') + '</td>' +
-      '<td><button class="btn-ghost sm-row-btn" onclick="smEdit(' + s.id + ')"><i class="ti ti-pencil"></i> Edit</button>' +
-      '<button class="btn-ghost sm-row-btn" onclick="smToggle(' + s.id + ')">' + (s.active ? 'Deactivate' : 'Activate') + '</button></td>' +
+      '<td id="sm-act-' + s.id + '">' + smButtons(s) + '</td>' +
     '</tr>';
   }).join('') : '<tr><td class="norow" colspan="5">No streamers yet. Register one above.</td></tr>';
+}
+
+function smButtons(s){
+  return '<button class="btn-ghost sm-row-btn" onclick="smEdit(' + s.id + ')"><i class="ti ti-pencil"></i> Edit</button>' +
+    '<button class="btn-ghost sm-row-btn" onclick="smToggle(' + s.id + ')">' + (s.active ? 'Deactivate' : 'Activate') + '</button>' +
+    '<button class="btn-ghost sm-row-btn" onclick="smAskDelete(' + s.id + ')"><i class="ti ti-trash"></i> Delete</button>';
+}
+
+/* Deleting cannot be undone from this page, so it is two-step and drawn inline
+   in the row - same reasoning as admAsk() above. */
+function smAskDelete(id){
+  var s = smFind(id);
+  var cell = document.getElementById('sm-act-' + id);
+  if(!s || !cell) return;
+  cell.innerHTML =
+    '<div class="adm-ask">' +
+      '<div class="adm-ask-q">Delete <b>' + escHtml(s.name) + '</b> (code <b>' + escHtml(s.code) + '</b>)? ' +
+        'The code stops working at once. Past donations keep their record.</div>' +
+      '<button class="adm-btn bad" onclick="smDelete(' + id + ')">Yes, delete</button>' +
+      '<button class="adm-btn" onclick="smCancelDelete(' + id + ')">Cancel</button>' +
+    '</div>';
+}
+
+function smCancelDelete(id){
+  var s = smFind(id);
+  var cell = document.getElementById('sm-act-' + id);
+  if(s && cell) cell.innerHTML = smButtons(s);
+}
+
+async function smDelete(id){
+  var cell = document.getElementById('sm-act-' + id);
+  if(cell) cell.innerHTML = '<span class="adm-by">Working...</span>';
+  var res = await NeroAPI.post('/qris.php', {action: 'streamer_delete', id: id});
+  await smLoad();
+  if(!res || !res.ok){ smMsg((res && res.error) || 'Could not delete the streamer.', false); return; }
+  if(Number(document.getElementById('sm-id').value) === id) smReset();
+  smMsg(res.data.name + ' (code ' + res.data.code + ') deleted.', true);
 }
 
 function smMsg(text, ok){
@@ -379,4 +417,146 @@ function admRestoreTab(){
   try{ want = sessionStorage.getItem('nero_adm_tab'); }catch(e){}
   var btn = want && document.querySelector('#adm-main .atab[data-t="' + want + '"]');
   if(btn) admTab(want, btn);
+}
+
+
+/* --- GM: manage guild referrals (qris.php guilds / guild_save / guild_delete) ---
+   A guild is registered by its LEADER's game account (account ID or login
+   name, e.g. dev_1); the bridge finds the guild whose master character is on
+   that account. Donors pick it on the donation page ("Guild royalty") for
+   +GuildReferralBonusPct CP, stacking with a streamer code, and the leader
+   account gets a Guild Referral tab on My Account. */
+
+var gmRows = [];
+
+async function gmLoad(){
+  var tb = document.querySelector('#gm-tbl tbody');
+  if(!tb) return;
+  var res = await NeroAPI.post('/qris.php?action=guilds', {});
+  if(!res || !res.ok){
+    tb.innerHTML = '<tr><td class="norow" colspan="5">' + escHtml(qrisErrorText(res)) + '</td></tr>';
+    return;
+  }
+  var pct = document.getElementById('gm-pct');
+  if(pct) pct.textContent = '+' + res.data.bonus_pct + '%';
+  gmRows = res.data.guilds || [];
+  tb.innerHTML = gmRows.length ? gmRows.map(function(g){
+    var ingame = g.guild_name
+      ? (g.guild_name !== g.name ? '<br><span class="adm-ref">in game: ' + escHtml(g.guild_name) + '</span>' : '')
+      : '<br><span class="adm-ref">guild no longer exists</span>';
+    return '<tr>' +
+      '<td><b>' + escHtml(g.name) + '</b>' + ingame + '</td>' +
+      '<td>' + escHtml(String(g.account_id)) + (g.userid ? ' <span class="adm-ref">' + escHtml(g.userid) + '</span>' : '') + '</td>' +
+      '<td>' + (g.guild_id ? escHtml(String(g.guild_id)) : '—') + '</td>' +
+      '<td>' + (g.active ? '<span class="adm-badge ok">Active</span>' : '<span class="adm-badge muted">Inactive</span>') + '</td>' +
+      '<td id="gm-act-' + g.id + '">' + gmButtons(g) + '</td>' +
+    '</tr>';
+  }).join('') : '<tr><td class="norow" colspan="5">No guilds yet. Register one above.</td></tr>';
+}
+
+function gmButtons(g){
+  return '<button class="btn-ghost sm-row-btn" onclick="gmEdit(' + g.id + ')"><i class="ti ti-pencil"></i> Edit</button>' +
+    '<button class="btn-ghost sm-row-btn" onclick="gmToggle(' + g.id + ')">' + (g.active ? 'Deactivate' : 'Activate') + '</button>' +
+    '<button class="btn-ghost sm-row-btn" onclick="gmAskDelete(' + g.id + ')"><i class="ti ti-trash"></i> Delete</button>';
+}
+
+function gmFind(id){
+  for(var i = 0; i < gmRows.length; i++) if(gmRows[i].id === id) return gmRows[i];
+  return null;
+}
+
+function gmMsg(text, ok){
+  var el = document.getElementById('gm-msg');
+  el.innerHTML = text ? '<p class="hintline" style="color:' + (ok ? '#8ce0b4' : '#f0a3a3') + '">' + escHtml(text) + '</p>' : '';
+}
+
+function gmReset(){
+  ['gm-id', 'gm-leader', 'gm-name'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('gm-active').value = '1';
+  document.getElementById('gm-save').innerHTML = '<i class="ti ti-shield-plus"></i> Register guild';
+  document.getElementById('gm-cancel').style.display = 'none';
+}
+
+function gmEdit(id){
+  var g = gmFind(id); if(!g) return;
+  document.getElementById('gm-id').value = g.id;
+  document.getElementById('gm-leader').value = g.userid || g.account_id;
+  document.getElementById('gm-name').value = g.name;
+  document.getElementById('gm-active').value = g.active ? '1' : '0';
+  document.getElementById('gm-save').innerHTML = '<i class="ti ti-device-floppy"></i> Save changes';
+  document.getElementById('gm-cancel').style.display = '';
+  gmMsg('', true);
+  document.getElementById('gm-leader').focus();
+}
+
+async function gmSend(payload, btn){
+  if(btn) btn.disabled = true;
+  var res = await NeroAPI.post('/qris.php', Object.assign({action: 'guild_save'}, payload));
+  if(btn) btn.disabled = false;
+  if(!res || !res.ok){ gmMsg((res && res.error) || 'Could not save the guild.', false); return false; }
+  var d = res.data;
+  gmMsg(d.name + ' saved — guild ' + d.guild_name + ' (master ' + d.master + '), leader account ' +
+        d.account_id + (d.userid ? ' (' + d.userid + ')' : '') + (d.active ? '.' : ', inactive.'), true);
+  await gmLoad();
+  return true;
+}
+
+async function gmSave(){
+  var payload = {
+    id:     Number(document.getElementById('gm-id').value) || 0,
+    leader: document.getElementById('gm-leader').value.trim(),
+    name:   document.getElementById('gm-name').value.trim(),
+    active: document.getElementById('gm-active').value === '1'
+  };
+  if(await gmSend(payload, document.getElementById('gm-save'))) gmReset();
+}
+
+async function gmToggle(id){
+  var g = gmFind(id); if(!g) return;
+  await gmSend({id: g.id, leader: String(g.account_id), name: g.name, active: !g.active});
+}
+
+/* Two-step, inline in the row - same reasoning as admAsk(). */
+function gmAskDelete(id){
+  var g = gmFind(id);
+  var cell = document.getElementById('gm-act-' + id);
+  if(!g || !cell) return;
+  cell.innerHTML =
+    '<div class="adm-ask">' +
+      '<div class="adm-ask-q">Delete guild <b>' + escHtml(g.name) + '</b>? Donors can no longer pick it. ' +
+        'Past donations keep their record.</div>' +
+      '<button class="adm-btn bad" onclick="gmDelete(' + id + ')">Yes, delete</button>' +
+      '<button class="adm-btn" onclick="gmCancelDelete(' + id + ')">Cancel</button>' +
+    '</div>';
+}
+
+function gmCancelDelete(id){
+  var g = gmFind(id);
+  var cell = document.getElementById('gm-act-' + id);
+  if(g && cell) cell.innerHTML = gmButtons(g);
+}
+
+async function gmDelete(id){
+  var cell = document.getElementById('gm-act-' + id);
+  if(cell) cell.innerHTML = '<span class="adm-by">Working...</span>';
+  var res = await NeroAPI.post('/qris.php', {action: 'guild_delete', id: id});
+  await gmLoad();
+  if(!res || !res.ok){ gmMsg((res && res.error) || 'Could not delete the guild.', false); return; }
+  if(Number(document.getElementById('gm-id').value) === id) gmReset();
+  gmMsg(res.data.name + ' deleted.', true);
+}
+
+/* Paid donations per guild for the period picked on the Donations tab. */
+function admGuildStats(list){
+  var el = document.getElementById('adm-guilds');
+  if(!el) return;
+  el.innerHTML = '<h2 class="adm-h2"><i class="ti ti-chart-bar"></i> Guild referral performance</h2>' +
+    (list.length
+      ? '<p class="subtitle" style="margin:0 0 10px">Paid donations per guild, for the period picked on the Donations tab.</p>' +
+        '<div class="tbl-wrap"><table class="stat"><thead><tr><th>Guild</th><th>Paid donations</th><th>Total</th></tr></thead><tbody>' +
+        list.map(function(g){
+          return '<tr><td>' + escHtml(g.guild_name || ('#' + g.guild_ref_id)) + '</td><td>' + admNum(g.n) +
+                 '</td><td>' + admRp(g.rp) + '</td></tr>';
+        }).join('') + '</tbody></table></div>'
+      : '<p class="subtitle">No paid donations with a guild picked in the period picked on the Donations tab.</p>');
 }

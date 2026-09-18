@@ -421,6 +421,11 @@ function donationHTML(){
     var was=(s.old_codes&&s.old_codes.length) ? ', was '+s.old_codes.map(escHtml).join(' / ') : '';
     return '<option value="'+escHtml(s.code)+'" data-name="'+escHtml(s.name)+'">'+escHtml(s.name)+' — Code '+escHtml(s.code)+was+' (+'+REFERRAL_BONUS_PCT+'% CP)</option>';
   }).join('');
+  var guildOpts=GUILDS.length
+    ? '<option value="">None</option>'+GUILDS.map(function(g){
+        return '<option value="'+g.id+'" data-name="'+escHtml(g.name)+'">'+escHtml(g.name)+' (+'+GUILD_BONUS_PCT+'% CP)</option>';
+      }).join('')
+    : '<option value="">Guild royalty — coming soon</option>';
   return `
   <p class="lead">Support NeRO and get Cash Points to spend in the Item Mall. <b>1 CP = Rp 1.</b></p>
   <div id="don-msg"></div>
@@ -431,10 +436,9 @@ function donationHTML(){
   <label class="fld">2 · Referral code <span class="fld-opt">(optional — +`+REFERRAL_BONUS_PCT+`% bonus CP)</span></label>
   <select class="inp" id="don-streamer" onchange="updateSummary()">`+streamerOpts+`</select>
   <p class="hintline"><i class="ti ti-gift"></i> Pick your favourite streamer and get <b>+`+REFERRAL_BONUS_PCT+`% extra CP</b> — e.g. Rp 100.000 gives `+fmtNum(100000+Math.round(100000*REFERRAL_BONUS_PCT/100))+` CP.</p>
+  <label class="fld">3 · Guild royalty <span class="fld-opt">(optional — +`+GUILD_BONUS_PCT+`% bonus CP, stacks with a streamer)</span></label>
   <div class="don-guildrow">
-    <select class="inp" id="don-guild" disabled>
-      <option>Guild royalty — coming soon</option>
-    </select>
+    <select class="inp" id="don-guild" onchange="updateSummary()"`+(GUILDS.length?'':' disabled')+`>`+guildOpts+`</select>
   </div>
 
   <div class="don-summary" id="don-summary">Select an amount to see your total.</div>
@@ -501,7 +505,8 @@ async function donClaim(){
   var res=await NeroAPI.post('/qris.php',{
     action:'claim',
     amount:DONATE_AMOUNTS[selAmt].cp,
-    streamer:(document.getElementById('don-streamer')||{}).value||''
+    streamer:(document.getElementById('don-streamer')||{}).value||'',
+    guild:Number((document.getElementById('don-guild')||{}).value)||0
   });
   if(btn){ btn.disabled=false; btn.innerHTML='<i class="ti ti-receipt"></i> I have paid — get my reference'; }
 
@@ -544,15 +549,19 @@ function updateSummary(){
   var code=sel.value;
   var name=code ? sel.options[sel.selectedIndex].getAttribute('data-name') : '';
   var bonus=code?Math.round(cp*REFERRAL_BONUS_PCT/100):0;
+  var gsel=document.getElementById('don-guild');
+  var gid=gsel?Number(gsel.value)||0:0;
+  var gname=gid?gsel.options[gsel.selectedIndex].getAttribute('data-name'):'';
+  var gbonus=gid?Math.round(cp*GUILD_BONUS_PCT/100):0;
   /* The donor pays exactly the tier; the referral is recorded on the donation
      row by the bridge, so the code is no longer added to the rupiah amount. */
   var payTotal=cp;
   box.innerHTML='Base: <b>'+fmtNum(cp)+' CP</b><br>'+
     (code?'Streamer bonus (+'+REFERRAL_BONUS_PCT+'%): <b>+'+fmtNum(bonus)+' CP</b> → '+escHtml(name)+' (code '+escHtml(code)+')<br>':'')+
+    (gid?'Guild bonus (+'+GUILD_BONUS_PCT+'%): <b>+'+fmtNum(gbonus)+' CP</b> → '+escHtml(gname)+'<br>':'')+
     '<hr class="don-hr">'+
-    'You receive: <b class="don-total">'+fmtNum(cp+bonus)+' CP</b><br>'+
-    'You pay: <b>'+fmtRp(payTotal)+'</b>'+
-    (code?' <span class="don-kode">· last 3 digits = code '+code+'</span>':'');
+    'You receive: <b class="don-total">'+fmtNum(cp+bonus+gbonus)+' CP</b><br>'+
+    'You pay: <b>'+fmtRp(payTotal)+'</b>';
   if(pay){
     pay.style.display='';
     var pa=document.getElementById('don-payamt');
@@ -605,10 +614,11 @@ async function qrisGenerate(){
   if(!qrisAvailable) return qrisShowFallback('Automatic QRIS is temporarily unavailable. Use the QR below.');
   var cp=DONATE_AMOUNTS[selAmt].cp;
   var code=(document.getElementById('don-streamer')||{}).value||'';
+  var guild=Number((document.getElementById('don-guild')||{}).value)||0;
 
   var btn=document.getElementById('don-generate'); if(btn){ btn.disabled=true; btn.textContent='Generating…'; }
   panelMsg('don-msg','',true);
-  var res=await NeroAPI.post('/qris.php',{action:'create',amount:cp,streamer:code});
+  var res=await NeroAPI.post('/qris.php',{action:'create',amount:cp,streamer:code,guild:guild});
   if(btn){ btn.disabled=false; btn.innerHTML='<i class="ti ti-qrcode"></i> Generate QRIS'; }
   if(!res||!res.ok){
     /* QRIS backend not live / failed: fall back to manual Discord flow. */
@@ -727,7 +737,7 @@ async function qrisCheckStatus(ref, amountRp){
     var s=(res.data.status||'').toLowerCase();
     if(s==='paid'||s==='success'||s==='completed'||s==='settlement'){
       qrisStopPolling();
-      st.innerHTML='<i class="ti ti-circle-check" style="color:#7ee787"></i> Payment received! <b>'+fmtNum(res.data.credit_cp+(res.data.bonus_cp||0))+' CP</b> added to <b>'+escHtml(Auth.user()||'')+'</b>\'s Cash Points. Relog in game to see your new balance.';
+      st.innerHTML='<i class="ti ti-circle-check" style="color:#7ee787"></i> Payment received! <b>'+fmtNum(res.data.credit_cp+(res.data.bonus_cp||0)+(res.data.guild_bonus_cp||0))+' CP</b> added to <b>'+escHtml(Auth.user()||'')+'</b>\'s Cash Points. Relog in game to see your new balance.';
       if(typeof loadAccountPanel==='function') loadAccountPanel();
       return;
     }
@@ -1075,6 +1085,7 @@ async function loadAccountPage(){
   var d = await NeroAPI.get('me');
   var demo = !d;
   loadReferral();
+  loadGuildReferral();
 
   var name = (d && d.account && d.account.userid) || Auth.user() || 'Adventurer';
   var mail = (d && d.account && d.account.email) || (demo ? 'not connected' : '—');
@@ -1147,8 +1158,8 @@ async function loadAccountPage(){
           '<td><code>'+x.ref+'</code></td>'+
           '<td>'+fmtRp(Number(x.amount_rp))+'</td>'+
           '<td>'+fmtNum(x.credit_cp)+'</td>'+
-          '<td>'+(Number(x.bonus_cp)>0?'+'+fmtNum(x.bonus_cp):'—')+'</td>'+
-          '<td>'+support+'</td>'+
+          '<td>'+((Number(x.bonus_cp)||0)+(Number(x.guild_bonus_cp)||0)>0?'+'+fmtNum((Number(x.bonus_cp)||0)+(Number(x.guild_bonus_cp)||0)):'—')+'</td>'+
+          '<td>'+escHtml(support)+'</td>'+
           '<td><span class="pill '+cls+'">'+st.charAt(0).toUpperCase()+st.slice(1)+'</span></td>'+
         '</tr>';
       }).join('');
@@ -1199,6 +1210,44 @@ async function loadReferral(){
       '<td>+'+fmtNum(x.bonus_cp)+' CP'+(x.bonus_pct?' <span class="pill paid">'+x.bonus_pct+'%</span>':'')+'</td>'+
     '</tr>';
   }).join('') : '<tr><td colspan="4" class="norow">No donations with your code in this period yet.</td></tr>';
+}
+
+/* ---- Guild Referral tab: shown only to the leader account of a guild
+   registered by a GM (bridge referral_guilds) ---- */
+async function loadGuildReferral(){
+  var tabBtn=document.getElementById('atab-guildref');
+  if(!tabBtn) return;
+  var sel=document.getElementById('gr-period');
+  var period=sel ? sel.value : 'all';
+  var r=await NeroAPI.get('guild_referral',{period:period});
+  if(!r || !r.is_guild){
+    tabBtn.style.display='none';
+    var panel=document.getElementById('tab-guildref');
+    if(panel && panel.classList.contains('show')){
+      var first=document.querySelector('.atab[data-t="details"]'); acctTab('details',first);
+    }
+    return;
+  }
+  tabBtn.style.display='';
+  var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+  set('gr-name', r.guild.name);
+  set('gr-pct', '+'+r.guild.bonus_pct+'%');
+  set('gr-count', fmtNum(r.summary.paid_donations));
+  set('gr-donors', fmtNum(r.summary.unique_donors));
+  set('gr-rp', fmtRp(r.summary.total_rp));
+  set('gr-bonus', fmtNum(r.summary.total_bonus_cp)+' CP');
+
+  var tb=document.querySelector('#gr-table tbody');
+  if(!tb) return;
+  var rows=r.rows||[];
+  tb.innerHTML = rows.length ? rows.map(function(x){
+    return '<tr>'+
+      '<td>'+escHtml(x.paid_at)+'</td>'+
+      '<td><b>'+escHtml(x.donor)+'</b></td>'+
+      '<td>'+fmtRp(x.amount_rp)+'</td>'+
+      '<td>+'+fmtNum(x.bonus_cp)+' CP'+(x.bonus_pct?' <span class="pill paid">'+x.bonus_pct+'%</span>':'')+'</td>'+
+    '</tr>';
+  }).join('') : '<tr><td colspan="4" class="norow">No donations for your guild in this period yet.</td></tr>';
 }
 
 function copyReferralCode(btn){

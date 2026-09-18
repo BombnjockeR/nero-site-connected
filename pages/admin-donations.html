@@ -39,6 +39,7 @@
     <div class="acct-tabs">
       <button class="atab on" data-t="donations" onclick="admTab('donations',this)"><i class="ti ti-receipt"></i> Donations</button>
       <button class="atab" data-t="streamers" onclick="admTab('streamers',this)"><i class="ti ti-speakerphone"></i> Streamers</button>
+      <button class="atab" data-t="guilds" onclick="admTab('guilds',this)"><i class="ti ti-shield"></i> Guilds</button>
     </div>
 
     <!-- ============ TAB: DONATIONS ============ -->
@@ -130,6 +131,44 @@
     </div>
 
     <div id="adm-streamers"></div>
+    </section>
+
+    <!-- ============ TAB: GUILDS ============ -->
+    <section class="atab-panel" id="adm-tab-guilds">
+    <p class="subtitle">Register a guild by its leader's game account. Donors who pick the guild under
+      <b>Guild royalty</b> on the donation page get <b id="gm-pct">+10%</b> bonus CP (on top of any streamer bonus),
+      and the leader's account sees who donated in its <b>Guild Referral</b> tab on My Account.</p>
+
+    <h2 class="adm-h2"><i class="ti ti-shield-plus"></i> Register guild</h2>
+    <div class="form-card sm-card">
+      <input type="hidden" id="gm-id" value="">
+      <div class="sm-grid">
+        <label class="adm-fld">Guild leader (account ID or login)
+          <input class="inp" id="gm-leader" maxlength="32" placeholder="e.g. dev_1 or 2000000">
+        </label>
+        <label class="adm-fld">Display name
+          <input class="inp" id="gm-name" maxlength="64" placeholder="blank = in-game guild name">
+        </label>
+        <label class="adm-fld sm-active">Active
+          <select class="inp" id="gm-active"><option value="1">Yes</option><option value="0">No</option></select>
+        </label>
+      </div>
+      <div class="sm-actions">
+        <button class="btn-gold" id="gm-save" onclick="gmSave()"><i class="ti ti-shield-plus"></i> Register guild</button>
+        <span class="adm-ref sm-hint">The guild is the one whose guild master is a character on that account.</span>
+        <button class="btn-ghost" id="gm-cancel" style="display:none" onclick="gmReset()">Cancel edit</button>
+      </div>
+      <div id="gm-msg"></div>
+    </div>
+    <h2 class="adm-h2"><i class="ti ti-list"></i> All guilds</h2>
+    <div class="tbl-wrap">
+      <table class="stat" id="gm-tbl">
+        <thead><tr><th>Guild</th><th>Leader account</th><th>Guild ID</th><th>Status</th><th></th></tr></thead>
+        <tbody><tr><td class="norow" colspan="5">Loading…</td></tr></tbody>
+      </table>
+    </div>
+
+    <div id="adm-guilds"></div>
     </section>
   </div>
 </div>

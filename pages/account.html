@@ -33,6 +33,7 @@
       <button class="atab"    data-t="security" onclick="acctTab('security',this)"><i class="ti ti-lock"></i> Security</button>
       <button class="atab"    data-t="donation" onclick="acctTab('donation',this)"><i class="ti ti-heart"></i> Donations &amp; CP</button>
       <button class="atab"    data-t="referral" id="atab-referral" style="display:none" onclick="acctTab('referral',this)"><i class="ti ti-speakerphone"></i> Referral</button>
+      <button class="atab"    data-t="guildref" id="atab-guildref" style="display:none" onclick="acctTab('guildref',this)"><i class="ti ti-shield"></i> Guild Referral</button>
     </div>
 
     <!-- ============ TAB 1 : ACCOUNT DETAILS ============ -->
@@ -176,6 +177,43 @@
 
       <div class="tbl-wrap">
         <table class="stat big" id="rf-table">
+          <thead><tr><th>Date</th><th>Donor</th><th>Amount</th><th>Bonus</th></tr></thead>
+          <tbody><tr><td colspan="4" class="norow">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="subtitle" style="margin-top:14px">
+        Only paid donations are listed. Donors are shown by their highest-level character.
+      </p>
+    </section>
+
+    <!-- ============ TAB 5 : GUILD REFERRAL (registered guild leaders only) ============ -->
+    <section class="atab-panel" id="tab-guildref">
+      <div class="cp-banner">
+        <div>
+          <span class="cp-label">Guild royalty</span>
+          <span class="cp-value" id="gr-name">—</span>
+          <span class="pstat-sub">Donors who pick your guild on the donation page get <b id="gr-pct">+10%</b> extra CP.</span>
+        </div>
+      </div>
+
+      <div class="rf-head">
+        <h2 class="sec-title"><i class="ti ti-chart-bar"></i> Your guild's supporters</h2>
+        <select class="inp rf-period" id="gr-period" onchange="loadGuildReferral()">
+          <option value="this_month">This month</option>
+          <option value="last_month">Last month</option>
+          <option value="all" selected>All time</option>
+        </select>
+      </div>
+
+      <div class="info-row">
+        <div class="info-item"><span>Donations</span><b id="gr-count">—</b></div>
+        <div class="info-item"><span>Unique donors</span><b id="gr-donors">—</b></div>
+        <div class="info-item"><span>Total donated</span><b id="gr-rp">—</b></div>
+        <div class="info-item"><span>Bonus CP given</span><b id="gr-bonus">—</b></div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table class="stat big" id="gr-table">
           <thead><tr><th>Date</th><th>Donor</th><th>Amount</th><th>Bonus</th></tr></thead>
           <tbody><tr><td colspan="4" class="norow">Loading…</td></tr></tbody>
         </table>
