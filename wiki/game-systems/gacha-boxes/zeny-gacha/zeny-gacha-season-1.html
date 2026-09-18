@@ -19,37 +19,141 @@
     <div class="wk-drawer-head"><span>Contents</span>
       <button class="wk-close" onclick="wikiNav(false)" aria-label="Close menu"><i class="ti ti-x"></i></button>
     </div>
-    <div class="wk-search"><i class="ti ti-search"></i><input id="wikisearch" placeholder="Search the wiki..." oninput="wikiSearch()" autocomplete="off"></div><div class="wk-results" id="wk-results"></div><div class="wk-nav" id="wk-nav"><a class="wk-home" href="../../../../wiki/index.html"><i class="ti ti-home"></i> Welcome to NeRO</a><div class="grp">Getting Started</div><a class="" href="../../../../wiki/getting-started/server-information.html">Server Information</a><a class="" href="../../../../wiki/getting-started/starter-rewards.html">New Player Start</a><a class="" href="../../../../wiki/getting-started/player-commands.html">Player Commands</a><a class="" href="../../../../wiki/getting-started/vip.html">VIP Benefits</a><div class="grp">Game Systems</div><a class="" href="../../../../wiki/game-systems/refine-system.html">Refine System</a><div class="wk-group"><div class="wk-grouprow"><a class="wk-grouplink" href="../../../../wiki/game-systems/equipment-options/index.html">Equipment Options</a><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Equipment Options"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" href="../../../../wiki/game-systems/equipment-options/weapon.html">Weapon</a><a class="sub" href="../../../../wiki/game-systems/equipment-options/armor.html">Armor</a><a class="sub" href="../../../../wiki/game-systems/equipment-options/shield.html">Shield</a><a class="sub" href="../../../../wiki/game-systems/equipment-options/garment.html">Garment</a><a class="sub" href="../../../../wiki/game-systems/equipment-options/shoes.html">Shoes</a></div></div><div class="wk-group"><div class="wk-grouprow"><a class="wk-grouplink" href="../../../../wiki/game-systems/era-options/index.html">Era Options</a><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Era Options"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" href="../../../../wiki/game-systems/era-options/power.html">Power</a><a class="sub" href="../../../../wiki/game-systems/era-options/arcane.html">Arcane</a><a class="sub" href="../../../../wiki/game-systems/era-options/guardian.html">Guardian</a><a class="sub" href="../../../../wiki/game-systems/era-options/ascension.html">Ascension</a></div></div><div class="wk-group"><div class="wk-grouprow"><a class="wk-grouplink" href="../../../../wiki/game-systems/shadow-equipment/index.html">Shadow Equipment</a><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Shadow Equipment"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" href="../../../../wiki/game-systems/shadow-equipment/status-sets.html">Status Sets</a><a class="sub" href="../../../../wiki/game-systems/shadow-equipment/offense-sets.html">Offense Sets</a><a class="sub" href="../../../../wiki/game-systems/shadow-equipment/lifesteal-sets.html">Lifesteal Sets</a><a class="sub" href="../../../../wiki/game-systems/shadow-equipment/earring-shadow.html">Earring Shadow</a></div></div><div class="wk-group open"><div class="wk-grouprow"><a class="wk-grouplink" href="../../../../wiki/game-systems/gacha-boxes/index.html">Gacha Boxes</a><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Gacha Boxes"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" href="../../../../wiki/game-systems/gacha-boxes/era-relic-scroll/index.html">Era Relic Scroll</a><a class="sub" style="padding-left:40px" href="../../../../wiki/game-systems/gacha-boxes/era-relic-scroll/era-relic-scroll-season-1.html">Era Relic Scroll Season 1</a><a class="sub" href="../../../../wiki/game-systems/gacha-boxes/zeny-gacha/index.html">Zeny Gacha</a><a class="sub active" style="padding-left:40px" href="../../../../wiki/game-systems/gacha-boxes/zeny-gacha/zeny-gacha-season-1.html">Zeny Gacha Season 1</a><a class="sub" href="../../../../wiki/game-systems/gacha-boxes/dungeon-treasure/index.html">Dungeon Treasure</a><a class="sub" style="padding-left:40px" href="../../../../wiki/game-systems/gacha-boxes/dungeon-treasure/common-dungeon-treasure.html">Common Dungeon Treasure</a></div></div><a class="" href="../../../../wiki/game-systems/mvp-card-deposit.html">MVP Card Deposit &amp; Resonance</a><div class="wk-group"><div class="wk-grouprow"><a class="wk-grouplink" href="../../../../wiki/game-systems/currencies/index.html">Currencies &amp; Valuable Tokens</a><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Currencies &amp; Valuable Tokens"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" href="../../../../wiki/game-systems/currencies/nero-token.html">Nero Token</a><a class="sub" href="../../../../wiki/game-systems/currencies/nero-shadow-orb.html">Nero Shadow Orb</a><a class="sub" href="../../../../wiki/game-systems/currencies/nero-dungeon-scrap.html">Nero Dungeon Scrap</a><a class="sub" href="../../../../wiki/game-systems/currencies/nero-premium-token.html">Nero Premium Token</a></div></div><div class="grp">Reward Exchange</div><a class="" href="../../../../wiki/reward-exchange/pvp-and-ranks.html">Battle System</a><a class="" href="../../../../wiki/reward-exchange/pvp-and-mvp-points.html">PVP &amp; MVP Points</a><div class="grp">Content &amp; Progression</div><a class="" href="../../../../wiki/content-and-progression/battle-pass.html">Battle Pass</a><a class="" href="../../../../wiki/content-and-progression/endless-tower.html">Endless Tower</a><a class="" href="../../../../wiki/content-and-progression/instances.html">Instances &amp; Dungeons</a></div>
+    <div class="wk-search"><i class="ti ti-search"></i><input id="wikisearch" placeholder="Search the wiki..." oninput="wikiSearch()" autocomplete="off"></div><div class="wk-results" id="wk-results"></div><div class="wk-nav" id="wk-nav"><a class="wk-home" href="../../../../wiki/index.html"><i class="ti ti-home"></i> Welcome to NeRO</a><div class="grp">Getting Started</div><a class="" href="../../../../wiki/getting-started/server-information.html">Server Information</a><a class="" href="../../../../wiki/getting-started/starter-rewards.html">New Player Start</a><a class="" href="../../../../wiki/getting-started/player-commands.html">Player Commands</a><a class="" href="../../../../wiki/getting-started/vip.html">VIP Benefits</a><div class="grp">Game Systems</div><a class="" href="../../../../wiki/game-systems/refine-system.html">Refine System</a><div class="wk-group"><div class="wk-grouprow"><a class="wk-grouplink" href="../../../../wiki/game-systems/equipment-options/index.html">Equipment Options</a><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Equipment Options"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" href="../../../../wiki/game-systems/equipment-options/weapon.html">Weapon</a><a class="sub" href="../../../../wiki/game-systems/equipment-options/armor.html">Armor</a><a class="sub" href="../../../../wiki/game-systems/equipment-options/shield.html">Shield</a><a class="sub" href="../../../../wiki/game-systems/equipment-options/garment.html">Garment</a><a class="sub" href="../../../../wiki/game-systems/equipment-options/shoes.html">Shoes</a></div></div><div class="wk-group"><div class="wk-grouprow"><a class="wk-grouplink" href="../../../../wiki/game-systems/era-options/index.html">Era Options</a><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Era Options"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" href="../../../../wiki/game-systems/era-options/power.html">Power</a><a class="sub" href="../../../../wiki/game-systems/era-options/arcane.html">Arcane</a><a class="sub" href="../../../../wiki/game-systems/era-options/guardian.html">Guardian</a><a class="sub" href="../../../../wiki/game-systems/era-options/ascension.html">Ascension</a></div></div><div class="wk-group"><div class="wk-grouprow"><a class="wk-grouplink" href="../../../../wiki/game-systems/shadow-equipment/index.html">Shadow Equipment</a><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Shadow Equipment"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" href="../../../../wiki/game-systems/shadow-equipment/status-sets.html">Status Sets</a><a class="sub" href="../../../../wiki/game-systems/shadow-equipment/offense-sets.html">Offense Sets</a><a class="sub" href="../../../../wiki/game-systems/shadow-equipment/lifesteal-sets.html">Lifesteal Sets</a><a class="sub" href="../../../../wiki/game-systems/shadow-equipment/earring-shadow.html">Earring Shadow</a></div></div><div class="wk-group open"><div class="wk-grouprow"><span class="wk-grouplink wk-toggleonly" onclick="wkToggleGroup(this)" style="cursor:pointer;flex:1">Gacha Boxes</span><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Gacha Boxes"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><div class="wk-group wk-subgroup"><div class="wk-grouprow"><span class="sub wk-toggleonly" onclick="wkToggleGroup(this)" style="cursor:pointer;flex:1">Era Relic Scroll</span><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Era Relic Scroll"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" style="padding-left:40px" href="../../../../wiki/game-systems/gacha-boxes/era-relic-scroll/era-relic-scroll-season-1.html">Era Relic Scroll Season 1</a></div></div><div class="wk-group wk-subgroup open"><div class="wk-grouprow"><span class="sub wk-toggleonly" onclick="wkToggleGroup(this)" style="cursor:pointer;flex:1">Zeny Gacha</span><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Zeny Gacha"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub active" style="padding-left:40px" href="../../../../wiki/game-systems/gacha-boxes/zeny-gacha/zeny-gacha-season-1.html">Zeny Gacha Season 1</a></div></div><div class="wk-group wk-subgroup"><div class="wk-grouprow"><span class="sub wk-toggleonly" onclick="wkToggleGroup(this)" style="cursor:pointer;flex:1">Dungeon Treasure</span><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Dungeon Treasure"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" style="padding-left:40px" href="../../../../wiki/game-systems/gacha-boxes/dungeon-treasure/common-dungeon-treasure.html">Common Dungeon Treasure</a></div></div></div></div><a class="" href="../../../../wiki/game-systems/mvp-card-deposit.html">MVP Card Deposit &amp; Resonance</a><div class="wk-group"><div class="wk-grouprow"><a class="wk-grouplink" href="../../../../wiki/game-systems/currencies/index.html">Currencies &amp; Valuable Tokens</a><button class="wk-chevbtn" onclick="wkToggleGroup(this)" aria-label="Toggle Currencies &amp; Valuable Tokens"><i class="ti ti-chevron-down"></i></button></div><div class="wk-subwrap"><a class="sub" href="../../../../wiki/game-systems/currencies/nero-token.html">Nero Token</a><a class="sub" href="../../../../wiki/game-systems/currencies/nero-shadow-orb.html">Nero Shadow Orb</a><a class="sub" href="../../../../wiki/game-systems/currencies/nero-dungeon-scrap.html">Nero Dungeon Scrap</a><a class="sub" href="../../../../wiki/game-systems/currencies/nero-premium-token.html">Nero Premium Token</a></div></div><div class="grp">Reward Exchange</div><a class="" href="../../../../wiki/reward-exchange/pvp-and-ranks.html">Battle System</a><a class="" href="../../../../wiki/reward-exchange/pvp-and-mvp-points.html">PVP &amp; MVP Points</a><div class="grp">Content &amp; Progression</div><a class="" href="../../../../wiki/content-and-progression/battle-pass.html">Battle Pass</a><a class="" href="../../../../wiki/content-and-progression/endless-tower.html">Endless Tower</a><a class="" href="../../../../wiki/content-and-progression/instances.html">Instances &amp; Dungeons</a></div>
   </nav>
   <div class="wk-scrim" id="wk-scrim" onclick="wikiNav(false)"></div>
   <main class="wiki-main" id="wiki-main" data-title="Zeny Gacha Season 1">
     <button class="wk-openbtn" onclick="wikiNav(true)"><i class="ti ti-menu-2"></i> Wiki Contents</button>
 <h1 id="zeny-gacha-season-1">Zeny Gacha Season 1</h1>
-<p><strong>Costume</strong> • Hellboy Blood Horn [ATK +1% MATK +1%] • Hellboy Scarfblade [Weight Limit +100] • Hellboy Aura ritual [All Stats +1] • Hellboy Wing of Devil [Weight Limit +250]</p>
-<p><strong>Hellboy Set Bonus</strong></p>
-<pre><code>When Upper, Middle, Lower &amp; Garment are equipped:
-All Stats +1
-Reduce Damage Demi Human 2%
-Drop Rate +10%
-EXP Rate +10%
-Movement Speed +10%
-</code></pre>
-<p><strong>Costume</strong> • Costume Drooping Toothless • Costume Mini toothless • Toothless Night Aura • Costume Toothless Wings</p>
-<p><strong>Toothless Set Bonus</strong></p>
-<pre><code>When Upper, Middle, Lower &amp; Garment are equipped:
-Drop Rate +5%
-EXP Rate +5%
-Movement Speed +10%
-</code></pre>
-<p><strong>Costume</strong> • Pink Helm • Pink Vespa • Pink Aura • Pink Cinnamoroll</p>
-<p><strong>Pink Paradise Set Bonus</strong></p>
-<pre><code>When Upper, Middle, Lower &amp; Garment are equipped:
-Drop Rate +5%
-EXP Rate +5%
-Movement Speed +10%
-</code></pre>
-<p><strong>Usable/Consumable</strong> •STR Dish +10 (not item mall) •AGI Dish +10 (not item mall) •VIT Dish +10 (not item mall) •INT Dish +10 (not item mall) •DEX Dish +10 (not item mall) •LUK Dish +10 (not item mall) •Yggdrasil Berry •Yggdrasil Seed •Speed Potion •Box of Gloom •Box of Resentment •Box of Drowsiness •Box of Thunder •Battle Manual •Job Battle Manual •Bloody Branch •Poison Bottle •Acid Bottle •Fire Bottle •Dead Branch Box</p>
-<p><strong>ETC</strong> •Era Dungeon Scrap •Oridecon •Elunium</p>  </main>
+<p>Obtained with <strong>Zeny</strong>. Rates shown are the roll chance for each rarity tier.</p>
+<h3 id="drop-rates">Drop Rates</h3>
+<div class="tbl-wrap"><table>
+<thead>
+<tr>
+<th>Rarity</th>
+<th>Chance</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mythic</td>
+<td>0.3%</td>
+<td>Wings</td>
+</tr>
+<tr>
+<td>Legendary</td>
+<td>1.2%</td>
+<td>Costumes (Upper / Mid / Lower / Garment)</td>
+</tr>
+<tr>
+<td>Epic</td>
+<td>6%</td>
+<td>Headgears, Bloody Branch</td>
+</tr>
+<tr>
+<td>Rare</td>
+<td>15%</td>
+<td>+10 Stat Dishes, Yggdrasil Berry, Status boxes</td>
+</tr>
+<tr>
+<td>Common</td>
+<td>77.5%</td>
+<td>Nero Dungeon Scrap, Yggdrasil Seed, potions, Oridecon, Elunium</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="costume-hellboy-set">Costume — Hellboy Set</h3>
+<div class="tbl-wrap"><table>
+<thead>
+<tr>
+<th class="cos-th">Preview</th>
+<th>Piece</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cos-cell" rowspan="4"><div class="cos-frame"><img class="cos-ph" src="../../../../assets/logo.png" alt="Hellboy preview"><span class="cos-soon">GIF soon</span></div><div class="cos-name">Hellboy</div></td>
+<td>Hellboy Blood Horn</td>
+<td>ATK +1%, MATK +1%</td>
+</tr>
+<tr>
+<td>Hellboy Scarfblade</td>
+<td>Weight Limit +100</td>
+</tr>
+<tr>
+<td>Hellboy Aura Ritual</td>
+<td>All Stats +1</td>
+</tr>
+<tr>
+<td>Hellboy Wing of Devil</td>
+<td>Weight Limit +250</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Set Bonus</strong> (Upper + Middle + Lower + Garment equipped): All Stats +1 · Reduce Damage from Demi-Human 2% · Drop Rate +10% · EXP Rate +10% · Movement Speed +10%</p>
+<h3 id="costume-toothless-set">Costume — Toothless Set</h3>
+<div class="tbl-wrap"><table>
+<thead>
+<tr>
+<th class="cos-th">Preview</th>
+<th>Piece</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cos-cell" rowspan="4"><div class="cos-frame"><img class="cos-ph" src="../../../../assets/logo.png" alt="Toothless preview"><span class="cos-soon">GIF soon</span></div><div class="cos-name">Toothless</div></td>
+<td>Costume Drooping Toothless</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Costume Mini Toothless</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Toothless Night Aura</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Costume Toothless Wings</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Set Bonus</strong> (Upper + Middle + Lower + Garment equipped): Drop Rate +5% · EXP Rate +5% · Movement Speed +10%</p>
+<h3 id="costume-pink-paradise-set">Costume — Pink Paradise Set</h3>
+<div class="tbl-wrap"><table>
+<thead>
+<tr>
+<th class="cos-th">Preview</th>
+<th>Piece</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cos-cell" rowspan="4"><div class="cos-frame"><img class="cos-ph" src="../../../../assets/logo.png" alt="Pink Paradise preview"><span class="cos-soon">GIF soon</span></div><div class="cos-name">Pink Paradise</div></td>
+<td>Pink Helm</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Pink Vespa</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Pink Aura</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Pink Cinnamoroll</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Set Bonus</strong> (Upper + Middle + Lower + Garment equipped): Drop Rate +5% · EXP Rate +5% · Movement Speed +10%</p>
+<h3 id="usable-consumable">Usable / Consumable</h3>
+<p>STR/AGI/VIT/INT/DEX/LUK Dish +10 (not item mall), Yggdrasil Berry, Yggdrasil Seed, Speed Potion, Box of Gloom, Box of Resentment, Box of Drowsiness, Box of Thunder, Battle Manual, Job Battle Manual, Bloody Branch, Poison Bottle, Acid Bottle, Fire Bottle, Dead Branch Box.</p>
+<h3 id="etc">ETC</h3>
+<p>Era Dungeon Scrap, Oridecon, Elunium.</p>  </main>
 </div>
 <div class="backdrop" id="backdrop" onclick="closePanel()"></div>
 <aside class="panel" id="panel">
