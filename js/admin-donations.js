@@ -56,6 +56,10 @@ async function admInit(){
   var res = await NeroAPI.post('/qris.php?action=donations&days=30', {});
   if(res && res.ok){
     gate.style.display = 'none';
+    /* Clear the "Loading…" text, or the watchdog below keeps restarting the
+       whole dashboard every 1.5s - re-rendering every table and wiping any
+       inline Delete/Confirm step the GM has just opened. */
+    msg.textContent = '';
     main.style.display = '';
     admRender(res.data);
     smLoad();
@@ -271,8 +275,9 @@ else admStart();
 /* Watchdog: if the page is ever showing the untouched "Loading…" gate with
    nothing in flight — however it got there — start it. */
 setInterval(function(){
-  var msg = document.getElementById('adm-gate-msg');
-  if(msg && msg.textContent === 'Loading…' && !admBusy) admStart();
+  var gate = document.getElementById('adm-gate');
+  var msg  = document.getElementById('adm-gate-msg');
+  if(gate && gate.style.display !== 'none' && msg && msg.textContent === 'Loading…' && !admBusy) admStart();
 }, 1500);
 
 
