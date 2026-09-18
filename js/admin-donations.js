@@ -332,8 +332,15 @@ async function smDelete(id){
   var cell = document.getElementById('sm-act-' + id);
   if(cell) cell.innerHTML = '<span class="adm-by">Working...</span>';
   var res = await NeroAPI.post('/qris.php', {action: 'streamer_delete', id: id});
+  if(!res || !res.ok){
+    /* Show the failure IN the row that was clicked - reloading the table would
+       wipe it and look like the button did nothing. */
+    var s = smFind(id);
+    if(cell) cell.innerHTML = '<span class="adm-by" style="color:#f0a3a3">Delete failed: ' +
+      escHtml(qrisErrorText(res)) + '</span><br>' + (s ? smButtons(s) : '');
+    return;
+  }
   await smLoad();
-  if(!res || !res.ok){ smMsg((res && res.error) || 'Could not delete the streamer.', false); return; }
   if(Number(document.getElementById('sm-id').value) === id) smReset();
   smMsg(res.data.name + ' (code ' + res.data.code + ') deleted.', true);
 }
@@ -540,8 +547,13 @@ async function gmDelete(id){
   var cell = document.getElementById('gm-act-' + id);
   if(cell) cell.innerHTML = '<span class="adm-by">Working...</span>';
   var res = await NeroAPI.post('/qris.php', {action: 'guild_delete', id: id});
+  if(!res || !res.ok){
+    var g = gmFind(id);
+    if(cell) cell.innerHTML = '<span class="adm-by" style="color:#f0a3a3">Delete failed: ' +
+      escHtml(qrisErrorText(res)) + '</span><br>' + (g ? gmButtons(g) : '');
+    return;
+  }
   await gmLoad();
-  if(!res || !res.ok){ gmMsg((res && res.error) || 'Could not delete the guild.', false); return; }
   if(Number(document.getElementById('gm-id').value) === id) gmReset();
   gmMsg(res.data.name + ' deleted.', true);
 }
