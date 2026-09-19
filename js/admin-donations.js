@@ -435,9 +435,10 @@ function admRestoreTab(){
 /* --- GM: manage guild referrals (qris.php guilds / guild_save / guild_delete) ---
    A guild is registered by its LEADER's game account (account ID or login
    name, e.g. dev_1); the bridge finds the guild whose master character is on
-   that account. Donors pick it on the donation page ("Guild royalty") for
-   +GuildReferralBonusPct CP, stacking with a streamer code, and the leader
-   account gets a Guild Referral tab on My Account. */
+   that account. Donors pick it on the donation page ("Guild royalty"). The
+   pick gives NO bonus CP (owner, 2026-09-19); it only records which guild the
+   donation supports, and GMs hand out guild rewards by hand from that count.
+   The leader account gets a Guild Referral tab on My Account. */
 
 var gmRows = [];
 
@@ -449,8 +450,6 @@ async function gmLoad(){
     tb.innerHTML = '<tr><td class="norow" colspan="5">' + escHtml(qrisErrorText(res)) + '</td></tr>';
     return;
   }
-  var pct = document.getElementById('gm-pct');
-  if(pct) pct.textContent = '+' + res.data.bonus_pct + '%';
   gmRows = res.data.guilds || [];
   tb.innerHTML = gmRows.length ? gmRows.map(function(g){
     var ingame = g.guild_name

@@ -423,7 +423,7 @@ function donationHTML(){
   }).join('');
   var guildOpts=GUILDS.length
     ? '<option value="">None</option>'+GUILDS.map(function(g){
-        return '<option value="'+g.id+'" data-name="'+escHtml(g.name)+'">'+escHtml(g.name)+' (+'+GUILD_BONUS_PCT+'% CP)</option>';
+        return '<option value="'+g.id+'" data-name="'+escHtml(g.name)+'">'+escHtml(g.name)+'</option>';
       }).join('')
     : '<option value="">Guild royalty — coming soon</option>';
   return `
@@ -436,10 +436,11 @@ function donationHTML(){
   <label class="fld">2 · Referral code <span class="fld-opt">(optional — +`+REFERRAL_BONUS_PCT+`% bonus CP)</span></label>
   <select class="inp" id="don-streamer" onchange="updateSummary()">`+streamerOpts+`</select>
   <p class="hintline"><i class="ti ti-gift"></i> Pick your favourite streamer and get <b>+`+REFERRAL_BONUS_PCT+`% extra CP</b> — e.g. Rp 100.000 gives `+fmtNum(100000+Math.round(100000*REFERRAL_BONUS_PCT/100))+` CP.</p>
-  <label class="fld">3 · Guild royalty <span class="fld-opt">(optional — +`+GUILD_BONUS_PCT+`% bonus CP, stacks with a streamer)</span></label>
+  <label class="fld">3 · Guild royalty <span class="fld-opt">(optional — no bonus CP)</span></label>
   <div class="don-guildrow">
     <select class="inp" id="don-guild" onchange="updateSummary()"`+(GUILDS.length?'':' disabled')+`>`+guildOpts+`</select>
   </div>
+  <p class="hintline"><i class="ti ti-shield"></i> Pick your guild to count this donation as support for it. This gives no extra CP — guild rewards are handed out by a GM.</p>
 
   <div class="don-summary" id="don-summary">Select an amount to see your total.</div>
 
@@ -552,15 +553,14 @@ function updateSummary(){
   var gsel=document.getElementById('don-guild');
   var gid=gsel?Number(gsel.value)||0:0;
   var gname=gid?gsel.options[gsel.selectedIndex].getAttribute('data-name'):'';
-  var gbonus=gid?Math.round(cp*GUILD_BONUS_PCT/100):0;
   /* The donor pays exactly the tier; the referral is recorded on the donation
      row by the bridge, so the code is no longer added to the rupiah amount. */
   var payTotal=cp;
   box.innerHTML='Base: <b>'+fmtNum(cp)+' CP</b><br>'+
     (code?'Streamer bonus (+'+REFERRAL_BONUS_PCT+'%): <b>+'+fmtNum(bonus)+' CP</b> → '+escHtml(name)+' (code '+escHtml(code)+')<br>':'')+
-    (gid?'Guild bonus (+'+GUILD_BONUS_PCT+'%): <b>+'+fmtNum(gbonus)+' CP</b> → '+escHtml(gname)+'<br>':'')+
+    (gid?'Supporting guild: <b>'+escHtml(gname)+'</b> (no bonus CP)<br>':'')+
     '<hr class="don-hr">'+
-    'You receive: <b class="don-total">'+fmtNum(cp+bonus+gbonus)+' CP</b><br>'+
+    'You receive: <b class="don-total">'+fmtNum(cp+bonus)+' CP</b><br>'+
     'You pay: <b>'+fmtRp(payTotal)+'</b>';
   if(pay){
     pay.style.display='';
@@ -1231,11 +1231,9 @@ async function loadGuildReferral(){
   tabBtn.style.display='';
   var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
   set('gr-name', r.guild.name);
-  set('gr-pct', '+'+r.guild.bonus_pct+'%');
   set('gr-count', fmtNum(r.summary.paid_donations));
   set('gr-donors', fmtNum(r.summary.unique_donors));
   set('gr-rp', fmtRp(r.summary.total_rp));
-  set('gr-bonus', fmtNum(r.summary.total_bonus_cp)+' CP');
 
   var tb=document.querySelector('#gr-table tbody');
   if(!tb) return;
@@ -1245,9 +1243,8 @@ async function loadGuildReferral(){
       '<td>'+escHtml(x.paid_at)+'</td>'+
       '<td><b>'+escHtml(x.donor)+'</b></td>'+
       '<td>'+fmtRp(x.amount_rp)+'</td>'+
-      '<td>+'+fmtNum(x.bonus_cp)+' CP'+(x.bonus_pct?' <span class="pill paid">'+x.bonus_pct+'%</span>':'')+'</td>'+
     '</tr>';
-  }).join('') : '<tr><td colspan="4" class="norow">No donations for your guild in this period yet.</td></tr>';
+  }).join('') : '<tr><td colspan="3" class="norow">No donations for your guild in this period yet.</td></tr>';
 }
 
 function copyReferralCode(btn){
