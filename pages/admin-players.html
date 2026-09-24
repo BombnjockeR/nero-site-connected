@@ -1,0 +1,202 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Players — NeRO Admin</title>
+<!-- Staff-only view, same model as admin-donations.html: the page holds no data
+     of its own; everything comes from bridge/gm.php, which refuses anyone below
+     GM. Opening this URL as a player shows the "staff only" notice. -->
+<link rel="stylesheet" href="../css/style.css?v=20260924a">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</head><body class="page">
+<div class="pagebg"><video autoplay muted loop playsinline><source src="../assets/nero_landingpage.mp4" type="video/mp4"></video><div class="pagebg-veil"></div></div>
+<div id="app">
+<header class="sitehead">
+  <img class="hd-logo" src="../assets/logo.png" alt="Home" title="Home" onclick="location.href='../'">
+  <nav class="hd-tabs"><a class="tab" href="../wiki/index.html">Wiki</a><a class="tab" href="../pages/stat-woe.html">WoE</a><a class="tab" href="../pages/stat-pvp.html">PvP</a><a class="tab" href="../pages/stat-mvp.html">MVP</a><a class="tab" href="../pages/stat-zeny.html">Zeny</a><a class="tab" href="../pages/marketplace.html">Market</a></nav>
+  <div class="hd-right">
+    <div class="hd-status"><span class="hd-time" id="hd-time">Server time: —</span><div class="hd-pill" id="hd-pill"><b id="online-num">—</b><span>Players</span><span class="hd-sep">|</span><b id="merchant-num">—</b><span>Merchants</span></div><span class="hd-peaklbl">peak player <b id="peak-num">—</b></span></div>
+    <div class="hd-acct" id="hd-acct"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1 class="pg-title">Player Monitor</h1>
+
+  <div id="pm-gate" class="don-note">
+    <i class="ti ti-lock"></i><span id="pm-gate-msg">Loading…</span>
+  </div>
+  <noscript><p class="don-note">This page needs JavaScript.</p></noscript>
+
+  <div id="pm-main" style="display:none">
+    <!-- Inside the GM-only block on purpose: players never see the staff pages listed. -->
+    <nav class="adm-switch">
+      <a class="adm-sw" href="../pages/admin-donations.html"><i class="ti ti-receipt-2"></i> Donations</a>
+      <a class="adm-sw on" href="../pages/admin-players.html"><i class="ti ti-eye"></i> Player Monitor</a>
+    </nav>
+    <div class="acct-tabs">
+      <button class="atab on" data-t="watcher" onclick="pmTab('watcher',this)"><i class="ti ti-eye"></i> Watcher</button>
+      <button class="atab" data-t="items" onclick="pmTab('items',this)"><i class="ti ti-package"></i> Item Log</button>
+      <button class="atab" data-t="zeny" onclick="pmTab('zeny',this)"><i class="ti ti-coins"></i> Zeny Log</button>
+      <button class="atab" data-t="trades" onclick="pmTab('trades',this)"><i class="ti ti-arrows-exchange"></i> Trades</button>
+    </div>
+
+    <!-- ============ TAB: WATCHER ============ -->
+    <section class="atab-panel show" id="pm-tab-watcher">
+      <p class="subtitle">Everyone online right now. Shops show their exact spot; a walking
+        player's map is from the last autosave, so it can be up to 5 minutes behind.</p>
+      <div class="adm-tiles" id="pm-tiles"></div>
+
+      <div class="adm-filters">
+        <label class="adm-fld">Search
+          <input class="inp" id="pw-q" placeholder="name, account, map, guild, shop" oninput="pwPaint()">
+        </label>
+        <label class="adm-fld">Status
+          <select id="pw-status" onchange="pwPaint()">
+            <option value="all">All</option>
+            <option value="playing">Playing</option>
+            <option value="shop">Any shop</option>
+            <option value="vending_afk">AFK vending</option>
+            <option value="vending">Vending (at keyboard)</option>
+            <option value="buying_afk">AFK buying store</option>
+            <option value="buying">Buying store (at keyboard)</option>
+            <option value="multi">Multi-client (same PC)</option>
+          </select>
+        </label>
+        <label class="adm-fld">Map
+          <select id="pw-map" onchange="pwPaint()"><option value="all">All maps</option></select>
+        </label>
+        <label class="adm-fld pm-auto"><span>Auto refresh</span>
+          <select id="pw-auto" onchange="pwAuto()">
+            <option value="0">Off</option><option value="30" selected>30 s</option><option value="60">1 min</option>
+          </select>
+        </label>
+        <button class="btn-ghost adm-refresh" onclick="pwLoad()"><i class="ti ti-refresh"></i> Refresh</button>
+        <span class="adm-ref" id="pw-at"></span>
+      </div>
+
+      <div id="pw-msg"></div>
+      <div class="pm-maps" id="pw-maps"></div>
+
+      <div class="tbl-wrap">
+        <table class="stat" id="pw-tbl">
+          <thead><tr>
+            <th>Character</th><th>Account</th><th>Job / Lv</th><th>Guild</th>
+            <th>Map</th><th>Status</th><th>Same PC / IP</th><th></th>
+          </tr></thead>
+          <tbody><tr><td class="norow" colspan="8">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ TAB: ITEM LOG ============ -->
+    <section class="atab-panel" id="pm-tab-items">
+      <p class="subtitle">Every item that moved (picklog). Search by character, by item ID, or follow
+        one exact item by its unique ID across every owner. Trade and vending rows show the other side.</p>
+      <div class="adm-filters">
+        <label class="adm-fld">Character
+          <input class="inp" id="pi-char" placeholder="name or char ID" onkeydown="if(event.key==='Enter')piLoad()">
+        </label>
+        <label class="adm-fld">Item ID
+          <input class="inp" id="pi-item" inputmode="numeric" placeholder="e.g. 607" onkeydown="if(event.key==='Enter')piLoad()">
+        </label>
+        <label class="adm-fld">Unique ID
+          <input class="inp" id="pi-uid" inputmode="numeric" placeholder="one item instance" onkeydown="if(event.key==='Enter')piLoad()">
+        </label>
+        <label class="adm-fld">Type
+          <select id="pi-type">
+            <option value="all">All</option>
+            <option value="p2p">Player ↔ player (trade, vend, buy store)</option>
+            <option value="npc">NPC ↔ player (shop, script, barter)</option>
+            <option value="T">Trade</option><option value="V">Vending</option><option value="B">Buying store</option>
+            <option value="S">NPC shop</option><option value="N">NPC script</option><option value="J">Barter</option>
+            <option value="P">Player drop / pick</option><option value="M">Monster drop</option>
+            <option value="R">Storage</option><option value="G">Guild storage</option><option value="E">Mail</option>
+            <option value="A">GM command</option><option value="$">Cash shop</option><option value="C">Consumed</option>
+          </select>
+        </label>
+        <label class="adm-fld">Period
+          <select id="pi-days"><option value="1">24 hours</option><option value="3">3 days</option>
+            <option value="7" selected>7 days</option><option value="30">30 days</option><option value="90">90 days</option></select>
+        </label>
+        <button class="btn-gold" onclick="piLoad()"><i class="ti ti-search"></i> Search</button>
+      </div>
+      <div id="pi-msg"></div>
+      <div class="tbl-wrap">
+        <table class="stat" id="pi-tbl">
+          <thead><tr><th>When</th><th>Character</th><th>Type</th><th>Item</th><th>Amount</th>
+            <th>Other side</th><th>Map</th><th>Unique ID</th></tr></thead>
+          <tbody><tr><td class="norow" colspan="8">Pick a character, an item ID or a unique ID, then Search.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ TAB: ZENY LOG ============ -->
+    <section class="atab-panel" id="pm-tab-zeny">
+      <p class="subtitle">Where a character's zeny came from and went to (zenylog). For trades,
+        vending and buying stores the other player is exact.</p>
+      <div class="adm-filters">
+        <label class="adm-fld">Character
+          <input class="inp" id="pz-char" placeholder="name or char ID" onkeydown="if(event.key==='Enter')pzLoad()">
+        </label>
+        <label class="adm-fld">Type
+          <select id="pz-type">
+            <option value="all">All</option>
+            <option value="p2p">Player ↔ player</option><option value="npc">NPC ↔ player</option>
+            <option value="T">Trade</option><option value="V">Vending</option><option value="B">Buying store</option>
+            <option value="S">NPC shop</option><option value="N">NPC script</option><option value="M">Monster</option>
+            <option value="E">Mail</option><option value="K">Bank</option><option value="A">GM command</option>
+          </select>
+        </label>
+        <label class="adm-fld">Period
+          <select id="pz-days"><option value="1">24 hours</option><option value="3">3 days</option>
+            <option value="7" selected>7 days</option><option value="30">30 days</option><option value="90">90 days</option></select>
+        </label>
+        <button class="btn-gold" onclick="pzLoad()"><i class="ti ti-search"></i> Search</button>
+      </div>
+      <div id="pz-msg"></div>
+      <div id="pz-summary"></div>
+      <div class="tbl-wrap">
+        <table class="stat" id="pz-tbl">
+          <thead><tr><th>When</th><th>Type</th><th>Amount</th><th>Other side</th><th>Map</th></tr></thead>
+          <tbody><tr><td class="norow" colspan="5">Enter a character, then Search.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ TAB: TRADES ============ -->
+    <section class="atab-panel" id="pm-tab-trades">
+      <p class="subtitle">Player-to-player trades of one character, one row per trade: who with,
+        what went each way. A partner marked <span class="adm-badge ok">exact</span> came from the zeny log;
+        the rest are matched by time and map (items-only trades).</p>
+      <div class="adm-filters">
+        <label class="adm-fld">Character
+          <input class="inp" id="pt-char" placeholder="name or char ID" onkeydown="if(event.key==='Enter')ptLoad()">
+        </label>
+        <label class="adm-fld">Period
+          <select id="pt-days"><option value="1">24 hours</option><option value="3">3 days</option>
+            <option value="7" selected>7 days</option><option value="30">30 days</option><option value="90">90 days</option></select>
+        </label>
+        <button class="btn-gold" onclick="ptLoad()"><i class="ti ti-search"></i> Search</button>
+      </div>
+      <div id="pt-msg"></div>
+      <div id="pt-summary"></div>
+      <div class="tbl-wrap">
+        <table class="stat" id="pt-tbl">
+          <thead><tr><th>When</th><th>Partner</th><th>Gave</th><th>Got</th><th>Map</th></tr></thead>
+          <tbody><tr><td class="norow" colspan="5">Enter a character, then Search.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="backdrop" id="backdrop" onclick="closePanel()"></div>
+<aside class="panel" id="panel">
+  <div class="panel-head"><i id="pnl-icon" class="ti"></i><h2 id="pnl-title"></h2>
+    <button class="panel-close" onclick="closePanel()">&times;</button></div>
+  <div class="panel-body" id="pnl-body"></div>
+</aside>
+</div>
+
+<script src="../js/data.js?v=20260919c"></script><script src="../js/wiki-index.js"></script><script src="../js/app.js?v=20260924a"></script>
+<script src="../js/admin-players.js?v=20260924a"></script>
+</body></html>

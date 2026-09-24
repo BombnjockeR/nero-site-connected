@@ -336,6 +336,8 @@ function accountHTML(){
   <button class="btn-gold" onclick="openPanel('donation')">Donate / Top Up</button>
   <a class="btn-ghost" id="pnl-admin" href="${ROOT}pages/admin-donations.html" style="display:none">
     <i class="ti ti-receipt-2"></i> Donation Dashboard</a>
+  <a class="btn-ghost" id="pnl-admin-pm" href="${ROOT}pages/admin-players.html" style="display:none">
+    <i class="ti ti-eye"></i> Player Monitor</a>
   <a class="btn-ghost" href="${ROOT}pages/account.html">Manage Account</a>
   <a class="btn-ghost" href="${ROOT}pages/marketplace.html">My Marketplace Listings</a>
   <button class="btn-ghost" onclick="doLogout()">Log Out</button>`;
@@ -364,6 +366,8 @@ async function loadAccountPanel(){
      qris.php refuses ?action=donations to anyone below GM regardless. */
   var admLink=document.getElementById('pnl-admin');
   if(admLink && Number(d.account.group_id||0) >= 99) admLink.style.display='';
+  var pmLink=document.getElementById('pnl-admin-pm');
+  if(pmLink && Number(d.account.group_id||0) >= 99) pmLink.style.display='';
 }
 async function doLogout(){
   if(NeroAPI.enabled()){ await NeroAPI.post('/account.php',{action:'logout'}); }
@@ -1792,10 +1796,12 @@ async function loadWoeMePage(){
     : noDataRow(cols,'No characters found on this account.');
 }
 
-/* Donation Admin lives in js/admin-donations.js; run it whenever its page is
-   on screen (first load, SPA arrival, sign-in, sign-out). */
+/* Donation Admin lives in js/admin-donations.js, Player Monitor in
+   js/admin-players.js; run whichever page is on screen (first load, SPA
+   arrival, sign-in, sign-out). Each start() returns at once off its page. */
 function runAdminPage(){
   if(typeof admStart==='function') admStart();
+  if(typeof pmStart==='function') pmStart();
 }
 
 /* ================= SPA ROUTER ================= */

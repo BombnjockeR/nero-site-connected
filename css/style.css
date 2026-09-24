@@ -789,3 +789,27 @@ body.page .oge-bg{display:none !important}
 .small-tbl{font-size:12px}
 .small-tbl td,.small-tbl th{padding:6px 10px!important;color:var(--muted)}
 .small-tbl thead{display:none}
+
+/* ---- Player Monitor (pages/admin-players.html) ---- */
+.adm-fld .inp{text-transform:none;letter-spacing:0;min-width:190px;padding:9px 12px;font-size:13.5px}
+.adm-filters .btn-gold{width:auto;margin:0;padding:9px 16px;display:flex;align-items:center;gap:8px}
+.pm-maps{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.pm-map{border:1px solid var(--tline);background:rgba(10,16,28,.55);color:#d4dbe8;border-radius:999px;
+  padding:5px 12px;font-size:12.5px;cursor:pointer}
+.pm-map b{color:#fff;margin-left:4px}
+.pm-map.on,.pm-map:hover{border-color:var(--gold);color:var(--gold)}
+.pm-shop{display:block;font-size:11.5px;color:var(--muted);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm-sub{display:block;font-size:11.5px;color:var(--muted)}
+.pm-in{color:#8fe0aa}.pm-out{color:#f0a0a0}
+.pm-link{color:var(--gold);cursor:pointer;text-decoration:none}
+.pm-link:hover{text-decoration:underline}
+.pm-items{margin:0;padding:0;list-style:none;font-size:12.5px}
+.pm-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:18px}
+@media (max-width:640px){ .adm-fld .inp,.adm-fld select{min-width:0;width:100%} .adm-fld{flex:1 1 140px} }
+
+/* Switch between the staff pages (admin-donations / admin-players) */
+.adm-switch{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 18px}
+.adm-sw{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;font-size:13px;
+  border:1px solid var(--tline);color:#d4dbe8;text-decoration:none;background:rgba(10,16,28,.55)}
+.adm-sw:hover{border-color:var(--gold);color:var(--gold)}
+.adm-sw.on{border-color:var(--gold);color:var(--gold);background:rgba(228,184,75,.10)}

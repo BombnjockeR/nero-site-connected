@@ -5,7 +5,7 @@
      holds no data of its own: everything comes from qris.php, which refuses
      ?action=donations to anyone who is not group_id 99. Opening this URL as a
      player shows the "staff only" notice and nothing else. -->
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/style.css?v=20260924a">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 </head><body class="page">
 <div class="pagebg"><video autoplay muted loop playsinline><source src="../assets/nero_landingpage.mp4" type="video/mp4"></video><div class="pagebg-veil"></div></div>
@@ -34,6 +34,11 @@
   </noscript>
 
   <div id="adm-main" style="display:none">
+    <!-- Inside the GM-only block on purpose: players never see the staff pages listed. -->
+    <nav class="adm-switch">
+      <a class="adm-sw on" href="../pages/admin-donations.html"><i class="ti ti-receipt-2"></i> Donations</a>
+      <a class="adm-sw" href="../pages/admin-players.html"><i class="ti ti-eye"></i> Player Monitor</a>
+    </nav>
     <!-- One tab per area, like the WoE page. To add a section: a button here
          with admTab('<name>'), and a <section class="atab-panel" id="adm-tab-<name>">. -->
     <div class="acct-tabs">
@@ -182,6 +187,6 @@
 </aside>
 </div>
 
-<script src="../js/data.js?v=20260919c"></script><script src="../js/wiki-index.js"></script><script src="../js/app.js?v=20260919c"></script>
+<script src="../js/data.js?v=20260919c"></script><script src="../js/wiki-index.js"></script><script src="../js/app.js?v=20260924a"></script>
 <script src="../js/admin-donations.js?v=20260919c"></script>
 </body></html>
