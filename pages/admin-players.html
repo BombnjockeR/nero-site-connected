@@ -37,6 +37,7 @@
       <button class="atab" data-t="items" onclick="pmTab('items',this)"><i class="ti ti-package"></i> Item Log</button>
       <button class="atab" data-t="zeny" onclick="pmTab('zeny',this)"><i class="ti ti-coins"></i> Zeny Log</button>
       <button class="atab" data-t="trades" onclick="pmTab('trades',this)"><i class="ti ti-arrows-exchange"></i> Trades</button>
+      <button class="atab" data-t="cash" onclick="pmTab('cash',this)"><i class="ti ti-diamond"></i> Cash Log</button>
     </div>
 
     <!-- ============ TAB: WATCHER ============ -->
@@ -186,6 +187,36 @@
         </table>
       </div>
     </section>
+
+    <!-- ============ TAB: CASH LOG ============ -->
+    <section class="atab-panel" id="pm-tab-cash">
+      <p class="subtitle">Cash Point history of the character's whole account (CP is account-wide):
+        what was bought in the Cash Shop, GM <code>@cash</code> changes with the GM's name, and QRIS
+        donations. <b>Not in logs</b> compares the balance with every logged movement since the logs
+        began; anything other than 0 moved without a log (e.g. a direct database edit).</p>
+      <div class="adm-filters">
+        <label class="adm-fld">Character
+          <input class="inp" id="pc-char" placeholder="name or char ID" onkeydown="if(event.key==='Enter')pcLoad()">
+        </label>
+        <label class="adm-fld">Period
+          <select id="pc-days"><option value="1">24 hours</option><option value="3">3 days</option>
+            <option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option></select>
+        </label>
+        <label class="adm-fld">From date <span class="adm-ref">(overrides period)</span>
+          <input class="inp" id="pc-from" type="date">
+        </label>
+        <button class="btn-gold" onclick="pcLoad()"><i class="ti ti-search"></i> Search</button>
+        <button class="btn-ghost adm-refresh" id="pc-csv" onclick="pcCsv()" disabled><i class="ti ti-download"></i> CSV</button>
+      </div>
+      <div id="pc-msg"></div>
+      <div id="pc-summary"></div>
+      <div class="tbl-wrap">
+        <table class="stat" id="pc-tbl">
+          <thead><tr><th>When</th><th>Character</th><th>Type</th><th>Detail</th><th>CP</th><th>Map</th></tr></thead>
+          <tbody><tr><td class="norow" colspan="6">Enter a character, then Search.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -198,5 +229,5 @@
 </div>
 
 <script src="../js/data.js?v=20260919c"></script><script src="../js/wiki-index.js"></script><script src="../js/app.js?v=20260924a"></script>
-<script src="../js/admin-players.js?v=20260924a"></script>
+<script src="../js/admin-players.js?v=20260925a"></script>
 </body></html>

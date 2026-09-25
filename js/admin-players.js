@@ -110,7 +110,7 @@ function pmRestoreTab(){
 function pmLookup(tab, name){
   var btn = document.querySelector('#pm-main .atab[data-t="' + tab + '"]');
   if(btn) pmTab(tab, btn);
-  var prefix = {items: 'pi', zeny: 'pz', trades: 'pt'}[tab];
+  var prefix = {items: 'pi', zeny: 'pz', trades: 'pt', cash: 'pc'}[tab];
   var inp = document.getElementById(prefix + '-char');
   if(inp) inp.value = name;
   if(tab === 'items'){
@@ -118,6 +118,7 @@ function pmLookup(tab, name){
     document.getElementById('pi-uid').value = '';
     piLoad();
   } else if(tab === 'zeny') pzLoad();
+  else if(tab === 'cash') pcLoad();
   else ptLoad();
   window.scrollTo(0, 0);
 }
@@ -234,6 +235,7 @@ function pwPaint(){
       '<td class="adm-act">' +
         '<button class="adm-btn" onclick="pmLookup(\'zeny\',' + escHtml(JSON.stringify(r.name)) + ')" title="Zeny log"><i class="ti ti-coins"></i></button>' +
         '<button class="adm-btn" onclick="pmLookup(\'trades\',' + escHtml(JSON.stringify(r.name)) + ')" title="Trades"><i class="ti ti-arrows-exchange"></i></button>' +
+        '<button class="adm-btn" onclick="pmLookup(\'cash\',' + escHtml(JSON.stringify(r.name)) + ')" title="Cash log"><i class="ti ti-diamond"></i></button>' +
       '</td></tr>';
   }).join('');
 }
@@ -399,4 +401,123 @@ function pmTraceFromTrade(uid){
   if(btn) pmTab('items', btn);
   piTrace(uid);
   window.scrollTo(0, 0);
+}
+
+/* --- CASH LOG ----------------------------------------------------------- */
+
+var PC_CUR = {C: 'Cash Points', K: 'Kafra Points', O: 'Other'};
+
+/* One timeline row -> {type, detail(html), text(plain, for CSV)}. */
+function pcDescribe(d, r){
+  if(r.kind === 'donation'){
+    var parts = [pmNum(r.credit_cp) + ' base'];
+    if(+r.bonus_cp) parts.push(pmNum(r.bonus_cp) + ' streamer ' + (r.streamer_code || ''));
+    if(+r.guild_bonus_cp) parts.push(pmNum(r.guild_bonus_cp) + ' guild ' + (r.guild_name || ''));
+    var txt = 'Rp ' + pmNum(r.amount_rp) + ' (' + r.source + ' #' + r.id + '): ' + parts.join(' + ');
+    return {type: 'QRIS donation', detail: escHtml(txt), text: txt};
+  }
+  var type = (d.types[r.type] || r.type) + (r.cash_type !== 'C' ? ' · ' + (PC_CUR[r.cash_type] || r.cash_type) : '');
+  if(r.items && r.items.length){
+    var html = '<ul class="pm-items">' + r.items.map(function(it){
+      return '<li>' + pmNum(it.amount) + '× ' + pmItem(d.items, it.nameid, 0) + '</li>';
+    }).join('') + '</ul>';
+    var text = r.items.map(function(it){
+      return it.amount + 'x ' + ((d.items && d.items[it.nameid]) || 'Item') + ' #' + it.nameid;
+    }).join('; ');
+    return {type: type, detail: html, text: text};
+  }
+  if(r.gm){
+    var t = 'GM ' + r.gm.by + ': ' + r.gm.command;
+    return {type: type, detail: escHtml(t), text: t};
+  }
+  return {type: type, detail: '<span class="adm-by">—</span>', text: ''};
+}
+
+async function pcLoad(){
+  var p = {
+    char: document.getElementById('pc-char').value.trim(),
+    days: document.getElementById('pc-days').value
+  };
+  var from = document.getElementById('pc-from').value;
+  if(from) p.from = from;
+  var tb = document.querySelector('#pc-tbl tbody');
+  tb.innerHTML = '<tr><td class="norow" colspan="6">Searching…</td></tr>';
+  document.getElementById('pc-summary').innerHTML = '';
+  document.getElementById('pc-csv').disabled = true;
+  PM.cash = null;
+  pmMsg('pc-msg', '');
+  var res = await pmGet('cashlog', p);
+  if(!res || !res.ok){
+    tb.innerHTML = '<tr><td class="norow" colspan="6">—</td></tr>';
+    return pmMsg('pc-msg', qrisErrorText(res), true);
+  }
+  var d = res.data;
+  PM.cash = d;
+  document.getElementById('pc-csv').disabled = !d.rows.length;
+
+  var cin = +d.donations_cp || 0, cout = 0;
+  d.by_type.forEach(function(x){ if(x.cash_type === 'C'){ cin += +x.in; cout += +x.out; } });
+  var gap = +d.recon.unlogged || 0;
+
+  var tiles = '<div class="adm-tiles">' +
+    '<div class="adm-tile gold"><div class="adm-tile-lbl">' + escHtml(d.userid) + ' · balance now</div><div class="adm-tile-val">' +
+      pmNum(d.balance.cash) + '</div><div class="adm-tile-sub">Cash Points' + (+d.balance.kafra ? ' · ' + pmNum(d.balance.kafra) + ' Kafra' : '') + '</div></div>' +
+    '<div class="adm-tile"><div class="adm-tile-lbl">CP in</div><div class="adm-tile-val pm-in">' + pmNum(cin) +
+      '</div><div class="adm-tile-sub">' + pmNum(d.donations_cp) + ' from QRIS</div></div>' +
+    '<div class="adm-tile"><div class="adm-tile-lbl">CP out</div><div class="adm-tile-val pm-out">' + pmNum(cout) +
+      '</div><div class="adm-tile-sub">in this period</div></div>' +
+    '<div class="adm-tile"><div class="adm-tile-lbl">Not in logs</div><div class="adm-tile-val ' + (gap ? 'pm-out' : 'pm-in') + '">' +
+      (gap > 0 ? '+' : '') + pmNum(gap) + '</div><div class="adm-tile-sub" title="balance − all QRIS credits − all cashlog rows">' +
+      'all time, logs since ' + pmWhen(d.recon.first_log) + '</div></div></div>';
+
+  var bought = '<div><h2 class="adm-h2"><i class="ti ti-shopping-cart"></i> Bought in the Cash Shop</h2><div class="tbl-wrap"><table class="stat">' +
+    '<thead><tr><th>Item</th><th>Qty</th><th>Purchases</th><th>CP</th></tr></thead><tbody>' +
+    (d.items_bought.length ? d.items_bought.map(function(x){
+      return '<tr><td>' + pmItem(d.items, x.nameid, 0) + '</td><td>' + pmNum(x.qty) + '</td><td>' + pmNum(x.buys) +
+        '</td><td class="pm-out">' + pmNum(x.cp) + (+x.cart_buys ? ' <span class="adm-ref" title="Bought together with other items; that price cannot be split per item">+' + x.cart_buys + ' in a cart</span>' : '') + '</td></tr>';
+    }).join('') : '<tr><td class="norow" colspan="4">Nothing bought in this period.</td></tr>') + '</tbody></table></div></div>';
+
+  var bySrc = d.by_type.slice();
+  if(+d.donations_cp) bySrc.unshift({cash_type: 'C', type: 'QRIS', in: d.donations_cp, out: 0,
+    n: d.rows.filter(function(r){ return r.kind === 'donation'; }).length});
+  var src = '<div><h2 class="adm-h2"><i class="ti ti-chart-pie"></i> By source</h2><div class="tbl-wrap"><table class="stat">' +
+    '<thead><tr><th>Type</th><th>In</th><th>Out</th><th>Times</th></tr></thead><tbody>' +
+    (bySrc.length ? bySrc.map(function(x){
+      var lbl = x.type === 'QRIS' ? 'QRIS donation' : (d.types[x.type] || x.type);
+      if(x.cash_type !== 'C') lbl += ' · ' + (PC_CUR[x.cash_type] || x.cash_type);
+      return '<tr><td>' + escHtml(lbl) + '</td><td class="pm-in">' + pmNum(x.in) + '</td><td class="pm-out">' +
+        pmNum(x.out) + '</td><td>' + pmNum(x.n) + '</td></tr>';
+    }).join('') : '<tr><td class="norow" colspan="4">No Cash Point movement.</td></tr>') + '</tbody></table></div></div>';
+
+  document.getElementById('pc-summary').innerHTML = tiles + '<div class="pm-split">' + bought + src + '</div>';
+  if(d.truncated) pmMsg('pc-msg', 'Showing the newest cash log rows only — narrow the period.');
+
+  tb.innerHTML = d.rows.length ? d.rows.map(function(r){
+    var x = pcDescribe(d, r);
+    var amt = Number(r.amount);
+    return '<tr><td>' + pmWhen(r.time) + '</td>' +
+      '<td>' + (r.char_id ? pmCharLink(d.chars[r.char_id], r.char_id) : '<span class="adm-by">account</span>') + '</td>' +
+      '<td>' + escHtml(x.type) + '</td><td>' + x.detail + '</td>' +
+      '<td class="' + (amt < 0 ? 'pm-out' : 'pm-in') + '">' + (amt > 0 ? '+' : '') + pmNum(amt) + '</td>' +
+      '<td>' + (r.map ? escHtml(r.map) : '<span class="adm-by">—</span>') + '</td></tr>';
+  }).join('') : '<tr><td class="norow" colspan="6">No Cash Point movement in this period.</td></tr>';
+}
+
+/* The timeline as CSV (UTF-8 with BOM so Excel opens it as UTF-8). */
+function pcCsv(){
+  var d = PM.cash; if(!d || !d.rows.length) return;
+  var q = function(v){ v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  var lines = [['time', 'account', 'character', 'type', 'currency', 'cp', 'detail', 'map', 'log_id'].join(',')];
+  d.rows.slice().reverse().forEach(function(r){
+    var x = pcDescribe(d, r);
+    lines.push([r.time, d.userid, r.char_id ? (d.chars[r.char_id] || r.char_id) : '', x.type,
+      PC_CUR[r.cash_type] || r.cash_type, r.amount, x.text, r.map,
+      (r.kind === 'donation' ? 'qris#' : 'cashlog#') + r.id].map(q).join(','));
+  });
+  var blob = new Blob(['﻿' + lines.join('\r\n')], {type: 'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'cashlog_' + d.userid + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
 }
