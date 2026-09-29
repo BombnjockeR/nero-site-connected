@@ -454,6 +454,7 @@ function donationHTML(){
     </button>
     <div id="don-qris-box" style="display:none">
       <label class="fld">3 · Scan &amp; pay with QRIS</label>
+      <p class="don-cashshop-warn">Please close your cash shop before completing your donation!</p>
       <p class="don-hint">Scan with any QRIS app (GoPay, OVO, DANA, ShopeePay, bank apps…). Pay <b id="don-payamt">the exact amount</b> within <b id="don-payexp">5 minutes</b>.</p>
       <div class="qris-card">
         <div id="don-qris-loading" class="don-qris-loading">Generating QR…</div>
@@ -467,6 +468,7 @@ function donationHTML(){
     </div>
     <div class="don-fallback" id="don-fallback" style="display:none">
       <p class="don-note" style="margin-top:14px"><i class="ti ti-info-circle"></i> QRIS gateway is offline. Use the static QR below and submit a Discord ticket — we'll credit your CP manually.</p>
+      <p class="don-cashshop-warn">Please close your cash shop before completing your donation!</p>
       <div class="qris-card"><img src="`+ROOT+`assets/qris-newera.png" alt="NewEraRO QRIS payment code" loading="lazy"></div>
       <div class="don-steps">
         <ol>

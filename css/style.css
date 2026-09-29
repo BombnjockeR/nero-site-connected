@@ -127,6 +127,7 @@ select.inp option{background:#101a2c;color:#fff}
 .don-pay{margin-top:22px;padding-top:20px;border-top:1px solid var(--tline)}
 .don-hint{font-size:12.5px;color:var(--muted);line-height:1.6;margin:2px 0 12px}
 .don-hint b{color:var(--gold)}
+.don-cashshop-warn{font-size:13.5px;font-weight:700;color:#ff4d4d;line-height:1.5;margin:2px 0 8px}
 .qris-card{background:#fff;border-radius:14px;padding:10px;max-width:320px;margin:0 auto;box-shadow:0 8px 30px rgba(0,0,0,.35)}
 .qris-card img{width:100%;display:block;border-radius:6px}
 .don-steps{margin-top:16px;font-size:13px;color:var(--muted);line-height:1.65}

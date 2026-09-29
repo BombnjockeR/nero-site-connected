@@ -463,7 +463,7 @@ async function pcLoad(){
     '<div class="adm-tile gold"><div class="adm-tile-lbl">' + escHtml(d.userid) + ' · balance now</div><div class="adm-tile-val">' +
       pmNum(d.balance.cash) + '</div><div class="adm-tile-sub">Cash Points' + (+d.balance.kafra ? ' · ' + pmNum(d.balance.kafra) + ' Kafra' : '') + '</div></div>' +
     '<div class="adm-tile"><div class="adm-tile-lbl">CP in</div><div class="adm-tile-val pm-in">' + pmNum(cin) +
-      '</div><div class="adm-tile-sub">' + pmNum(d.donations_cp) + ' from QRIS</div></div>' +
+      '</div><div class="adm-tile-sub">' + pmNum(d.donations_cp) + ' from QRIS (all donations, any date)</div></div>' +
     '<div class="adm-tile"><div class="adm-tile-lbl">CP out</div><div class="adm-tile-val pm-out">' + pmNum(cout) +
       '</div><div class="adm-tile-sub">in this period</div></div>' +
     '<div class="adm-tile"><div class="adm-tile-lbl">Not in logs</div><div class="adm-tile-val ' + (gap ? 'pm-out' : 'pm-in') + '">' +
