@@ -19,7 +19,7 @@
 
   var SLIDES = [
     { type: 'image', src: 'assets/event-oct-battlepass-s2.jpg', alt: 'Battle Pass Season 2' },
-    { type: 'mvp', items: [
+    { type: 'mvp', title: 'World Boss', items: [
       { src: 'assets/mvp/1373.gif', name: 'Lord of Death' },
       { src: 'assets/mvp/1685.gif', name: 'Vesper' }
     ] }
@@ -27,36 +27,39 @@
 
   var css = '' +
     '.evp-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;' +
-      'background:rgba(4,7,13,.74);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;transition:opacity .22s ease}' +
+      'background:rgba(4,7,13,.5);opacity:0;transition:opacity .22s ease}' +
     '.evp-overlay.on{opacity:1}' +
     '.evp-box{position:relative;width:min(920px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;' +
-      'background:#0d1522;border:1px solid var(--line,rgba(228,184,75,.45));border-radius:16px;' +
+      'background:transparent;border:1px solid var(--line,rgba(228,184,75,.45));border-radius:16px;' +
       'box-shadow:0 24px 70px rgba(0,0,0,.6);overflow:hidden;transform:translateY(10px) scale(.98);transition:transform .22s ease}' +
     '.evp-overlay.on .evp-box{transform:none}' +
     '.evp-head{display:flex;align-items:center;justify-content:center;padding:14px 56px 12px;' +
-      'border-bottom:1px solid rgba(228,184,75,.25);background:linear-gradient(180deg,rgba(228,184,75,.14),rgba(228,184,75,0))}' +
+      'border-bottom:1px solid rgba(228,184,75,.25);background:linear-gradient(180deg,#1d2230,#0d1522)}' +
     '.evp-title{margin:0;color:var(--gold,#E4B84B);font-size:22px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}' +
     '.evp-close{position:absolute;top:9px;right:10px;width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.18);' +
       'background:rgba(255,255,255,.06);color:#e7ecf5;font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;z-index:3}' +
     '.evp-close:hover{background:rgba(255,255,255,.14);color:#fff}' +
-    '.evp-viewport{position:relative;overflow:hidden;background:#070b12}' +
+    '.evp-viewport{position:relative;overflow:hidden;background:transparent}' +
     '.evp-track{display:flex;transition:transform .38s ease}' +
     '.evp-slide{flex:0 0 100%;aspect-ratio:1446/1088;max-height:calc(100vh - 160px);display:flex;align-items:center;justify-content:center}' +
-    '.evp-slide img.evp-full{width:100%;height:100%;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none}' +
-    '.evp-mvp{width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:6%;' +
-      'background:rgba(128,128,128,.42)}' +
-    '.evp-mvp figure{margin:0;height:62%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:12px}' +
+    '.evp-slide.evp-img{background:#070b12}.evp-slide img.evp-full{width:100%;height:100%;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none}' +
+    '.evp-mvp{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+      'background:rgba(128,128,128,.5)}' +
+    '.evp-mvp-title{margin:0 0 4%;color:#fff;font-size:34px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;' +
+      'text-shadow:0 3px 10px rgba(0,0,0,.75),0 0 18px rgba(228,184,75,.45)}' +
+    '.evp-mvp-row{width:100%;height:62%;display:flex;align-items:flex-end;justify-content:center;gap:6%}' +
+    '.evp-mvp figure{margin:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:12px}' +
     '.evp-mvp img{height:100%;width:auto;max-width:38vw;object-fit:contain;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))}' +
     '.evp-mvp figcaption{color:#fff;font-weight:700;font-size:15px;letter-spacing:.3px;text-shadow:0 2px 6px rgba(0,0,0,.7)}' +
     '.evp-nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.25);' +
       'background:rgba(7,11,18,.62);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;z-index:2}' +
     '.evp-nav:hover{background:rgba(228,184,75,.85);color:#241a07}' +
     '.evp-prev{left:10px}.evp-next{right:10px}' +
-    '.evp-dots{display:flex;justify-content:center;gap:8px;padding:11px 0 13px}' +
+    '.evp-dots{display:flex;justify-content:center;gap:8px;padding:11px 0 13px;background:#0d1522}' +
     '.evp-dot{width:9px;height:9px;border-radius:50%;border:none;padding:0;background:rgba(255,255,255,.28);cursor:pointer;transition:.15s}' +
     '.evp-dot.on{background:var(--gold,#E4B84B);width:22px;border-radius:5px}' +
     '@media (max-width:600px){.evp-title{font-size:18px}.evp-nav{width:34px;height:34px;font-size:18px}' +
-      '.evp-mvp figcaption{font-size:12.5px}.evp-head{padding:12px 50px 10px}}';
+      '.evp-mvp figcaption{font-size:12.5px}.evp-mvp-title{font-size:20px}.evp-head{padding:12px 50px 10px}}';
 
   function build() {
     var style = document.createElement('style');
@@ -65,11 +68,13 @@
 
     var slidesHtml = SLIDES.map(function (s) {
       if (s.type === 'image') {
-        return '<div class="evp-slide"><img class="evp-full" src="' + ROOT + s.src + '" alt="' + s.alt + '"></div>';
+        return '<div class="evp-slide evp-img"><img class="evp-full" src="' + ROOT + s.src + '" alt="' + s.alt + '"></div>';
       }
-      return '<div class="evp-slide"><div class="evp-mvp">' + s.items.map(function (m) {
-        return '<figure><img src="' + ROOT + m.src + '" alt="' + m.name + '"><figcaption>' + m.name + '</figcaption></figure>';
-      }).join('') + '</div></div>';
+      return '<div class="evp-slide"><div class="evp-mvp">' +
+        (s.title ? '<h3 class="evp-mvp-title">' + s.title + '</h3>' : '') +
+        '<div class="evp-mvp-row">' + s.items.map(function (m) {
+          return '<figure><img src="' + ROOT + m.src + '" alt="' + m.name + '"><figcaption>' + m.name + '</figcaption></figure>';
+        }).join('') + '</div></div></div>';
     }).join('');
 
     var dotsHtml = SLIDES.map(function (_, i) {
