@@ -299,7 +299,7 @@ async function smLoad(){
         return '<br><span class="adm-ref">was ' + escHtml(o.code) + ' · works until ' + escHtml(String(o.expires_at).slice(0, 10)) + '</span>';
       }).join('') + '</td>' +
       '<td>' + escHtml(s.name) + '</td>' +
-      '<td>' + (s.account_id ? escHtml(String(s.account_id)) + (s.userid ? ' <span class="adm-ref">' + escHtml(s.userid) + '</span>' : '') : '<span class="adm-ref">not linked</span>') + '</td>' +
+      '<td>' + (s.account_id ? (s.userid ? '<b>' + escHtml(s.userid) + '</b> ' : '') + '<span class="adm-ref">#' + escHtml(String(s.account_id)) + '</span>' : '<span class="adm-ref">not linked</span>') + '</td>' +
       '<td>' + (s.active ? '<span class="adm-badge ok">Active</span>' : '<span class="adm-badge muted">Inactive</span>') + '</td>' +
       '<td id="sm-act-' + s.id + '">' + smButtons(s) + '</td>' +
     '</tr>';
@@ -370,7 +370,7 @@ function smFind(id){
 function smEdit(id){
   var s = smFind(id); if(!s) return;
   document.getElementById('sm-id').value = s.id;
-  document.getElementById('sm-aid').value = s.account_id || '';
+  document.getElementById('sm-aid').value = s.userid || s.account_id || '';
   document.getElementById('sm-name').value = s.name;
   document.getElementById('sm-code').value = s.code;
   document.getElementById('sm-active').value = s.active ? '1' : '0';
@@ -387,7 +387,7 @@ async function smSend(payload, btn){
   if(!res || !res.ok){ smMsg((res && res.error) || 'Could not save the streamer.', false); return false; }
   var d = res.data;
   smMsg(d.name + ' (code ' + d.code + ') saved' +
-        (d.account_id ? ' — linked to account ' + d.account_id + (d.userid ? ' (' + d.userid + ')' : '') : '') +
+        (d.account_id ? ' — linked to ' + (d.userid ? d.userid + ' (#' + d.account_id + ')' : 'account ' + d.account_id) : '') +
         (d.active ? '.' : ', inactive.') +
         (d.history_moved ? ' ' + d.history_moved + ' past donation(s) moved to the new code.' : '') +
         (d.old_code ? (d.old_code_days
@@ -410,7 +410,7 @@ async function smSave(){
 
 async function smToggle(id){
   var s = smFind(id); if(!s) return;
-  await smSend({id: s.id, account_id: s.account_id ? String(s.account_id) : '', name: s.name, code: s.code, active: !s.active});
+  await smSend({id: s.id, account_id: s.userid || (s.account_id ? String(s.account_id) : ''), name: s.name, code: s.code, active: !s.active});
 }
 
 
