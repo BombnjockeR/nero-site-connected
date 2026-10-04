@@ -73,13 +73,17 @@
         </select>
       </label>
       <label class="adm-fld">Period
-        <select id="f-days" onchange="admLoad()">
+        <select id="f-days" onchange="admPeriodChange()">
           <option value="1">Last 24 hours</option>
           <option value="7">Last 7 days</option>
           <option value="30" selected>Last 30 days</option>
           <option value="90">Last 90 days</option>
+          <option value="month">Monthly</option>
           <option value="all">All time</option>
         </select>
+      </label>
+      <label class="adm-fld" id="f-month-wrap" style="display:none">Month
+        <input class="inp" type="month" id="f-month" onchange="admLoad()">
       </label>
       <button class="btn-ghost adm-refresh" onclick="admLoad()"><i class="ti ti-refresh"></i> Refresh</button>
     </div>
