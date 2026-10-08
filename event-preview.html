@@ -1,143 +1,57 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>New Era Ragnarok Online — NeRO</title>
+<title>PvP Statistics (Preview) — NeRO</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
-<style>
-/* ===== On-Going Event badge + modal ===== */
-.oge-badge{position:fixed;left:49px;top:182px;z-index:40;width:104px;cursor:pointer;border:none;background:none;padding:0;
-  filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));transition:transform .18s}
-.oge-badge:hover{transform:translateY(-3px) scale(1.03)}
-.oge-badge img{width:100%;display:block;animation:oge-bob 3.4s ease-in-out infinite}
-.oge-badge .oge-ping{position:absolute;top:6px;right:10px;width:13px;height:13px;border-radius:50%;background:#ff5252;
-  border:2px solid #1a1206;box-shadow:0 0 0 0 rgba(255,82,82,.6);animation:oge-pulse 1.8s infinite}
-@keyframes oge-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes oge-pulse{0%{box-shadow:0 0 0 0 rgba(255,82,82,.6)}70%{box-shadow:0 0 0 9px rgba(255,82,82,0)}100%{box-shadow:0 0 0 0 rgba(255,82,82,0)}}
-/* tablet: logo 96px tall, centered at 26+48=74px */
-@media(max-width:900px){.oge-badge{width:84px;left:32px;top:128px}}
-/* phone: homebar becomes relative/centered; drop the badge to top-center so it stays under the logo */
-@media(max-width:640px){.oge-badge{width:70px;left:50%;transform:translateX(-50%);top:96px}
-  .oge-badge:hover{transform:translateX(-50%) translateY(-3px) scale(1.03)}}
-
-.oge-bg{position:fixed;inset:0;z-index:120;background:rgba(3,6,12,.82);backdrop-filter:blur(4px);
-  display:none;align-items:center;justify-content:center;padding:24px}
-.oge-bg.show{display:flex}
-.oge-modal{position:relative;width:min(1000px,96vw);height:min(88vh,900px);background:#0b1220;border:1px solid var(--line);
-  border-radius:18px;box-shadow:0 40px 100px rgba(0,0,0,.7);display:flex;flex-direction:column;overflow:hidden}
-.oge-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--tline);flex-shrink:0}
-.oge-top h2{margin:0;font-size:17px;font-weight:800;display:flex;align-items:center;gap:9px}
-.oge-top h2 i{color:var(--gold);font-size:20px}
-.oge-close{background:rgba(255,255,255,.06);border:1px solid var(--tline);color:var(--muted);width:38px;height:38px;
-  border-radius:10px;font-size:24px;line-height:1;cursor:pointer;flex-shrink:0;transition:.15s}
-.oge-close:hover{background:#ff5252;color:#fff;border-color:#ff5252}
-
-.oge-viewport{position:relative;flex:1;overflow:hidden}
-.oge-track{display:flex;height:100%;transition:transform .45s cubic-bezier(.4,0,.2,1)}
-.oge-slide{min-width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.oge-banner{width:100%;display:block;background:#0b1220}
-.oge-banner-link{position:relative;display:block;cursor:pointer}
-.oge-banner-link .oge-banner{transition:filter .2s}
-.oge-banner-link:hover .oge-banner{filter:brightness(1.06)}
-.oge-banner-cta{position:absolute;right:12px;bottom:12px;display:inline-flex;align-items:center;gap:6px;
-  background:rgba(88,101,242,.92);color:#fff;font-size:12px;font-weight:700;padding:8px 13px;border-radius:9px;
-  box-shadow:0 4px 14px rgba(0,0,0,.4);opacity:0;transform:translateY(6px);transition:.2s;pointer-events:none}
-.oge-banner-link:hover .oge-banner-cta{opacity:1;transform:translateY(0)}
-@media(max-width:640px){.oge-banner-cta{opacity:1;transform:none;font-size:11px;padding:6px 10px}}
-.oge-body{padding:20px 26px 30px}
-.oge-etitle{font-size:22px;font-weight:800;margin:0 0 4px;letter-spacing:.2px}
-.oge-period{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--gold-soft);
-  background:rgba(228,184,75,.12);border:1px solid rgba(228,184,75,.35);border-radius:8px;padding:5px 11px;margin-bottom:14px}
-.oge-body p{font-size:14px;line-height:1.65;color:var(--text);margin:0 0 12px}
-.oge-body .lead{color:var(--muted)}
-.oge-body h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--gold);font-weight:700;margin:20px 0 9px}
-.oge-body ul{margin:0 0 12px;padding:0;list-style:none}
-.oge-body ul li{position:relative;padding:5px 0 5px 22px;font-size:13.5px;line-height:1.5;color:var(--text);border-bottom:1px solid rgba(255,255,255,.06)}
-.oge-body ul li:before{content:'';position:absolute;left:4px;top:12px;width:6px;height:6px;border-radius:50%;background:var(--gold)}
-.oge-body ul.plain li{padding-left:0}.oge-body ul.plain li:before{display:none}
-.oge-body a{color:var(--gold);text-decoration:underline;text-underline-offset:2px;word-break:break-word}
-.oge-links{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
-.oge-lbtn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);border:1px solid var(--tline);
-  color:var(--text);border-radius:9px;padding:9px 13px;font-size:12.5px;font-weight:600;text-decoration:none;transition:.15s}
-.oge-lbtn:hover{border-color:var(--line);background:rgba(255,255,255,.1)}
-.oge-lbtn.fb:hover{background:#1877f2;border-color:#1877f2;color:#fff}
-.oge-lbtn.ig:hover{background:#d6249f;border-color:#d6249f;color:#fff}
-.oge-lbtn.dc:hover{background:#5865f2;border-color:#5865f2;color:#fff}
-.oge-note{font-size:12px;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--tline);
-  border-radius:10px;padding:11px 13px;line-height:1.55;margin-top:8px}
-.oge-prize{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 0 12px}
-.oge-prize .pz{background:rgba(228,184,75,.07);border:1px solid rgba(228,184,75,.25);border-radius:8px;padding:8px 11px;font-size:13px;color:var(--text)}
-@media(max-width:640px){.oge-prize{grid-template-columns:1fr}.oge-body{padding:16px 16px 26px}.oge-etitle{font-size:18px}}
-
-/* nav arrows */
-.oge-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:44px;height:44px;border-radius:50%;
-  background:rgba(11,18,32,.85);border:1px solid var(--line);color:var(--gold);font-size:22px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:.15s}
-.oge-nav:hover{background:var(--gold);color:#1a1206}
-.oge-prev{left:12px}.oge-next{right:12px}
-@media(max-width:640px){.oge-nav{width:36px;height:36px;font-size:18px}}
-
-/* dots + autoplay bar */
-.oge-foot{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px;border-top:1px solid var(--tline);flex-shrink:0}
-.oge-dots{display:flex;gap:8px}
-.oge-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;padding:0;transition:.15s}
-.oge-dot.on{background:var(--gold);width:26px;border-radius:5px}
-</style>
-</head><body class="landing">
+</head><body class="page">
 <div class="pagebg"><video autoplay muted loop playsinline><source src="assets/nero_landingpage.mp4" type="video/mp4"></video><div class="pagebg-veil"></div></div>
 <div id="app">
-  <div class="stage-wrap"><div class="stage">
-  <div class="homebar">
-  <img class="hd-logo home-logo" src="assets/logo.png" alt="Home" title="Home" onclick="location.href='./'">
+<header class="sitehead">
+  <img class="hd-logo" src="assets/logo.png" alt="Home" title="Home" onclick="location.href='./'">
+  <nav class="hd-tabs"><a class="tab" href="wiki/index.html">Wiki</a><a class="tab" href="pages/stat-woe.html">WoE</a><a class="tab on" href="pages/stat-pvp.html">PvP</a><a class="tab" href="pages/stat-mvp.html">MVP</a><a class="tab" href="pages/stat-zeny.html">Zeny</a><a class="tab" href="pages/marketplace.html">Market</a></nav>
   <div class="hd-right">
     <div class="hd-status"><span class="hd-time" id="hd-time">Server time: —</span><div class="hd-pill" id="hd-pill"><b id="online-num">—</b><span>Players</span><span class="hd-sep">|</span><b id="merchant-num">—</b><span>Merchants</span></div><span class="hd-peaklbl">peak player <b id="peak-num">—</b></span></div>
     <div class="hd-acct" id="hd-acct"></div>
   </div>
-</div>
-  <div class="pin-area">
-    <button class="pin" id="pin-server" style="left:16.88%;top:43.5%;width:7.71%" onclick="openPanel('server')">
-      <span class="bob" style="animation-delay:0.0s"><img style="animation-delay:0.0s" src="assets/btn_server.png" alt="Server Detail" draggable="false"></span>
-    </button>
-    <button class="pin" id="pin-download" style="left:48.93%;top:43.6%;width:6.97%" onclick="openPanel('download')">
-      <span class="bob" style="animation-delay:-0.9s"><img style="animation-delay:-1.3s" src="assets/btn_download.png" alt="Download" draggable="false"></span>
-    </button>
-    <button class="pin" id="pin-marketplace" style="left:67.06%;top:53.6%;width:7.06%" onclick="openPanel('marketplace')">
-      <span class="bob" style="animation-delay:-1.8s"><img style="animation-delay:-2.6s" src="assets/btn_marketplace.png" alt="Marketplace" draggable="false"></span>
-    </button>
-    <button class="pin" id="pin-donation" style="left:58.7%;top:18.6%;width:7.09%" onclick="openPanel('donation')">
-      <span class="bob" style="animation-delay:-2.7s"><img style="animation-delay:-3.9s" src="assets/btn_donation.png" alt="Donation" draggable="false"></span>
-    </button>
-    <button class="pin" id="pin-login" style="left:79.64%;top:13.6%;width:6.23%" onclick="openPanel('login')">
-      <span class="bob" style="animation-delay:-3.6s"><img style="animation-delay:-5.2s" src="assets/btn_login.png" alt="Login" draggable="false"></span>
-    </button>
+</header>
+<div class="wrap full">
+  <h1 class="pg-title">PvP Statistics</h1>
+  <p class="subtitle pvp-demo"><i class="ti ti-eye"></i> Preview with dummy data — not live numbers.</p>
+
+  <div class="acct-tabs">
+    <button class="atab on" onclick="pvpTab('guildkills',this)"><i class="ti ti-shield-half-filled"></i> Guild Kills</button>
+    <button class="atab" onclick="pvpTab('players',this)"><i class="ti ti-swords"></i> Top Players</button>
+    <div class="searchbar woe-tabsearch"><i class="ti ti-search"></i>
+      <input id="tblsearch" placeholder="Search this table..." oninput="filterTable()" autocomplete="off">
+      <span class="hits" id="hits"></span></div>
   </div>
-  <div class="hint">Click a signpost to explore</div>
-  </div></div>
-  <div class="backdrop" id="backdrop" onclick="closePanel()"></div>
-  <aside class="panel" id="panel">
-    <div class="panel-head"><i id="pnl-icon" class="ti"></i><h2 id="pnl-title"></h2>
-      <button class="panel-close" onclick="closePanel()">&times;</button></div>
-    <div class="panel-body" id="pnl-body"></div>
-  </aside>
+
+  <section class="atab-panel narrow show" id="pvp-guildkills">
+    <p class="subtitle">Player kills and deaths by guild this month.</p>
+    <div class="tbl-wrap"><table class="stat"><thead><tr><th>#</th><th>Guild</th><th>Kills</th><th>Deaths</th></tr></thead><tbody><tr><td>1</td><td>New Era RO</td><td>124</td><td>118</td></tr><tr><td>2</td><td>Reincarnation</td><td>88</td><td>77</td></tr><tr><td>3</td><td>Nightfall</td><td>75</td><td>113</td></tr><tr><td>4</td><td>GBLK</td><td>71</td><td>71</td></tr><tr><td>5</td><td>AA</td><td>41</td><td>76</td></tr><tr><td>6</td><td>Valhalla</td><td>38</td><td>58</td></tr><tr><td>7</td><td>Syndicate</td><td>18</td><td>68</td></tr><tr><td>8</td><td>Phoenix</td><td>7</td><td>30</td></tr></tbody></table></div>
+  </section>
+
+  <section class="atab-panel" id="pvp-players">
+    <p class="subtitle">Everyone who fought in PvP this month, <b>ranked by kills</b>. Score breaks ties.</p>
+    <div class="tbl-wrap"><table class="stat"><thead><tr><th>#</th><th>Player</th><th>Guild</th><th>Job</th><th>Kills</th><th>Deaths</th><th>Assist</th><th>Damage Dealt</th><th>Damage Taken</th><th>Skill Used</th><th>Support Casts</th><th>Acid Demo</th><th>Healing Done</th><th>SP Used</th><th>Heal Items</th><th>Role</th><th>Score</th></tr></thead><tbody><tr><td>1</td><td>DarkLotus</td><td>GBLK</td><td>High Wizard</td><td>50</td><td>24</td><td>31</td><td>1,807,000</td><td>230,000</td><td>724</td><td>2</td><td>0</td><td>17,000</td><td>78,000</td><td>212</td><td>Attacker</td><td>6,431</td></tr><tr><td>2</td><td>Ronin</td><td>Reincarnation</td><td>Paladin</td><td>49</td><td>17</td><td>33</td><td>2,098,000</td><td>878,000</td><td>788</td><td>0</td><td>0</td><td>0</td><td>40,000</td><td>130</td><td>Tank</td><td>6,429</td></tr><tr><td>3</td><td>Aria</td><td>New Era RO</td><td>High Wizard</td><td>46</td><td>35</td><td>29</td><td>2,370,000</td><td>953,000</td><td>447</td><td>12</td><td>0</td><td>12,000</td><td>18,000</td><td>133</td><td>Attacker</td><td>6,058</td></tr><tr><td>4</td><td>LunaMoon</td><td>New Era RO</td><td>Sniper</td><td>42</td><td>43</td><td>36</td><td>1,704,000</td><td>251,000</td><td>266</td><td>1</td><td>0</td><td>17,000</td><td>22,000</td><td>84</td><td>Attacker</td><td>5,816</td></tr><tr><td>5</td><td>Sakura</td><td>New Era RO</td><td>Stalker</td><td>25</td><td>12</td><td>33</td><td>1,300,000</td><td>1,466,000</td><td>133</td><td>22</td><td>0</td><td>8,000</td><td>71,000</td><td>103</td><td>Attacker</td><td>4,060</td></tr><tr><td>6</td><td>Orion</td><td>Valhalla</td><td>High Wizard</td><td>24</td><td>17</td><td>40</td><td>993,000</td><td>1,405,000</td><td>870</td><td>25</td><td>0</td><td>6,000</td><td>35,000</td><td>219</td><td>Attacker</td><td>4,224</td></tr><tr><td>7</td><td>Akatsuki</td><td>AA</td><td>Creator</td><td>24</td><td>13</td><td>31</td><td>321,000</td><td>596,000</td><td>826</td><td>9</td><td>86</td><td>7,000</td><td>55,000</td><td>110</td><td>Attacker</td><td>3,717</td></tr><tr><td>8</td><td>Tempest</td><td>Reincarnation</td><td>Paladin</td><td>24</td><td>27</td><td>9</td><td>419,000</td><td>510,000</td><td>194</td><td>7</td><td>0</td><td>7,000</td><td>6,000</td><td>134</td><td>Tank</td><td>2,836</td></tr><tr><td>9</td><td>Valkyr</td><td>Nightfall</td><td>Champion</td><td>23</td><td>25</td><td>37</td><td>1,948,000</td><td>290,000</td><td>900</td><td>2</td><td>0</td><td>8,000</td><td>65,000</td><td>188</td><td>Attacker</td><td>3,984</td></tr><tr><td>10</td><td>Fenrir</td><td>Nightfall</td><td>Sniper</td><td>23</td><td>16</td><td>39</td><td>87,000</td><td>1,131,000</td><td>708</td><td>11</td><td>0</td><td>20,000</td><td>15,000</td><td>223</td><td>Attacker</td><td>3,925</td></tr><tr><td>11</td><td>Draven</td><td>GBLK</td><td>Creator</td><td>21</td><td>8</td><td>6</td><td>1,483,000</td><td>1,666,000</td><td>311</td><td>15</td><td>102</td><td>16,000</td><td>7,000</td><td>62</td><td>Attacker</td><td>2,564</td></tr><tr><td>12</td><td>Celeste</td><td>Valhalla</td><td>Assassin Cross</td><td>14</td><td>41</td><td>28</td><td>1,511,000</td><td>896,000</td><td>122</td><td>7</td><td>0</td><td>3,000</td><td>34,000</td><td>130</td><td>Attacker</td><td>2,706</td></tr><tr><td>13</td><td>Blitz</td><td>Nightfall</td><td>Clown</td><td>13</td><td>23</td><td>37</td><td>121,000</td><td>890,000</td><td>346</td><td>284</td><td>0</td><td>936,000</td><td>36,000</td><td>30</td><td>Support</td><td>4,305</td></tr><tr><td>14</td><td>Kaiser</td><td>Reincarnation</td><td>Clown</td><td>12</td><td>6</td><td>4</td><td>58,000</td><td>1,052,000</td><td>206</td><td>142</td><td>0</td><td>1,592,000</td><td>81,000</td><td>23</td><td>Support</td><td>2,234</td></tr><tr><td>15</td><td>Ragnar</td><td>AA</td><td>Paladin</td><td>11</td><td>37</td><td>36</td><td>1,343,000</td><td>1,297,000</td><td>875</td><td>21</td><td>0</td><td>5,000</td><td>18,000</td><td>158</td><td>Tank</td><td>2,779</td></tr><tr><td>16</td><td>Yuki</td><td>Syndicate</td><td>Paladin</td><td>11</td><td>43</td><td>22</td><td>1,571,000</td><td>1,121,000</td><td>165</td><td>3</td><td>0</td><td>15,000</td><td>64,000</td><td>132</td><td>Tank</td><td>2,153</td></tr><tr><td>17</td><td>Zephyr</td><td>New Era RO</td><td>Champion</td><td>11</td><td>28</td><td>4</td><td>2,274,000</td><td>342,000</td><td>414</td><td>18</td><td>0</td><td>1,000</td><td>69,000</td><td>64</td><td>Attacker</td><td>1,577</td></tr><tr><td>18</td><td>Hikari</td><td>Nightfall</td><td>Professor</td><td>9</td><td>36</td><td>21</td><td>191,000</td><td>1,069,000</td><td>334</td><td>104</td><td>0</td><td>683,000</td><td>70,000</td><td>117</td><td>Support</td><td>2,347</td></tr><tr><td>19</td><td>Mystic</td><td>Nightfall</td><td>Creator</td><td>7</td><td>13</td><td>25</td><td>2,330,000</td><td>719,000</td><td>180</td><td>26</td><td>240</td><td>17,000</td><td>40,000</td><td>190</td><td>Attacker</td><td>2,064</td></tr><tr><td>20</td><td>Kurogane</td><td>Phoenix</td><td>Lord Knight</td><td>7</td><td>30</td><td>4</td><td>1,065,000</td><td>335,000</td><td>604</td><td>13</td><td>0</td><td>1,000</td><td>77,000</td><td>41</td><td>Attacker</td><td>1,031</td></tr><tr><td>21</td><td>Seraphine</td><td>AA</td><td>Professor</td><td>6</td><td>26</td><td>35</td><td>187,000</td><td>278,000</td><td>617</td><td>91</td><td>0</td><td>2,735,000</td><td>31,000</td><td>137</td><td>Support</td><td>2,746</td></tr><tr><td>22</td><td>Noctis</td><td>Syndicate</td><td>Professor</td><td>5</td><td>19</td><td>0</td><td>42,000</td><td>1,008,000</td><td>587</td><td>408</td><td>0</td><td>2,697,000</td><td>77,000</td><td>91</td><td>Support</td><td>2,813</td></tr><tr><td>23</td><td>Nova</td><td>Reincarnation</td><td>Clown</td><td>3</td><td>27</td><td>30</td><td>50,000</td><td>1,038,000</td><td>848</td><td>370</td><td>0</td><td>555,000</td><td>55,000</td><td>128</td><td>Support</td><td>3,410</td></tr><tr><td>24</td><td>Shiro</td><td>Syndicate</td><td>Clown</td><td>2</td><td>6</td><td>36</td><td>179,000</td><td>1,062,000</td><td>331</td><td>425</td><td>0</td><td>2,938,000</td><td>49,000</td><td>15</td><td>Support</td><td>4,075</td></tr><tr><td>25</td><td>Ember</td><td>GBLK</td><td>High Priest</td><td>0</td><td>39</td><td>34</td><td>30,000</td><td>894,000</td><td>668</td><td>56</td><td>0</td><td>488,000</td><td>31,000</td><td>167</td><td>Support</td><td>1,691</td></tr></tbody></table></div>
+  </section>
 </div>
-<button class="oge-badge" id="oge-badge" onclick="ogeOpen()" title="On-Going Events" aria-label="On-Going Events">
-  <img src="assets/event-icon.png" alt="On-Going Event"><span class="oge-ping"></span>
-</button>
-<div class="oge-bg" id="oge-bg" onclick="if(event.target===this)ogeClose()">
-  <div class="oge-modal">
-    <div class="oge-top">
-      <h2><i class="ti ti-calendar-star"></i> On-Going Events</h2>
-      <button class="oge-close" onclick="ogeClose()" aria-label="Close">&times;</button>
-    </div>
-    <div class="oge-viewport">
-      <button class="oge-nav oge-prev" onclick="ogeGo(-1)" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
-      <div class="oge-track" id="oge-track"></div>
-      <button class="oge-nav oge-next" onclick="ogeGo(1)" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
-    </div>
-    <div class="oge-foot">
-      <div class="oge-dots" id="oge-dots"></div>
-    </div>
-  </div>
+<style>.pvp-demo{color:var(--gold-soft)}.pvp-demo i{margin-right:5px}</style>
+<script>
+function pvpTab(name,btn){
+  document.querySelectorAll('.acct-tabs .atab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  ['guildkills','players'].forEach(function(n){document.getElementById('pvp-'+n).classList.toggle('show',n===name);});
+  if(window.resetTableSearch) resetTableSearch();
+}
+</script>
+<div class="backdrop" id="backdrop" onclick="closePanel()"></div>
+<aside class="panel" id="panel">
+  <div class="panel-head"><i id="pnl-icon" class="ti"></i><h2 id="pnl-title"></h2>
+    <button class="panel-close" onclick="closePanel()">&times;</button></div>
+  <div class="panel-body" id="pnl-body"></div>
+</aside>
 </div>
 <div class="music" id="music">
   <button class="mus-toggle" id="mus-toggle" title="Play / pause"><i class="ti ti-player-play"></i></button>
@@ -149,216 +63,5 @@
   <div class="mus-panel" id="mus-panel"></div>
 </div>
 <audio id="bgm" preload="auto"></audio>
-<script>
-/* ===== On-Going Events carousel (self-contained) ===== */
-var OGE_LINK='https://discord.com/channels/1528372919229485076/1543820458795864144';
-var OGE_EVENTS=[
-{
- img:'assets/event-likeshare.jpg',
- title:'Like &amp; Share Event',
- period:'Total Prize: 20,000 IDR',
- html:
-   '<p class="lead">Don\'t miss the opportunity to earn Rupiah in the Like &amp; Share event at New Era Ragnarok. The steps are very easy: share the post image below, tag 5 friends, and tag New Era on whatever platform you use.</p>'+
-   '<div class="oge-links">'+
-     '<a class="oge-lbtn fb" target="_blank" rel="noopener" href="https://www.facebook.com/profile.php?id=61592822981622"><i class="ti ti-brand-facebook"></i> Facebook</a>'+
-     '<a class="oge-lbtn ig" target="_blank" rel="noopener" href="https://www.instagram.com/newera_ro/"><i class="ti ti-brand-instagram"></i> Instagram</a>'+
-     '<a class="oge-lbtn dc" target="_blank" rel="noopener" href="https://discord.com/invite/sXRqykzN3G"><i class="ti ti-brand-discord"></i> Discord</a>'+
-   '</div>'+
-   '<h4>Rewards</h4><ul>'+
-     '<li>Facebook Like &amp; Share — 5,000 IDR</li>'+
-     '<li>Instagram Like &amp; Share — 5,000 IDR</li>'+
-     '<li>Discord Like &amp; Share — 10,000 IDR</li>'+
-     '<li><b>Total prize — 20,000 IDR</b></li>'+
-   '</ul>'+
-   '<p class="lead">More likes, more shares, more rewards!</p>'+
-   '<a target="_blank" rel="noopener" href="https://discord.com/channels/1528372919229485076/1543824150358007889/1543824150358007889">Full details on Discord →</a>'
-},
-{
- img:'assets/event-stayonline.jpg',
- title:'Stay Online, Get Lucky with NERO!',
- period:'02 September – 12 October 2026',
- html:
-   '<p class="lead">📢 Calling all adventurers! Are you always online and enjoying your journey in NERO? Now your playtime can turn into lucky rewards — the longer you stay active, the more Hourly Points you collect, and the more chances you have to win!</p>'+
-   '<h4>🎟️ How to get raffle tickets</h4>'+
-   '<ul><li>Stay online and play NERO to earn Hourly Points.</li>'+
-   '<li>Every <b>100 Hourly Points</b> can be exchanged for <b>1 Play-For-Win Raffle Ticket</b> in the Hourly Shop.</li>'+
-   '<li>Collect tickets and use them for your chance to win!</li></ul>'+
-   '<h4>🎁 Raffle prize pool</h4>'+
-   '<div class="oge-prize">'+
-     '<div class="pz">🚲 Mountain Bike MTB 27.5" Evergreen Ranger</div>'+
-     '<div class="pz">⌚ Xiaomi Mi Smart Band 9</div>'+
-     '<div class="pz">🎧 Rexus Thundervox Gaming Headset</div>'+
-     '<div class="pz">💰 300,000 Cash Coin × 2</div>'+
-     '<div class="pz">👑 VIP 30 Days × 5</div>'+
-   '</div>'+
-   '<h4>⚠️ Live draw</h4>'+
-   '<p>The raffle drawing will be conducted via LIVE STREAM after the event ends.</p>'+
-   '<h4>Event rules</h4>'+
-   '<ul><li>This event is for <b>characters, not ID</b>.</li>'+
-   '<li>Keep your tickets in your inventory — <b>do not</b> place them in Kafra/Cart.</li>'+
-   '<li>Tickets left in Kafra/Cart after the event ends will not be counted.</li>'+
-   '<li>The list of participants will be announced before the draw.</li>'+
-   '<li>Draw date &amp; time announced on social media &amp; NERO Discord.</li>'+
-   '<li>Winners must share on social media with <b>#STAYONLINEGETLUCKYWITHNERO</b>.</li></ul>'+
-   '<a target="_blank" rel="noopener" href="https://discord.com/channels/1528372919229485076/1543825977572987020/1543825977572987020">Full details on Discord →</a>'
-},
-{
- img:'assets/event-blessing.jpg',
- title:'Nero Blessing Aura Event',
- period:'02 September – 12 October 2026',
- html:
-   '<p class="lead">Lucky Aura Reward — <b>Total Prize: 10M</b> in HP, gaming gear, smart watch, microphone &amp; more!</p>'+
-   '<h4>🎁 Prize pool</h4>'+
-   '<div class="oge-prize">'+
-     '<div class="pz">📱 Samsung Galaxy A07</div>'+
-     '<div class="pz">⌚ Samsung Galaxy Watch 7</div>'+
-     '<div class="pz">🪑 Kucadi Gaming Chair</div>'+
-     '<div class="pz">⌨️ Gaming Keyboard</div>'+
-     '<div class="pz">🖱️ Logitech G203 Gaming Mouse</div>'+
-     '<div class="pz">🎙️ TNWK18 Microphone</div>'+
-     '<div class="pz">🎧 Rexus Gaming Headset</div>'+
-     '<div class="pz">🖱️ RGB Gaming Mouse Pad × 3</div>'+
-     '<div class="pz">💵 100K IDR × 5</div>'+
-     '<div class="pz">🪙 100K Cash Coin × 5</div>'+
-     '<div class="pz">🪙 50K Cash Coin × 5</div>'+
-     '<div class="pz">✨ Exclusive Costume LHZ</div>'+
-     '<div class="pz">✨ Exclusive Costume Garment</div>'+
-   '</div>'+
-   '<h4>Requirements</h4>'+
-   '<ul><li>Your character must be <b>Lv 99/70</b>.</li>'+
-   '<li>Post on your social media, then screenshot and share it in the Discord channel to get your ticket number.</li>'+
-   '<li>Use caption: <b>EVENT BLESSING AURA NEW ERA RAGNAROK</b></li></ul>'+
-   '<div class="oge-note">Tickets are unlimited — the more tickets you collect, the higher your chance to win. Winners are drawn via live stream.</div>'+
-   '<p style="margin-top:12px"><a target="_blank" rel="noopener" href="https://discord.com/channels/1528372919229485076/1543826503123345438/1543826503123345438">Full details on Discord →</a></p>'
-},
-{
- img:'assets/event-mvp.jpg',
- title:'MVP Collector — Hunt MVP, Get the Glory!',
- period:'Starts 02 September 2026',
- html:
-   '<p class="lead">Calling all MVP hunters who roam the Rune Midgard — quickly conquer MVPs in New Era Ragnarok! The first player to obtain an MVP Card in each category is rewarded <b>IDR 500K + CP 500K</b>. Be the first to own an MVP card!</p>'+
-   '<div class="oge-note">Event ends when the first MVP card in each category has been obtained.</div>'+
-   '<h4>🌟 Prize pool</h4>'+
-   '<ul><li><b>Total Prize:</b> 25,000,000 IDR / 85,000 PHP</li>'+
-   '<li>IDR = Rp 12,500,000 / 42,000 PHP</li>'+
-   '<li>Cash Points = 12,500,000</li></ul>'+
-   '<h4>💫 Event rules</h4>'+
-   '<ul><li>The first to obtain an MVP card of a monster is entitled to IDR 500K + CP 500K. <b>Only MVP cards, and only the first card dropped directly from the monster</b> — not from a Mystical Card Album. (Example: first Golden Thief Bug Card.)</li>'+
-   '<li>Multi-claims allowed — obtaining the first MVP card of different monsters lets you claim 2× or more.</li>'+
-   '<li>Prizes are based on the first MVP card in the inventory. If you kill an MVP and someone else takes the first card, the person who gets the card is eligible to claim.</li>'+
-   '<li>Any form of cheating will result in sanctions.</li>'+
-   '<li>The first upload of the MVP Card screenshot will be counted as the winner.</li></ul>'+
-   '<a target="_blank" rel="noopener" href="https://discord.com/channels/1528372919229485076/1543827139424686140/1543827139424686140">Full details on Discord →</a>'
-},
-{
- img:'assets/event-refinemaster.jpg',
- title:'Nero Refine Master S1',
- period:'From Open Beta (OBT) until all rewards are claimed',
- html:
-   '<p class="lead">Refine to <b>+10</b> and claim the glory! Will you be the first to master refinement in New Era Ragnarok?</p>'+
-   '<h4>Rules</h4>'+
-   '<ul><li>Only <b>1 winner per armor category</b> (e.g. 1 for +10 Boots/Shoes, 1 for +10 Muffler/Manteau, etc.).</li>'+
-   '<li>First to reach <b>+10</b> on a specific armor type automatically wins its designated prize.</li></ul>'+
-   '<h4>🏆 Exclusive rewards</h4>'+
-   '<div class="oge-prize">'+
-     '<div class="pz">🛡️ Armor +10 Winner</div>'+
-     '<div class="pz">🛡️ Shield +10 Winner</div>'+
-     '<div class="pz">👢 Shoes +10 Winner</div>'+
-     '<div class="pz">🧥 Garment +10 Winner</div>'+
-     '<div class="pz">👑 Cash Shop Upper Headgear +10 Winner</div>'+
-     '<div class="pz">✨ …and more amazing prizes!</div>'+
-   '</div>'+
-   '<div class="oge-note">Refine » Enhance to +10 » Be the first to win! #NEWERARO #RefineToGlory</div>'
-},
-{
- img:'assets/event-shadowrefine.jpg',
- title:'Nero Shadow Refine Event',
- period:'02 September – 31 October 2026',
- html:
-   '<p class="lead">Hello adventurers! New Era Ragnarok has begun, and it\'s time to prove your refining skills in the <b>Shadow Refine Challenge</b>. Sharpen your determination, push your limits, and let your Shadow Equipment shine brighter than ever!</p>'+
-   '<h4>🏆 Special reward — fastest refiners</h4>'+
-   '<p>Prize pool total: <b>10,000,000 IDR / 35,000 PHP</b>. The <b>3 fastest</b> players to reach a total refine score of <b>+55</b> will win:</p>'+
-   '<ul><li><b>Rank 1</b> — 5,000,000 IDR / 17,500 PHP</li>'+
-   '<li><b>Rank 2</b> — 3,000,000 IDR / 10,500 PHP</li>'+
-   '<li><b>Rank 3</b> — 2,000,000 IDR / 7,000 PHP</li></ul>'+
-   '<h4>How to join</h4>'+
-   '<p>Complete a full set of Shadow Equipment — Weapon, Armor, Shield, Shoes, Accessory 1 and Accessory 2 — reaching a <b>total refine score of +55</b>.</p>'
-},
-{
- img:'assets/event-luckydraw.jpg',
- title:'OBT Lucky Draw — Top-Up',
- period:'02 September – 12 October 2026',
- html:
-   '<p class="lead"><b>100K CP = 1 Raffle Ticket.</b> Applies multiply — the more you top up, the more tickets you get. Top up more, win bigger!</p>'+
-   '<p>Total grand prize: <b>20,000,000 IDR / 70,000 PHP</b></p>'+
-   '<h4>🎁 Amazing prizes</h4>'+
-   '<div class="oge-prize">'+
-     '<div class="pz">🛹 E-Buy 10" HoverBoard (Smart Balance Scooter)</div>'+
-     '<div class="pz">🖥️ Xiaomi Gaming Monitor G24i</div>'+
-     '<div class="pz">🎮 Game Retro R356 128GB</div>'+
-     '<div class="pz">🔊 Sony SRS-XB13 Bluetooth Speaker</div>'+
-     '<div class="pz">⌨️ Fantech ATOM Mizu Gaming Keyboard</div>'+
-     '<div class="pz">🔊 JBL Speaker Go 2 Portable</div>'+
-     '<div class="pz">🖱️ Rexus RX-KM8 Wireless Keyboard + Mouse</div>'+
-     '<div class="pz">📷 Webcam EYD UHD 2K</div>'+
-   '</div>'+
-   '<div class="oge-note">Top up now &amp; get your tickets — your luck, your reward!</div>'
-}
-];
-
-var ogeIdx=0, ogeTimer=null;
-function ogeBuild(){
-  var track=document.getElementById('oge-track'), dots=document.getElementById('oge-dots');
-  track.innerHTML=OGE_EVENTS.map(function(e){
-    return '<div class="oge-slide"><a class="oge-banner-link" href="'+OGE_LINK+'" target="_blank" rel="noopener" title="Open event details on Discord"><img class="oge-banner" src="'+e.img+'" alt="'+e.title+'" loading="lazy"><span class="oge-banner-cta"><i class="ti ti-brand-discord"></i> View on Discord</span></a>'+
-      '<div class="oge-body"><h3 class="oge-etitle">'+e.title+'</h3>'+
-      '<div class="oge-period"><i class="ti ti-calendar-event"></i> '+e.period+'</div>'+e.html+'</div></div>';
-  }).join('');
-  dots.innerHTML=OGE_EVENTS.map(function(_,i){return '<button class="oge-dot'+(i===0?' on':'')+'" onclick="ogeSet('+i+')" aria-label="Event '+(i+1)+'"></button>';}).join('');
-}
-function ogeApply(){
-  document.getElementById('oge-track').style.transform='translateX(-'+(ogeIdx*100)+'%)';
-  Array.prototype.forEach.call(document.querySelectorAll('.oge-dot'),function(d,i){d.classList.toggle('on',i===ogeIdx);});
-  // reset each slide scroll to top on change
-  var s=document.querySelectorAll('.oge-slide')[ogeIdx]; if(s) s.scrollTop=0;
-}
-function ogeSet(i){ ogeIdx=(i+OGE_EVENTS.length)%OGE_EVENTS.length; ogeApply(); ogeRestart(); }
-function ogeGo(d){ ogeSet(ogeIdx+d); }
-function ogeRestart(){ if(ogeTimer){clearInterval(ogeTimer);ogeTimer=null;} ogeTimer=setInterval(function(){ogeIdx=(ogeIdx+1)%OGE_EVENTS.length;ogeApply();},5000); }
-function ogeOpen(){
-  document.getElementById('oge-bg').classList.add('show');
-  document.body.style.overflow='hidden';
-  ogeIdx=0; ogeApply();
-  ogeRestart();
-}
-function ogeClose(){
-  document.getElementById('oge-bg').classList.remove('show');
-  document.body.style.overflow='';
-  if(ogeTimer){clearInterval(ogeTimer);ogeTimer=null;}
-}
-document.addEventListener('keydown',function(e){
-  if(!document.getElementById('oge-bg').classList.contains('show')) return;
-  if(e.key==='Escape') ogeClose();
-  else if(e.key==='ArrowRight') ogeGo(1);
-  else if(e.key==='ArrowLeft') ogeGo(-1);
-});
-/* pause auto-advance while the pointer is over the modal so long text is readable */
-(function(){
-  var bg=document.getElementById('oge-bg');
-  var modal=bg.querySelector('.oge-modal');
-  modal.addEventListener('mouseenter',function(){ if(ogeTimer){clearInterval(ogeTimer);ogeTimer=null;} });
-  modal.addEventListener('mouseleave',function(){ ogeRestart(); });
-})();
-ogeBuild();
-</script>
-
 <script src="js/data.js"></script><script src="js/wiki-index.js"></script><script src="js/app.js"></script>
-<style>
-.don-qris-loading{padding:60px 20px;color:var(--muted);font-size:13px;text-align:center}
-.don-qris-status{margin-top:12px;padding:10px 12px;border:1px solid var(--tline);border-radius:9px;
-  background:rgba(228,184,75,.08);font-size:13px;color:var(--text);text-align:center}
-.don-qris-status i{color:var(--gold);margin-right:6px}
-.don-fallback .qris-card{margin-top:10px}
-</style>
-<script src="js/event-popup.js?v=4"></script>
 </body></html>
