@@ -1055,10 +1055,13 @@ function woeTab(name, btn){
   var root=btn && btn.closest('.acct-tabs');
   (root || document).querySelectorAll('.atab').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
-  ['castles','players','guildkills','kills','me'].forEach(function(n){
+  ['castles','players','guildkills','kills','me','stats','pvpnight'].forEach(function(n){
     var el=document.getElementById('woe-'+n);
     if(el) el.classList.toggle('show', n===name);
   });
+  /* PvP page: the month/date bar belongs to the PvP Night tabs only */
+  var bar=document.getElementById('woe-datebar');
+  if(bar && bar.getAttribute('data-hide-on')) bar.style.display=(bar.getAttribute('data-hide-on')===name)?'none':'';
   resetTableSearch();
 }
 function acctTab(name, btn){
@@ -1356,6 +1359,27 @@ var woePlayersPerPage=20;            /* 20 | 50 | 100 | 'all' */
    null means "not resolved yet" — loadWoeDates() fills it from the newest day
    that actually has data before the first fetch goes out. */
 var woeDate=null;
+/* The month picker next to it: 'm:YYYY-MM', 'y:YYYY' or 'all'. woeDate is then
+   one day in it, or 'all' for every event in that month/year. */
+var woeMonth=null;
+/* Which game table the woe_* boards read: the WoE page reads WoE, the PvP
+   page's PvP Night tab reads the same boards with src=pvpnight. Marked on the
+   page by data-statsrc (SPA navigation swaps the page, not <body>). */
+function woeSrc(){
+  var el=document.querySelector('[data-statsrc]');
+  return el ? el.getAttribute('data-statsrc') : '';
+}
+/* Query for the selected window, plus the source. */
+function woeQ(extra){
+  var q={};
+  if(woeDate && woeDate!=='all') q.date=woeDate;
+  else if(woeMonth && woeMonth.indexOf('y:')===0) q.year=woeMonth.slice(2);
+  else if(woeMonth && woeMonth.indexOf('m:')===0) q.month=woeMonth.slice(2);
+  else q.date='all';
+  if(woeSrc()) q.src=woeSrc();
+  for(var k in (extra||{})) q[k]=extra[k];
+  return q;
+}
 
 /* The flat boards. Page and rows-per-page are per board so switching tabs or
    pages on one doesn't disturb another. */
@@ -1367,9 +1391,9 @@ function isStatKey(key){ return STAT_KEYS.indexOf(key)!==-1; }
 
 /* Per-table query string for the paged endpoints. */
 function tableParams(key){
-  if(key==='woe_players') return {page:woePlayersPage, per_page:woePlayersPerPage, date:woeDate||'all'};
+  if(key==='woe_players') return woeQ({page:woePlayersPage, per_page:woePlayersPerPage});
   /* the guild board and the kill feed follow the same day as the player board */
-  if(key==='woe_guild_kills' || key==='woe_kills') return woeDate ? {date:woeDate} : null;
+  if(key==='woe_guild_kills' || key==='woe_kills') return woeQ();
   if(isStatKey(key)) return {page:statPage[key], per_page:statPerPage[key]};
   return null;
 }
@@ -1428,34 +1452,78 @@ function renderPager(id,meta,goFn,noun,opts){
     '<div class="pg-btns">'+btns+'</div>'+picker;
 }
 
-/* ---- WoE date filter ----
-   Built from the days woe_stats actually holds. The default is the NEWEST day
-   with data, not today: WoE runs on set days, so on most days today is empty
-   and an empty board reads as a broken page. With nothing recorded at all we
-   fall back to today, which is at least honest about being empty. */
+/* ---- WoE / PvP Night date filter ----
+   Two pickers: a month (or a whole year, or all time) and, inside it, one
+   event day or every event in it. Built from the days the game actually wrote
+   (woe_dates), so it never offers an empty day. On arrival: the newest day
+   with data, in its month - events run on set days, so "today" is empty on
+   most of them. With nothing recorded at all the board says so. */
+var woeDays=[];
+var WOE_MONS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 async function loadWoeDates(){
   var sel=document.getElementById('woe-datefilter');
-  if(!sel) return;                                  /* not the WoE page */
-  var d=await NeroAPI.get('woe_dates');
-  var dates=(d && Array.isArray(d.dates)) ? d.dates : [];
+  if(!sel) return;                                  /* no date filter on this page */
+  var d=await NeroAPI.get('woe_dates', woeSrc()?{src:woeSrc()}:null);
+  woeDays=(d && Array.isArray(d.dates)) ? d.dates : [];
   var today=(d && d.today) || new Date().toISOString().slice(0,10);
-  if(!woeDate) woeDate=(d && d.latest) || today;
-
+  if(!woeMonth){
+    var first=(d && d.latest) || today;
+    woeMonth='m:'+first.slice(0,7);
+    if(!woeDate) woeDate=(d && d.latest) || 'all';
+  }
+  var msel=document.getElementById('woe-month');
+  if(msel){
+    var months=[], years=[];
+    woeDays.forEach(function(x){
+      var m=x.date.slice(0,7), y=x.date.slice(0,4);
+      if(months.indexOf(m)<0) months.push(m);
+      if(years.indexOf(y)<0) years.push(y);
+    });
+    var cur=today.slice(0,7);
+    if(months.indexOf(cur)<0) months.push(cur);
+    if(years.indexOf(cur.slice(0,4))<0) years.push(cur.slice(0,4));
+    months.sort().reverse(); years.sort().reverse();
+    msel.innerHTML=months.map(function(m){
+        var v='m:'+m;
+        return '<option value="'+v+'"'+(v===woeMonth?' selected':'')+'>'+WOE_MONS[parseInt(m.slice(5),10)-1]+' '+m.slice(0,4)+'</option>';
+      }).join('')+
+      '<optgroup label="Longer">'+years.map(function(y){
+        var v='y:'+y;
+        return '<option value="'+v+'"'+(v===woeMonth?' selected':'')+'>Whole year '+y+'</option>';
+      }).join('')+'<option value="all"'+(woeMonth==='all'?' selected':'')+'>All time</option></optgroup>';
+  }
+  renderWoeDaySelect();
+}
+/* The event-day picker for the selected month/year. */
+function renderWoeDaySelect(){
+  var sel=document.getElementById('woe-datefilter');
+  if(!sel) return;
   var note=document.getElementById('woe-datenote');
-  if(!dates.length){
-    sel.innerHTML='<option value="'+today+'">'+fmtWoeDate(today)+'</option>';
+  var hasMonth=!!document.getElementById('woe-month');
+  var pre=(hasMonth && woeMonth && woeMonth!=='all') ? woeMonth.slice(2) : '';
+  var days=woeDays.filter(function(x){ return !pre || x.date.indexOf(pre)===0; });
+  var scope=!pre ? 'on record' : (woeMonth.indexOf('y:')===0 ? 'in '+pre : 'this month');
+  if(woeDate && woeDate!=='all' && !days.some(function(x){ return x.date===woeDate; })) woeDate='all';
+  if(!days.length){
+    sel.innerHTML='<option value="all">No event recorded '+scope+'</option>';
     sel.disabled=true;
-    if(note) note.textContent='No WoE recorded yet.';
+    if(note) note.textContent='';
     return;
   }
   sel.disabled=false;
-  var opts=dates.map(function(x,i){
-    var label=fmtWoeDate(x.date)+' — '+fmtNum(x.players)+' player'+(x.players===1?'':'s');
-    if(i===0) label+=' (latest)';
-    return '<option value="'+x.date+'"'+(x.date===woeDate?' selected':'')+'>'+label+'</option>';
-  }).join('');
-  sel.innerHTML=opts+'<option value="all"'+(woeDate==='all'?' selected':'')+'>All dates combined</option>';
-  if(note) note.textContent=(dates.length===1?'1 WoE day':fmtNum(dates.length)+' WoE days')+' on record.';
+  sel.innerHTML='<option value="all"'+(woeDate==='all'||!woeDate?' selected':'')+'>All events '+scope+' ('+days.length+')</option>'+
+    days.map(function(x){
+      var label=fmtWoeDate(x.date)+' — '+fmtNum(x.players)+' player'+(x.players===1?'':'s');
+      if(x.date===woeDays[0].date) label+=' (latest)';
+      return '<option value="'+x.date+'"'+(x.date===woeDate?' selected':'')+'>'+label+'</option>';
+    }).join('');
+  if(note) note.textContent=(days.length===1?'1 event':fmtNum(days.length)+' events')+' '+scope+'.';
+}
+async function goWoeMonth(v){
+  woeMonth=v||'all';
+  woeDate='all';
+  renderWoeDaySelect();
+  await goWoeDate('all');
 }
 function fmtWoeDate(iso){
   var d=new Date(iso+'T00:00:00');
@@ -1592,22 +1660,25 @@ async function hydrateOneTable(tbl){
        bridge this is belt-and-braces: it only ever returns rows scoring above
        zero, so nothing here is actually dropped and the pager's "of N" count
        stays true to what's listed.) */
+    var pvpn=(woeSrc()==='pvpnight');
     d.rows.filter(woeParticipated).forEach(function(r){
-      rows.push(tdRow([i++, woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0),
-        fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.assists), fmtNum(r.damage), fmtNum(r.damage_taken),
-        fmtNum(r.emperium_damage), fmtNum(r.barricade_damage),
-        fmtNum(r.skill_casts), fmtNum(r.support_skills_used), fmtNum(r.acid_demonstration_used),
+      var c=[i++, woeNameLink(r.char_id,r.name), r.guild||'—', jobName(r.class||0),
+        fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.assists), fmtNum(r.damage), fmtNum(r.damage_taken)];
+      /* no Emperium / Barricade on the PvP Night arena */
+      if(!pvpn) c.push(fmtNum(r.emperium_damage), fmtNum(r.barricade_damage));
+      c.push(fmtNum(r.skill_casts), fmtNum(r.support_skills_used), fmtNum(r.acid_demonstration_used),
         fmtNum(r.healing_done), fmtNum(r.sp_used), fmtNum(r.healing_items),
-        r.role||'—', fmtNum(r.score)]));
+        r.role||'—', fmtNum(r.score));
+      rows.push(tdRow(c));
     });
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
-      : noDataRow(cols,'No WoE combat data recorded yet this month.');
+      : noDataRow(cols, pvpn ? 'No PvP Night recorded for this period.' : 'No WoE combat data recorded for this period.');
   } else if(key==='woe_guild_kills' && d.rows){
     d.rows.forEach(function(r){
       rows.push(tdRow([i++, r.name, fmtNum(r.kills), fmtNum(r.deaths)]));
     });
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
-      : noDataRow(cols,'No guild WoE kills recorded yet this month.');
+      : noDataRow(cols, woeSrc()==='pvpnight' ? 'No PvP Night recorded for this period.' : 'No guild WoE kills recorded for this period.');
   } else if(key==='woe_kills' && d.rows){
     d.rows.forEach(function(r){
       rows.push(tdRow([fmtWoeTime(r.time), r.killer, r.killed, r.map||'—']));
@@ -1624,7 +1695,7 @@ async function hydrateOneTable(tbl){
   } else if(key==='pvp'){
     if(!d.available) return;                      /* keep the honest "no tracking" row already in the HTML */
     d.rows.forEach(function(r){
-      rows.push(tdRow([i++, r.name, fmtNum(r.kills), fmtNum(r.deaths), r.kd, fmtNum(r.points)]));
+      rows.push(tdRow([i++, r.name, fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.points)]));
     });
     renderStatPager('pvp', d, 'players');
     if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
@@ -1758,7 +1829,7 @@ async function openWoePlayerDetail(charId){
   panel.classList.add('show'); backdrop.classList.add('show');
 
   /* same day the board is showing, so the detail matches the row clicked */
-  var d=await NeroAPI.get('woe_player',{char_id:charId, date:woeDate||'all'});
+  var d=await NeroAPI.get('woe_player',woeQ({char_id:charId}));
   if(!d){
     document.getElementById('pnl-body').innerHTML='<p class="lead">Could not load this player’s WoE stats.</p>';
     return;
@@ -1778,7 +1849,7 @@ async function loadWoeMePage(){
   var tbl=document.getElementById('woeme-tbl');
   if(!tbl) return;
   var cols=tbl.rows[0].cells.length;
-  var d=await NeroAPI.get('woe_me',{date:woeDate||'all'});
+  var d=await NeroAPI.get('woe_me',woeQ());
   if(!d){ tbl.tBodies[0].innerHTML=noDataRow(cols,'Could not load your characters — try again shortly.'); return; }
   woeEstNote('woeme-est', !!d.estimated);
   var rows=d.rows.map(function(r){
@@ -1816,6 +1887,7 @@ function afterPageLoad(){
   curF='all';                       /* reset marketplace filter state */
   woePlayersPage=1;                 /* ...and the WoE Top Players page */
   woeDate=null;                     /* ...and re-resolve which WoE day to show */
+  woeMonth=null;
   STAT_KEYS.forEach(function(k){ statPage[k]=1; });
   selAmt=null;
   /* loadWoeDates() must settle first: it decides which day the WoE tables ask

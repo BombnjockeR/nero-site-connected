@@ -826,3 +826,9 @@ body.page .oge-bg{display:none !important}
 .era-tbl tr.era-r td{border-top:none}
 .wiki-main table.era-tbl{width:100%}.wiki-main table.era-tbl th:first-child,.wiki-main table.era-tbl td.era-tier{width:120px;padding-left:16px;padding-right:16px}
 .wiki-main table.era-tbl td:not(.era-tier){width:auto}
+
+/* PvP page - PvP Night tab: two boards under one month/date bar */
+.pvpn-h{font-size:18px;color:var(--gold);font-weight:600;margin:22px 0 6px;display:flex;align-items:center;gap:8px}
+.pvpn-h i{font-size:20px}
+.pvpn-narrow{max-width:760px}
+.statbar-sel.pvpn-msel,#woe-month{min-width:170px}

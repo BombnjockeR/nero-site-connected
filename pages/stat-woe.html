@@ -18,6 +18,8 @@
   <h1 class="pg-title">WoE Statistics</h1>
 
   <div class="statbar">
+    <label class="statbar-lbl" for="woe-month"><i class="ti ti-calendar-month"></i> Month</label>
+    <select class="statbar-sel" id="woe-month" onchange="goWoeMonth(this.value)"><option>Loading…</option></select>
     <label class="statbar-lbl" for="woe-datefilter"><i class="ti ti-calendar-event"></i> WoE date</label>
     <select class="statbar-sel" id="woe-datefilter" onchange="goWoeDate(this.value)">
       <option>Loading…</option>

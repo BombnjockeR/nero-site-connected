@@ -14,11 +14,41 @@
     <div class="hd-acct" id="hd-acct"></div>
   </div>
 </header>
-<div class="wrap">
+<div class="wrap full">
   <h1 class="pg-title">PvP Statistics</h1>
-  <p class="subtitle">Top PvP killers this month.</p>
-  <div class="tbl-wrap"><table class="stat" id="stbl" data-api="pvp"><thead><tr><th>#</th><th>Player</th><th>Kills</th><th>Deaths</th><th>K/D</th><th>Points</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="6">No PvP tracking data yet — check back once the server has been tracking kills for a while.</td></tr></tbody></table></div>
-  <div class="pager" id="pvp-pager" style="display:none"></div>
+
+  <div class="acct-tabs">
+    <button class="atab on" onclick="woeTab('stats',this)"><i class="ti ti-skull"></i> PvP Statistics</button>
+    <button class="atab" onclick="woeTab('pvpnight',this)"><i class="ti ti-moon-stars"></i> PvP Night</button>
+    <div class="searchbar woe-tabsearch"><i class="ti ti-search"></i>
+      <input id="tblsearch" placeholder="Search this table..." oninput="filterTable()" autocomplete="off">
+      <span class="hits" id="hits"></span></div>
+  </div>
+
+  <section class="atab-panel narrow show" id="woe-stats">
+    <p class="subtitle">Top PvP killers this month. Points are the PvP Points actually earned this month (a kill's reward is split across the killer's party on the same map).</p>
+    <div class="tbl-wrap"><table class="stat" id="stbl" data-api="pvp"><thead><tr><th>#</th><th>Player</th><th>Kills</th><th>Deaths</th><th>Points</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="5">No PvP kills recorded yet this month.</td></tr></tbody></table></div>
+    <div class="pager" id="pvp-pager" style="display:none"></div>
+  </section>
+
+  <section class="atab-panel" id="woe-pvpnight">
+    <div class="statbar" id="woe-datebar" data-statsrc="pvpnight" data-hide-on="stats">
+      <label class="statbar-lbl" for="woe-month"><i class="ti ti-calendar-month"></i> Month</label>
+      <select class="statbar-sel pvpn-msel" id="woe-month" onchange="goWoeMonth(this.value)"><option>Loading…</option></select>
+      <label class="statbar-lbl" for="woe-datefilter"><i class="ti ti-calendar-event"></i> Event date</label>
+      <select class="statbar-sel" id="woe-datefilter" onchange="goWoeDate(this.value)"><option>Loading…</option></select>
+      <span class="statbar-note" id="woe-datenote"></span>
+    </div>
+
+    <h2 class="pvpn-h"><i class="ti ti-shield-half-filled"></i> Guild Kills</h2>
+    <p class="subtitle">Player kills and deaths by guild in the PvP Night Event, for the selected period.</p>
+    <div class="tbl-wrap pvpn-narrow"><table class="stat" data-api="woe_guild_kills"><thead><tr><th>#</th><th>Guild</th><th>Kills</th><th>Deaths</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="4">Loading…</td></tr></tbody></table></div>
+
+    <h2 class="pvpn-h"><i class="ti ti-swords"></i> Top Players</h2>
+    <p class="subtitle">Everyone who fought in the PvP Night Event, <b>ranked by kills</b>. Score breaks ties.</p>
+    <div class="tbl-wrap"><table class="stat" data-api="woe_players"><thead><tr><th>#</th><th>Player</th><th>Guild</th><th>Job</th><th>Kills</th><th>Deaths</th><th>Assist</th><th>Damage Dealt</th><th>Damage Taken</th><th>Skill Used</th><th>Support Casts</th><th>Acid Demo</th><th>Healing Done</th><th>SP Used</th><th>Heal Items</th><th>Role</th><th>Score</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="17">Loading…</td></tr></tbody></table></div>
+    <div class="pager" id="woeplayers-pager" style="display:none"></div>
+  </section>
 </div>
 <div class="backdrop" id="backdrop" onclick="closePanel()"></div>
 <aside class="panel" id="panel">
