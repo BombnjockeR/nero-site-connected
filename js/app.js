@@ -1464,6 +1464,9 @@ async function loadWoeDates(){
   var sel=document.getElementById('woe-datefilter');
   if(!sel) return;                                  /* no date filter on this page */
   var d=await NeroAPI.get('woe_dates', woeSrc()?{src:woeSrc()}:null);
+  /* PvP Night: only trust an answer that says it read the PvP Night tables -
+     an older bridge ignores src and would hand back WoE days */
+  if(d && woeSrc() && d.src!==woeSrc()) d=null;
   woeDays=(d && Array.isArray(d.dates)) ? d.dates : [];
   var today=(d && d.today) || new Date().toISOString().slice(0,10);
   if(!woeMonth){
@@ -1622,6 +1625,8 @@ async function hydrateOneTable(tbl){
     return;
   }
   var d=await NeroAPI.get(key,tableParams(key));
+  /* same guard for the boards: no PvP Night data rather than WoE data */
+  if(d && woeSrc() && key.indexOf('woe_')===0 && d.src!==woeSrc()) d={rows:[], offset:0};
   if(!d){
     tbl.tBodies[0].innerHTML = noDataRow(cols,'Could not load data — try again shortly.');
     return;
