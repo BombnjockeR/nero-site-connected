@@ -814,3 +814,14 @@ body.page .oge-bg{display:none !important}
   border:1px solid var(--tline);color:#d4dbe8;text-decoration:none;background:rgba(10,16,28,.55)}
 .adm-sw:hover{border-color:var(--gold);color:var(--gold)}
 .adm-sw.on{border-color:var(--gold);color:var(--gold);background:rgba(228,184,75,.10)}
+
+/* ---- Era Crystal option tables (merged rarity cell, PDF colours) ---- */
+.wiki-main table.era-tbl td.era-tier{font-weight:700;text-align:center;vertical-align:middle;white-space:nowrap;width:1%;padding:10px 22px}
+.wiki-main table.era-tbl tr.era-r td{padding:6px 14px}
+.era-tbl .era-mythic td{background:rgba(224,102,102,.16)}.era-tbl .era-mythic .era-tier{color:#f0a0a0}
+.era-tbl .era-legendary td{background:rgba(230,145,56,.14)}.era-tbl .era-legendary .era-tier{color:#f6b26b}
+.era-tbl .era-epic td{background:rgba(241,194,50,.12)}.era-tbl .era-epic .era-tier{color:#ffd966}
+.era-tbl .era-rare td{background:rgba(106,168,79,.13)}.era-tbl .era-rare .era-tier{color:#93c47d}
+.era-tbl .era-common td{background:rgba(109,158,235,.12)}.era-tbl .era-common .era-tier{color:#a4c2f4}
+.era-tbl tr.era-r td{border-top:none}
+.wiki-main table.era-tbl th:first-child,.wiki-main table.era-tbl td.era-tier{width:170px}
