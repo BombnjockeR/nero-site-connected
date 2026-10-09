@@ -824,4 +824,5 @@ body.page .oge-bg{display:none !important}
 .era-tbl .era-rare td{background:rgba(106,168,79,.13)}.era-tbl .era-rare .era-tier{color:#93c47d}
 .era-tbl .era-common td{background:rgba(109,158,235,.12)}.era-tbl .era-common .era-tier{color:#a4c2f4}
 .era-tbl tr.era-r td{border-top:none}
-.wiki-main table.era-tbl th:first-child,.wiki-main table.era-tbl td.era-tier{width:170px}
+.wiki-main table.era-tbl{width:auto;min-width:min(520px,100%)}.wiki-main table.era-tbl th:first-child,.wiki-main table.era-tbl td.era-tier{width:120px;padding-left:16px;padding-right:16px}
+.wiki-main table.era-tbl td:not(.era-tier){width:auto}
