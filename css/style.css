@@ -832,3 +832,18 @@ body.page .oge-bg{display:none !important}
 .pvpn-h i{font-size:20px}
 .pvpn-narrow{max-width:760px}
 .statbar-sel.pvpn-msel,#woe-month{min-width:170px}
+
+/* ================= CENTERED LAYOUT (owner, 2026-10-14) =================
+   Everything on the content pages sits on the page's centre line: titles,
+   captions, filter bars, tab rows, the narrow boards and every table cell.
+   Kept as one block at the end so it overrides the left-aligned rules above
+   without touching them. */
+.wrap .pg-title,.wrap .subtitle{text-align:center}
+.statbar{justify-content:center}
+.acct-tabs{justify-content:center}
+.woe-tabsearch{margin-left:0}
+.pvpn-h{justify-content:center}
+.wrap.full .atab-panel.narrow,.pvpn-narrow,.guard-box{margin-left:auto;margin-right:auto}
+table.stat th,table.stat td,.wiki-main th,.wiki-main td{text-align:center}
+/* the sort arrow sits in the right padding; mirror it so the label stays centred */
+table.stat th.sortable{padding-left:26px}
