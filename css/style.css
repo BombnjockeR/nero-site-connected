@@ -844,6 +844,7 @@ body.page .oge-bg{display:none !important}
 .woe-tabsearch{margin-left:0}
 .pvpn-h{justify-content:center}
 .wrap.full .atab-panel.narrow,.pvpn-narrow,.guard-box{margin-left:auto;margin-right:auto}
-table.stat th,table.stat td,.wiki-main th,.wiki-main td{text-align:center}
+/* every table on the site - the bare th,td covers tables with no class */
+th,td,table.stat th,table.stat td,.wiki-main th,.wiki-main td{text-align:center}
 /* the sort arrow sits in the right padding; mirror it so the label stays centred */
 table.stat th.sortable{padding-left:26px}
