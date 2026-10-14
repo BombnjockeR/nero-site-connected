@@ -407,6 +407,23 @@ function pmTraceFromTrade(uid){
 
 var PC_CUR = {C: 'Cash Points', K: 'Kafra Points', O: 'Other'};
 
+/* Free cash: the online reward from script/cashpointhourly.txt (hourlypoints,
+   .point_amt = 60 every hour). It is logged like any NPC script ('N'), so it is
+   picked out by amount. Owner, 2026-10-14: it is not counted as CP in and the
+   timeline hides it unless asked; "Not in logs" still includes it, because it
+   really is in the balance. Keep in step with .point_amt. */
+var PC_FREE_AMT = 60;
+function pcIsFree(r){
+  return r.kind !== 'donation' && r.type === 'N' && r.cash_type === 'C' && Number(r.amount) === PC_FREE_AMT;
+}
+
+/* Timeline rows shown with the current "Show free cash" choice. */
+function pcVisibleRows(d){
+  var box = document.getElementById('pc-free');
+  var showFree = !!(box && box.checked);
+  return d.rows.filter(function(r){ return showFree || !pcIsFree(r); });
+}
+
 /* One timeline row -> {type, detail(html), text(plain, for CSV)}. */
 function pcDescribe(d, r){
   if(r.kind === 'donation'){
@@ -416,6 +433,7 @@ function pcDescribe(d, r){
     var txt = 'Rp ' + pmNum(r.amount_rp) + ' (' + r.source + ' #' + r.id + '): ' + parts.join(' + ');
     return {type: 'QRIS donation', detail: escHtml(txt), text: txt};
   }
+  if(pcIsFree(r)) return {type: 'Free cash', detail: '<span class="adm-by">hourly online reward</span>', text: 'hourly online reward'};
   var type = (d.types[r.type] || r.type) + (r.cash_type !== 'C' ? ' · ' + (PC_CUR[r.cash_type] || r.cash_type) : '');
   if(r.items && r.items.length){
     var html = '<ul class="pm-items">' + r.items.map(function(it){
@@ -455,8 +473,15 @@ async function pcLoad(){
   PM.cash = d;
   document.getElementById('pc-csv').disabled = !d.rows.length;
 
+  /* Free cash comes out of the NPC script bucket and gets its own tile. */
+  var free = d.rows.filter(pcIsFree), freeCp = free.length * PC_FREE_AMT;
+  var byType = d.by_type.map(function(x){
+    if(x.cash_type !== 'C' || x.type !== 'N' || !free.length) return x;
+    return {cash_type: x.cash_type, type: x.type, in: +x.in - freeCp, out: x.out, n: +x.n - free.length};
+  }).filter(function(x){ return +x.n > 0; });
+
   var cin = +d.donations_cp || 0, cout = 0;
-  d.by_type.forEach(function(x){ if(x.cash_type === 'C'){ cin += +x.in; cout += +x.out; } });
+  byType.forEach(function(x){ if(x.cash_type === 'C'){ cin += +x.in; cout += +x.out; } });
   var gap = +d.recon.unlogged || 0;
 
   var tiles = '<div class="adm-tiles">' +
@@ -464,6 +489,8 @@ async function pcLoad(){
       pmNum(d.balance.cash) + '</div><div class="adm-tile-sub">Cash Points' + (+d.balance.kafra ? ' · ' + pmNum(d.balance.kafra) + ' Kafra' : '') + '</div></div>' +
     '<div class="adm-tile"><div class="adm-tile-lbl">CP in</div><div class="adm-tile-val pm-in">' + pmNum(cin) +
       '</div><div class="adm-tile-sub">' + pmNum(d.donations_cp) + ' from QRIS (all donations, any date)</div></div>' +
+    '<div class="adm-tile"><div class="adm-tile-lbl">Free cash</div><div class="adm-tile-val">' + pmNum(freeCp) +
+      '</div><div class="adm-tile-sub">' + pmNum(free.length) + '× hourly +' + PC_FREE_AMT + ', not in CP in</div></div>' +
     '<div class="adm-tile"><div class="adm-tile-lbl">CP out</div><div class="adm-tile-val pm-out">' + pmNum(cout) +
       '</div><div class="adm-tile-sub">in this period</div></div>' +
     '<div class="adm-tile"><div class="adm-tile-lbl">Not in logs</div><div class="adm-tile-val ' + (gap ? 'pm-out' : 'pm-in') + '">' +
@@ -477,7 +504,7 @@ async function pcLoad(){
         '</td><td class="pm-out">' + pmNum(x.cp) + (+x.cart_buys ? ' <span class="adm-ref" title="Bought together with other items; that price cannot be split per item">+' + x.cart_buys + ' in a cart</span>' : '') + '</td></tr>';
     }).join('') : '<tr><td class="norow" colspan="4">Nothing bought in this period.</td></tr>') + '</tbody></table></div></div>';
 
-  var bySrc = d.by_type.slice();
+  var bySrc = byType.slice();
   if(+d.donations_cp) bySrc.unshift({cash_type: 'C', type: 'QRIS', in: d.donations_cp, out: 0,
     n: d.rows.filter(function(r){ return r.kind === 'donation'; }).length});
   var src = '<div><h2 class="adm-h2"><i class="ti ti-chart-pie"></i> By source</h2><div class="tbl-wrap"><table class="stat">' +
@@ -495,7 +522,16 @@ async function pcLoad(){
      when it was cut off the purchases are listed without their items. */
   else if(d.items_skipped) pmMsg('pc-msg', 'Item log was busy, so purchases are shown without their items. Search again in a moment.');
 
-  tb.innerHTML = d.rows.length ? d.rows.map(function(r){
+  pcPaint();
+}
+
+/* The timeline table; re-run by the "Show free cash" box without a new search. */
+function pcPaint(){
+  var d = PM.cash; if(!d) return;
+  var tb = document.querySelector('#pc-tbl tbody');
+  var rows = pcVisibleRows(d);
+  document.getElementById('pc-csv').disabled = !rows.length;
+  tb.innerHTML = rows.length ? rows.map(function(r){
     var x = pcDescribe(d, r);
     var amt = Number(r.amount);
     return '<tr><td>' + pmWhen(r.time) + '</td>' +
@@ -508,10 +544,11 @@ async function pcLoad(){
 
 /* The timeline as CSV (UTF-8 with BOM so Excel opens it as UTF-8). */
 function pcCsv(){
-  var d = PM.cash; if(!d || !d.rows.length) return;
+  var d = PM.cash; if(!d) return;
+  var rows = pcVisibleRows(d); if(!rows.length) return;
   var q = function(v){ v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   var lines = [['time', 'account', 'character', 'type', 'currency', 'cp', 'detail', 'map', 'log_id'].join(',')];
-  d.rows.slice().reverse().forEach(function(r){
+  rows.slice().reverse().forEach(function(r){
     var x = pcDescribe(d, r);
     lines.push([r.time, d.userid, r.char_id ? (d.chars[r.char_id] || r.char_id) : '', x.type,
       PC_CUR[r.cash_type] || r.cash_type, r.amount, x.text, r.map,
