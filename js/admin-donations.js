@@ -76,8 +76,9 @@ async function admInit(){
     : qrisErrorText(res);
 }
 
-/* The Period filter as a query string - shared by the Donations table and the
-   CSV exports on the Streamers / Guilds tabs, so both cover the same window. */
+/* The Period filter as a query string, for the Donations table. (The CSV
+   exports on the Streamers / Guilds tabs pick all-time or this month from
+   their own menu - see admCsv.) */
 function admPeriodQS(){
   var days = document.getElementById('f-days').value;
   var qs = '&days=' + encodeURIComponent(days);
@@ -93,11 +94,6 @@ function admMonth(){
     el.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
   }
   return el.value;
-}
-
-function admPeriodLabel(){
-  var sel = document.getElementById('f-days');
-  return sel.value === 'month' ? admMonth() : sel.options[sel.selectedIndex].text;
 }
 
 function admPeriodChange(){
@@ -338,7 +334,7 @@ async function smLoad(){
 }
 
 function smButtons(s){
-  return '<button class="btn-ghost sm-row-btn" onclick="admCsv(\'streamer\',' + s.id + ')" title="Paid donations with this code, for the Period picked on the Donations tab"><i class="ti ti-download"></i> CSV</button>' +
+  return admCsvButton('streamer', s.id) +
     '<button class="btn-ghost sm-row-btn" onclick="smEdit(' + s.id + ')"><i class="ti ti-pencil"></i> Edit</button>' +
     '<button class="btn-ghost sm-row-btn" onclick="smToggle(' + s.id + ')">' + (s.active ? 'Deactivate' : 'Activate') + '</button>' +
     '<button class="btn-ghost sm-row-btn" onclick="smAskDelete(' + s.id + ')"><i class="ti ti-trash"></i> Delete</button>';
@@ -498,7 +494,7 @@ async function gmLoad(){
 }
 
 function gmButtons(g){
-  return '<button class="btn-ghost sm-row-btn" onclick="admCsv(\'guild\',' + g.id + ')" title="Paid donations for this guild, for the Period picked on the Donations tab"><i class="ti ti-download"></i> CSV</button>' +
+  return admCsvButton('guild', g.id) +
     '<button class="btn-ghost sm-row-btn" onclick="gmEdit(' + g.id + ')"><i class="ti ti-pencil"></i> Edit</button>' +
     '<button class="btn-ghost sm-row-btn" onclick="gmToggle(' + g.id + ')">' + (g.active ? 'Deactivate' : 'Activate') + '</button>' +
     '<button class="btn-ghost sm-row-btn" onclick="gmAskDelete(' + g.id + ')"><i class="ti ti-trash"></i> Delete</button>';
@@ -611,20 +607,65 @@ function admGuildStats(list){
 }
 
 /* --- CSV export per streamer / guild (qris.php referral_export) ----------
-   Paid donations only, for the Period picked on the Donations tab. Built in
-   the browser so no file is ever written on the server. UTF-8 with BOM so
-   Excel shows character names correctly; ';'-free values are not assumed -
-   every field is quoted. */
-async function admCsv(kind, id){
+   Owner (2026-10-14): the CSV button opens a small menu - "Download all
+   reports" (every paid donation on record) or "Download <this month> report"
+   (the current calendar month only: in October it is October, in November
+   November). It no longer follows the Donations tab Period, whose "last 30
+   days" mixed two months and confused the reader.
+   Paid donations only. Built in the browser so no file is ever written on the
+   server. UTF-8 with BOM so Excel shows character names correctly; every
+   field is quoted. */
+function admCurMonth(){
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+function admMonthName(ym){
+  var names = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return names[parseInt(ym.slice(5), 10) - 1] + ' ' + ym.slice(0, 4);
+}
+function admCsvButton(kind, id){
+  return '<span class="csv-wrap"><button class="btn-ghost sm-row-btn" onclick="admCsvMenu(event,\'' + kind + '\',' + id + ')" title="Download paid donations as CSV"><i class="ti ti-download"></i> CSV <i class="ti ti-chevron-down"></i></button></span>';
+}
+function admCsvClose(){
+  document.querySelectorAll('.csv-menu').forEach(function(m){ m.remove(); });
+}
+/* The menu hangs off <body> at the button's screen position: inside the table
+   it would be clipped by the scrolling .tbl-wrap on the last rows. */
+function admCsvMenu(ev, kind, id){
+  ev.stopPropagation();
+  var btn = ev.currentTarget;
+  var open = document.querySelector('.csv-menu[data-for="' + kind + id + '"]');
+  admCsvClose();
+  if(open) return;                                  /* second click closes it */
+  var r = btn.getBoundingClientRect();
+  var m = document.createElement('div');
+  m.className = 'csv-menu';
+  m.setAttribute('data-for', kind + id);
+  m.style.left = Math.round(r.left) + 'px';
+  m.style.top = Math.round(r.bottom + 4) + 'px';
+  m.innerHTML =
+    '<button onclick="admCsvClose();admCsv(\'' + kind + '\',' + id + ',\'all\')"><i class="ti ti-files"></i> Download all reports</button>' +
+    '<button onclick="admCsvClose();admCsv(\'' + kind + '\',' + id + ',\'month\')"><i class="ti ti-calendar-month"></i> Download ' + admMonthName(admCurMonth()) + ' report</button>';
+  document.body.appendChild(m);
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest || !e.target.closest('.csv-wrap, .csv-menu')) admCsvClose();
+});
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') admCsvClose(); });
+window.addEventListener('scroll', admCsvClose, true);
+window.addEventListener('resize', admCsvClose);
+
+async function admCsv(kind, id, scope){
   var item = kind === 'streamer' ? smFind(id) : gmFind(id);
   if(!item) return;
   var cell = document.getElementById((kind === 'streamer' ? 'sm-act-' : 'gm-act-') + id);
   var keep = cell ? cell.innerHTML : '';
   if(cell) cell.innerHTML = '<span class="adm-by">Preparing CSV...</span>';
 
+  var month = admCurMonth();
   var qs = '?action=referral_export' +
            (kind === 'streamer' ? '&streamer=' + encodeURIComponent(item.code) : '&guild=' + item.id) +
-           admPeriodQS();
+           (scope === 'month' ? '&days=month&month=' + month : '&days=all');
   var res = await NeroAPI.post('/qris.php' + qs, {});
   if(cell) cell.innerHTML = keep;
   if(!res || !res.ok){
@@ -646,7 +687,7 @@ async function admCsv(kind, id){
   lines.push(q('TOTAL') + ',,,,,,' + q(total) + ',,,,,,,');
 
   var name = (kind === 'streamer' ? 'streamer_' + item.name + '_' + item.code : 'guild_' + item.name) +
-             '_' + admPeriodLabel();
+             '_' + (scope === 'month' ? month : 'all');
   var file = name.replace(/[^A-Za-z0-9_\-]+/g, '_').replace(/_+/g, '_') + '.csv';
   var blob = new Blob(['﻿' + lines.join('\r\n')], {type: 'text/csv;charset=utf-8'});
   var a = document.createElement('a');

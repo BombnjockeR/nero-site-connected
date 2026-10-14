@@ -1353,7 +1353,7 @@ function woeEstNote(id,on){
    navigation, same as the marketplace filter. */
 var WOE_PLAYERS_PER_PAGE=20;
 var woePlayersPage=1;
-var woePlayersPerPage=20;            /* 20 | 50 | 100 | 'all' */
+var woePlayersPerPage=100;           /* 20 | 50 | 100 | 'all' - 100 by default (owner, 2026-10-14) */
 
 /* Which WoE day the board is showing. 'all' aggregates every day on record.
    null means "not resolved yet" — loadWoeDates() fills it from the newest day
@@ -1385,7 +1385,7 @@ function woeQ(extra){
    pages on one doesn't disturb another. */
 var STAT_KEYS=['pvp','mvp','zeny'];
 var statPage={pvp:1, mvp:1, zeny:1};
-var statPerPage={pvp:30, mvp:30, zeny:30};
+var statPerPage={pvp:100, mvp:30, zeny:30};   /* PvP: 100 by default (owner, 2026-10-14) */
 
 function isStatKey(key){ return STAT_KEYS.indexOf(key)!==-1; }
 
@@ -1514,7 +1514,7 @@ function renderWoeDaySelect(){
     return;
   }
   sel.disabled=false;
-  sel.innerHTML='<option value="all"'+(woeDate==='all'||!woeDate?' selected':'')+'>All events '+scope+' ('+days.length+')</option>'+
+  sel.innerHTML='<option value="all"'+(woeDate==='all'||!woeDate?' selected':'')+'>All events combined ('+days.length+')</option>'+
     days.map(function(x){
       var label=fmtWoeDate(x.date)+' — '+fmtNum(x.players)+' player'+(x.players===1?'':'s');
       if(x.date===woeDays[0].date) label+=' (latest)';
