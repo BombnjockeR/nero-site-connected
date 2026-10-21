@@ -1386,6 +1386,39 @@ function woeQ(extra){
 var STAT_KEYS=['pvp','mvp','zeny'];
 var statPage={pvp:1, mvp:1, zeny:1};
 var statPerPage={pvp:100, mvp:30, zeny:30};   /* PvP: 100 by default (owner, 2026-10-14) */
+/* Month picker (<select data-stat-month="pvp">): 'YYYY-MM' per board, unset =
+   this month. The list runs from this month back to STAT_FIRST_MONTH - the
+   first month the bridge has a board for (September 2026 is rebuilt from the
+   weekly ladder snapshot of Oct 5, see bridge/stats.php case 'pvp'). */
+var statMonth={};
+var STAT_FIRST_MONTH='2026-09';
+var STAT_MONTH_NOTE={'2026-09':'September = every kill before Oct 5 (from the old weekly ladder), points = kills × 12.'};
+function fillStatMonths(){
+  var sels=document.querySelectorAll('select[data-stat-month]');
+  for(var s=0;s<sels.length;s++){
+    var sel=sels[s], key=sel.getAttribute('data-stat-month'), html='';
+    var d=new Date(), y=d.getFullYear(), m=d.getMonth();
+    while(true){
+      var ym=y+'-'+(m<9?'0':'')+(m+1);
+      if(ym<STAT_FIRST_MONTH) break;
+      html+='<option value="'+ym+'"'+(ym===(statMonth[key]||'')?' selected':'')+'>'+WOE_MONS[m]+' '+y+'</option>';
+      if(--m<0){ m=11; y--; }
+    }
+    sel.innerHTML=html;
+    statMonthNote(key);
+  }
+}
+function statMonthNote(key){
+  var n=document.getElementById(key+'-month-note');
+  if(n) n.textContent=STAT_MONTH_NOTE[statMonth[key]]||'';
+}
+async function goStatMonth(key,v){
+  if(!isStatKey(key)) return;
+  statMonth[key]=v;
+  statPage[key]=1;
+  statMonthNote(key);
+  await rehydrateStatTable(key);
+}
 
 function isStatKey(key){ return STAT_KEYS.indexOf(key)!==-1; }
 
@@ -1394,7 +1427,11 @@ function tableParams(key){
   if(key==='woe_players') return woeQ({page:woePlayersPage, per_page:woePlayersPerPage});
   /* the guild board and the kill feed follow the same day as the player board */
   if(key==='woe_guild_kills' || key==='woe_kills') return woeQ();
-  if(isStatKey(key)) return {page:statPage[key], per_page:statPerPage[key]};
+  if(isStatKey(key)){
+    var p={page:statPage[key], per_page:statPerPage[key]};
+    if(statMonth[key]) p.month=statMonth[key];
+    return p;
+  }
   return null;
 }
 
@@ -1703,7 +1740,8 @@ async function hydrateOneTable(tbl){
       rows.push(tdRow([i++, r.name, fmtNum(r.kills), fmtNum(r.deaths), fmtNum(r.points)]));
     });
     renderStatPager('pvp', d, 'players');
-    if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
+    /* with a month picker an empty answer must clear the previous month's rows */
+    tbl.tBodies[0].innerHTML = rows.length ? rows.join('') : noDataRow(cols,'No PvP kills recorded for this month.');
   }
 }
 /* The three flat boards all page the same way, so they share one call. The
@@ -1722,6 +1760,7 @@ function setPvpPerPage(v){ return setStatPerPage('pvp',v); }
 function setMvpPerPage(v){ return setStatPerPage('mvp',v); }
 function setZenyPerPage(v){ return setStatPerPage('zeny',v); }
 async function hydrateTable(){
+  fillStatMonths();
   var tables=document.querySelectorAll('table.stat[data-api]');
   for(var t=0;t<tables.length;t++){ await hydrateOneTable(tables[t]); }
 }

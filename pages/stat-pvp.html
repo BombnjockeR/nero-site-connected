@@ -26,7 +26,12 @@
   </div>
 
   <section class="atab-panel narrow show" id="woe-stats">
-    <p class="subtitle">Top PvP killers this month. Points are the PvP Points actually earned this month (a kill's reward is split across the killer's party on the same map).</p>
+    <div class="statbar">
+      <label class="statbar-lbl" for="pvp-month"><i class="ti ti-calendar-month"></i> Month</label>
+      <select class="statbar-sel" id="pvp-month" data-stat-month="pvp" onchange="goStatMonth('pvp',this.value)"><option>Loading…</option></select>
+      <span class="statbar-note" id="pvp-month-note"></span>
+    </div>
+    <p class="subtitle">Top PvP killers of the selected month. Points are the PvP Points actually earned that month (a kill's reward is split across the killer's party on the same map).</p>
     <div class="tbl-wrap"><table class="stat" id="stbl" data-api="pvp"><thead><tr><th>#</th><th>Player</th><th>Kills</th><th>Deaths</th><th>Points</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="5">No PvP kills recorded yet this month.</td></tr></tbody></table></div>
     <div class="pager" id="pvp-pager" style="display:none"></div>
   </section>
