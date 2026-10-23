@@ -16,7 +16,12 @@
 </header>
 <div class="wrap">
   <h1 class="pg-title">MVP Statistics</h1>
-  <p class="subtitle">Top MVP hunters this month.</p>
+  <div class="statbar">
+    <label class="statbar-lbl" for="mvp-month"><i class="ti ti-calendar-month"></i> Month</label>
+    <select class="statbar-sel" id="mvp-month" data-stat-month="mvp" onchange="goStatMonth('mvp',this.value)"><option>Loading…</option></select>
+    <span class="statbar-note" id="mvp-month-note"></span>
+  </div>
+  <p class="subtitle">Top MVP hunters of the selected month. Points are the MVP Points that account earned that month.</p>
   <div class="tbl-wrap"><table class="stat" id="stbl" data-api="mvp"><thead><tr><th>#</th><th>Player</th><th>MVP Kills</th><th>Favorite MVP</th><th>Points</th></tr></thead><tbody><tr class="norow-row"><td class="norow" colspan="5">No MVP tracking data yet — check back once the server has been tracking kills for a while.</td></tr></tbody></table></div>
   <div class="pager" id="mvp-pager" style="display:none"></div>
 </div>

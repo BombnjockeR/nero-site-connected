@@ -62,6 +62,7 @@ async function admInit(){
     msg.textContent = '';
     main.style.display = '';
     admRender(res.data);
+    admRefLoad();
     smLoad();
     gmLoad();
     admRestoreTab();
@@ -128,7 +129,6 @@ function admRender(d){
   ADM = d || {};
   admTiles(d.totals || {});
   admTable(d.rows || [], Number(d.ever_any || 0) === 0);
-  admStreamers(d.streamers || []);
   admGuildStats(d.guilds || []);
   if(d.truncated) admMsg('Showing the newest ' + (d.filters && d.filters.limit) +
                          ' only — narrow the period to see the rest.');
@@ -192,15 +192,46 @@ function admTable(rows, neverAny){
   }).join('');
 }
 
+/* Referral performance (Streamers tab) has its own period, two options only
+   (JokeR, 2026-10-23): the running current month, or all time. It used to
+   follow the Donations tab's Period box (default "Last 30 days"), which is not
+   visible from the Streamers tab. Paid donations only, sorted by total Rp. */
+var ADM_REF_SCOPE = 'month';
+async function admRefLoad(){
+  var qs = '?action=donations&status=paid&limit=1' +
+           (ADM_REF_SCOPE === 'month' ? '&days=month&month=' + encodeURIComponent(admCurMonth()) : '&days=all');
+  var res = await NeroAPI.post('/qris.php' + qs, {});
+  if(!res || !res.ok){
+    document.getElementById('adm-streamers').innerHTML = admRefHead() +
+      '<p class="subtitle">' + escHtml(qrisErrorText(res)) + '</p>';
+    return;
+  }
+  admStreamers(res.data.streamers || []);
+}
+function admRefScope(v){
+  ADM_REF_SCOPE = v === 'all' ? 'all' : 'month';
+  admRefLoad();
+}
+function admRefHead(){
+  return '<h2 class="adm-h2"><i class="ti ti-chart-bar"></i> Referral performance ' +
+    '<select class="inp" id="ref-scope" style="width:auto;margin-left:10px;font-size:14px" onchange="admRefScope(this.value)">' +
+    '<option value="month"' + (ADM_REF_SCOPE === 'month' ? ' selected' : '') + '>' + escHtml(admMonthName(admCurMonth())) + ' (running)</option>' +
+    '<option value="all"' + (ADM_REF_SCOPE === 'all' ? ' selected' : '') + '>All time</option>' +
+    '</select></h2>';
+}
+function admRefPeriodText(){
+  return ADM_REF_SCOPE === 'all' ? 'all time' : admMonthName(admCurMonth()) + ' so far';
+}
+
 function admStreamers(list){
   var el = document.getElementById('adm-streamers');
   if(!list.length){
-    el.innerHTML = '<h2 class="adm-h2"><i class="ti ti-chart-bar"></i> Referral performance</h2>' +
-      '<p class="subtitle">No paid donations with a referral code in the period picked on the Donations tab.</p>';
+    el.innerHTML = admRefHead() +
+      '<p class="subtitle">No paid donations with a referral code (' + escHtml(admRefPeriodText()) + ').</p>';
     return;
   }
-  el.innerHTML = '<h2 class="adm-h2"><i class="ti ti-chart-bar"></i> Referral performance</h2>' +
-    '<p class="subtitle" style="margin:0 0 10px">Paid donations per code, for the period picked on the Donations tab.</p>' +
+  el.innerHTML = admRefHead() +
+    '<p class="subtitle" style="margin:0 0 10px">Paid donations per code, ' + escHtml(admRefPeriodText()) + ', highest total first.</p>' +
     '<div class="tbl-wrap"><table class="stat"><thead><tr>' +
     '<th>Code</th><th>Streamer</th><th>Paid donations</th><th>Total</th>' +
     '</tr></thead><tbody>' +

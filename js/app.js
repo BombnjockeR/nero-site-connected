@@ -1392,7 +1392,11 @@ var statPerPage={pvp:100, mvp:30, zeny:30};   /* PvP: 100 by default (owner, 202
    weekly ladder snapshot of Oct 5, see bridge/stats.php case 'pvp'). */
 var statMonth={};
 var STAT_FIRST_MONTH='2026-09';
-var STAT_MONTH_NOTE={'2026-09':'September = every kill before Oct 5 (from the old weekly ladder), points = kills × 12.'};
+/* Boards that start later: the MVP board has no month before October 2026
+   (bridge stats.php case 'mvp' - September came back empty). */
+var STAT_FIRST_MONTH_BY={mvp:'2026-10'};
+/* Per board: the September note is about the PvP rebuild only. */
+var STAT_MONTH_NOTE={pvp:{'2026-09':'September = every kill before Oct 5 (from the old weekly ladder), points = kills × 12.'}};
 function fillStatMonths(){
   var sels=document.querySelectorAll('select[data-stat-month]');
   for(var s=0;s<sels.length;s++){
@@ -1400,7 +1404,7 @@ function fillStatMonths(){
     var d=new Date(), y=d.getFullYear(), m=d.getMonth();
     while(true){
       var ym=y+'-'+(m<9?'0':'')+(m+1);
-      if(ym<STAT_FIRST_MONTH) break;
+      if(ym<(STAT_FIRST_MONTH_BY[key]||STAT_FIRST_MONTH)) break;
       html+='<option value="'+ym+'"'+(ym===(statMonth[key]||'')?' selected':'')+'>'+WOE_MONS[m]+' '+y+'</option>';
       if(--m<0){ m=11; y--; }
     }
@@ -1410,7 +1414,7 @@ function fillStatMonths(){
 }
 function statMonthNote(key){
   var n=document.getElementById(key+'-month-note');
-  if(n) n.textContent=STAT_MONTH_NOTE[statMonth[key]]||'';
+  if(n) n.textContent=(STAT_MONTH_NOTE[key]||{})[statMonth[key]]||'';
 }
 async function goStatMonth(key,v){
   if(!isStatKey(key)) return;
@@ -1730,10 +1734,12 @@ async function hydrateOneTable(tbl){
   } else if(key==='mvp'){
     if(!d.available) return;                      /* keep the honest "no tracking" row already in the HTML */
     d.rows.forEach(function(r){
-      rows.push(tdRow([i++, r.name, fmtNum(r.kills), r.favorite||'—', fmtNum(r.kills*2)]));
+      /* points = MVP Points that account earned that month (bridge), not kills x 2 */
+      rows.push(tdRow([i++, r.name, fmtNum(r.kills), r.favorite||'—', fmtNum(r.points)]));
     });
     renderStatPager('mvp', d, 'players');
-    if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
+    /* with a month picker an empty answer must clear the previous month's rows */
+    tbl.tBodies[0].innerHTML = rows.length ? rows.join('') : noDataRow(cols,'No MVP kills recorded for this month.');
   } else if(key==='pvp'){
     if(!d.available) return;                      /* keep the honest "no tracking" row already in the HTML */
     d.rows.forEach(function(r){
