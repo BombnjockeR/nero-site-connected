@@ -18,10 +18,14 @@
   })();
 
   var SLIDES = [
+    // Same order as the homepage On-Going Events carousel.
     { type: 'image', src: 'assets/event-battlepass-s3.jpg', alt: 'Battle Pass Season 3' },
+    { type: 'image', src: 'assets/event-likeshare.jpg', alt: 'Like & Share Event' },
+    { type: 'image', src: 'assets/event-mvp.jpg', alt: 'MVP Collector' },
+    { type: 'image', src: 'assets/event-refinemaster.jpg', alt: 'Nero Refine Master' },
     { type: 'mvp', title: 'World Boss', items: [
-      { src: 'assets/mvp/1373.gif', name: 'Lord of Death' },
-      { src: 'assets/mvp/1685.gif', name: 'Vesper' }
+      { src: 'assets/mvp/1751.gif', name: 'Valkyrie Randgris' },
+      { src: 'assets/mvp/1734.gif', name: 'Kiel-D-01' }
     ] }
   ];
 
