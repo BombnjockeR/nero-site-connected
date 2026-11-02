@@ -8,7 +8,7 @@
    Closes on: the X button, a click outside the box, or the Esc key.
    ===================================================================== */
 (function () {
-  var TITLE = 'October Event';
+  var TITLE = 'November Event';
 
   // Asset paths are resolved relative to this script (js/ -> site root),
   // so the popup works from any page depth.
@@ -18,7 +18,7 @@
   })();
 
   var SLIDES = [
-    { type: 'image', src: 'assets/event-oct-battlepass-s2.jpg', alt: 'Battle Pass Season 2' },
+    { type: 'image', src: 'assets/event-battlepass-s3.jpg', alt: 'Battle Pass Season 3' },
     { type: 'mvp', title: 'World Boss', items: [
       { src: 'assets/mvp/1373.gif', name: 'Lord of Death' },
       { src: 'assets/mvp/1685.gif', name: 'Vesper' }
