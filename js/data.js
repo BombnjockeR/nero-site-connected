@@ -96,6 +96,12 @@ var GUILDS = [];
 var DONATE_AMOUNTS = [
   {cp:100000},{cp:250000},{cp:500000},{cp:1000000},{cp:5000000},{cp:10000000}
 ];
+/* "Type your own amount" range (owner, 2026-11-08). Default only - replaced by
+   bridge/_config.php [QRIS][CustomMinRp]/[CustomMaxRp] via NeroConfig.load().
+   The bridge accepts any whole rupiah amount in this range next to the tiers.
+   DONATE_CUSTOM_MIN = 0 hides the field. */
+var DONATE_CUSTOM_MIN = 20000;
+var DONATE_CUSTOM_MAX = 100000000;
 /* Master switch for the automatic QRIS flow. false falls back to the "static QR
    + Discord ticket" path, and the donation panel then skips the API call
    entirely instead of showing a Generate button that can only fail.
@@ -136,6 +142,12 @@ const NeroConfig = {
         .map(function(t){ return {cp: Number(t && t.cp)}; })
         .filter(function(t){ return isFinite(t.cp) && t.cp > 0; });
       if(tiers.length){ DONATE_AMOUNTS = tiers; changed = true; }
+    }
+
+    if(d.custom_min !== undefined && d.custom_min !== null && isFinite(Number(d.custom_min))){
+      DONATE_CUSTOM_MIN = Math.max(0, Math.floor(Number(d.custom_min)));
+      if(isFinite(Number(d.custom_max))) DONATE_CUSTOM_MAX = Math.max(DONATE_CUSTOM_MIN, Math.floor(Number(d.custom_max)));
+      changed = true;
     }
 
     if(isFinite(Number(d.referral_bonus_pct)) && d.referral_bonus_pct !== null && d.referral_bonus_pct !== undefined){

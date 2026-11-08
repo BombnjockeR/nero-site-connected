@@ -435,7 +435,11 @@ function donationHTML(){
   <div id="don-msg"></div>
 
   <label class="fld">1 · Choose an amount</label>
-  <div class="amt-grid">`+amts+`</div>
+  <div class="amt-grid">`+amts+`</div>`+(DONATE_CUSTOM_MIN>0?`
+  <input class="inp" id="don-custom" type="text" inputmode="numeric" autocomplete="off" style="margin-top:10px"
+         placeholder="Or type your own amount (`+fmtRp(DONATE_CUSTOM_MIN)+` – `+fmtRp(DONATE_CUSTOM_MAX)+`)"
+         oninput="pickCustom(this.value)">
+  <p class="hintline" id="don-custom-hint"><i class="ti ti-pencil"></i> Any amount from <b>`+fmtRp(DONATE_CUSTOM_MIN)+`</b> to <b>`+fmtRp(DONATE_CUSTOM_MAX)+`</b>.</p>`:'')+`
 
   <label class="fld">2 · Referral code <span class="fld-opt">(optional — +`+REFERRAL_BONUS_PCT+`% bonus CP)</span></label>
   <select class="inp" id="don-streamer" onchange="updateSummary()">`+streamerOpts+`</select>
@@ -511,7 +515,7 @@ async function donClaim(){
   if(btn){ btn.disabled=true; btn.textContent='Submitting…'; }
   var res=await NeroAPI.post('/qris.php',{
     action:'claim',
-    amount:DONATE_AMOUNTS[selAmt].cp,
+    amount:donCp(),
     streamer:(document.getElementById('don-streamer')||{}).value||'',
     guild:Number((document.getElementById('don-guild')||{}).value)||0
   });
@@ -541,6 +545,33 @@ async function qrisRefreshAvailability(){
 
 function pickAmt(i){ selAmt=i;
   document.querySelectorAll('.amt').forEach(function(e){e.classList.toggle('sel',+e.dataset.i===i);});
+  var ci=document.getElementById('don-custom'); if(ci) ci.value='';
+  var ch=document.getElementById('don-custom-hint');
+  if(ch) ch.innerHTML='<i class="ti ti-pencil"></i> Any amount from <b>'+fmtRp(DONATE_CUSTOM_MIN)+'</b> to <b>'+fmtRp(DONATE_CUSTOM_MAX)+'</b>.';
+  updateSummary();
+}
+
+/* "Type your own amount" (owner, 2026-11-08). selAmt becomes 'custom' and the
+   amount lives in donCustomCp; donCp() is what every payment path sends. The
+   bridge re-checks the range (qris_amount_allowed in qris_lib.php), this only
+   gives early feedback. Dots/commas/spaces are ignored: "50.000" = 50000. */
+var donCustomCp=0;
+function donCp(){ return selAmt==='custom' ? donCustomCp : DONATE_AMOUNTS[selAmt].cp; }
+
+function pickCustom(raw){
+  document.querySelectorAll('.amt').forEach(function(e){e.classList.remove('sel');});
+  var digits=String(raw||'').replace(/[^0-9]/g,'');
+  var n=digits ? parseInt(digits,10) : 0;
+  var hint=document.getElementById('don-custom-hint');
+  var ok=n>=DONATE_CUSTOM_MIN && n<=DONATE_CUSTOM_MAX;
+  if(ok){ selAmt='custom'; donCustomCp=n; }
+  else { selAmt=null; donCustomCp=0; }
+  if(hint){
+    hint.innerHTML = !digits
+      ? '<i class="ti ti-pencil"></i> Any amount from <b>'+fmtRp(DONATE_CUSTOM_MIN)+'</b> to <b>'+fmtRp(DONATE_CUSTOM_MAX)+'</b>.'
+      : ok ? '<i class="ti ti-check"></i> '+fmtRp(n)
+           : '<i class="ti ti-alert-triangle"></i> Amount must be between <b>'+fmtRp(DONATE_CUSTOM_MIN)+'</b> and <b>'+fmtRp(DONATE_CUSTOM_MAX)+'</b>.';
+  }
   updateSummary();
 }
 
@@ -551,7 +582,7 @@ function updateSummary(){
   /* Gateway off, or not enabled for this account: show the manual QR straight
      away rather than offering a "Generate QRIS" button that can only fail. */
   if(!qrisAvailable) qrisShowFallback('Automatic QRIS is temporarily unavailable. Use the QR below.');
-  var cp=DONATE_AMOUNTS[selAmt].cp;
+  var cp=donCp();
   var sel=document.getElementById('don-streamer');
   var code=sel.value;
   var name=code ? sel.options[sel.selectedIndex].getAttribute('data-name') : '';
@@ -618,7 +649,7 @@ async function qrisGenerate(){
   if(!Auth.loggedIn)   return panelMsg('don-msg','Sign in first.',false);
   /* Off in data.js, or not enabled for this account — skip the round-trip. */
   if(!qrisAvailable) return qrisShowFallback('Automatic QRIS is temporarily unavailable. Use the QR below.');
-  var cp=DONATE_AMOUNTS[selAmt].cp;
+  var cp=donCp();
   var code=(document.getElementById('don-streamer')||{}).value||'';
   var guild=Number((document.getElementById('don-guild')||{}).value)||0;
 
