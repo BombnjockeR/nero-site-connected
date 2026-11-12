@@ -1752,7 +1752,10 @@ async function hydrateOneTable(tbl){
       : noDataRow(cols, pvpn ? 'No PvP Night recorded for this period.' : 'No WoE combat data recorded for this period.');
   } else if(key==='woe_guild_kills' && d.rows){
     d.rows.forEach(function(r){
-      rows.push(tdRow([i++, r.name, fmtNum(r.kills), fmtNum(r.deaths)]));
+      /* fastest Emperium break / gate rebuild in ms (bridge woe_speed_log); null = none */
+      rows.push(tdRow([i++, r.name, fmtNum(r.kills), fmtNum(r.deaths),
+        r.emperium_ms!=null ? fmtNum(r.emperium_ms) : '—',
+        r.barricade_ms!=null ? fmtNum(r.barricade_ms) : '—']));
     });
     tbl.tBodies[0].innerHTML = rows.length ? rows.join('')
       : noDataRow(cols, woeSrc()==='pvpnight' ? 'No PvP Night recorded for this period.' : 'No guild WoE kills recorded for this period.');
